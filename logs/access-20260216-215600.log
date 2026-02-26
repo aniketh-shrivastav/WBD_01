@@ -1,0 +1,6 @@
+[2026-02-16T16:26:04.244Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:26:04.229Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:26:04.570Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1
+[2026-02-16T16:26:04.804Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1
+[2026-02-16T16:26:11.447Z] [HEARTBEAT] log rotation
+[2026-02-16T16:26:19.226Z] GET /chat/unread-count - IP: ::1

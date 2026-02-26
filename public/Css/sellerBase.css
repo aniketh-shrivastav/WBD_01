@@ -1,0 +1,37 @@
+/* Shared base styles for seller static pages */
+:root {
+  --seller-gradient: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+body.seller-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+main.seller-main {
+  flex: 1 0 auto;
+  width: 95%;
+  max-width: 1700px;
+  margin: 0 auto 40px auto;
+}
+.seller-footer {
+  background: var(--seller-gradient);
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 0.95rem;
+}
+.seller-footer p {
+  margin: 0;
+}
+/* Utility */
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

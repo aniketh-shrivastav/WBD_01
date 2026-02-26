@@ -1,0 +1,10 @@
+[2026-02-16T11:07:07.354Z] POST /login - IP: ::1
+[2026-02-16T11:07:07.580Z] GET /api/session - IP: ::1
+[2026-02-16T11:07:07.899Z] GET /api/session - IP: ::1
+[2026-02-16T11:07:07.962Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:07:08.007Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:07:08.236Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-16T11:07:08.300Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-16T11:07:08.496Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-16T11:07:08.639Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-16T11:07:10.139Z] [HEARTBEAT] log rotation

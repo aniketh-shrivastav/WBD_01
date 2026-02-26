@@ -1,0 +1,27 @@
+[2026-02-12T17:06:40.276Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:40.282Z] GET /api/session - IP: ::1
+[2026-02-12T17:06:40.291Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:40.303Z] GET /api/session - IP: ::1
+[2026-02-12T17:06:40.615Z] GET /chat/customer/67e53cb532c5a757c77e3df8/messages - IP: ::1
+[2026-02-12T17:06:40.955Z] GET /chat/customer/67e53cb532c5a757c77e3df8/messages - IP: ::1
+[2026-02-12T17:06:41.859Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:41.873Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:42.184Z] GET /styles/styles.css - IP: ::1
+[2026-02-12T17:06:42.186Z] GET /customer/api/cart - IP: ::1
+[2026-02-12T17:06:42.186Z] GET /api/payments/config - IP: ::1
+[2026-02-12T17:06:42.435Z] GET /api/payments/config - IP: ::1
+[2026-02-12T17:06:42.512Z] GET /customer/api/cart - IP: ::1
+[2026-02-12T17:06:43.182Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:43.186Z] GET /styles/styles.css - IP: ::1
+[2026-02-12T17:06:43.193Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:44.266Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:44.281Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:44.585Z] GET /styles/styles.css - IP: ::1
+[2026-02-12T17:06:44.587Z] GET /customer/api/booking - IP: ::1
+[2026-02-12T17:06:44.843Z] GET /customer/api/booking - IP: ::1
+[2026-02-12T17:06:45.137Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:45.143Z] GET /styles/styles.css - IP: ::1
+[2026-02-12T17:06:45.150Z] GET /chat/unread-count - IP: ::1
+[2026-02-12T17:06:45.448Z] GET /customer/api/index - IP: ::1
+[2026-02-12T17:06:45.781Z] GET /customer/api/index - IP: ::1
+[2026-02-12T17:06:53.664Z] [HEARTBEAT] log rotation

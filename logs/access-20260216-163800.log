@@ -1,0 +1,15 @@
+[2026-02-16T11:08:01.119Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:10.151Z] [HEARTBEAT] log rotation
+[2026-02-16T11:08:10.434Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:10.446Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:10.755Z] GET /manager/api/payments - IP: ::1
+[2026-02-16T11:08:11.007Z] GET /manager/api/payments - IP: ::1
+[2026-02-16T11:08:12.974Z] GET /manager/api/services - IP: ::1
+[2026-02-16T11:08:13.325Z] GET /manager/api/services - IP: ::1
+[2026-02-16T11:08:13.417Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:13.427Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:14.349Z] GET /manager/api/users - IP: ::1
+[2026-02-16T11:08:14.677Z] GET /manager/api/users - IP: ::1
+[2026-02-16T11:08:14.760Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:14.769Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:08:19.351Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

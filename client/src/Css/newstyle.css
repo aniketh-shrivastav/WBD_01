@@ -1,0 +1,177 @@
+/* === Seller Product Management Page Layout === */
+/* DO NOT TOUCH NAVBAR OR FOOTER STYLES */
+
+.seller-page {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e8edf5;
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Page Header --- */
+header h1 {
+  text-align: center;
+  margin: 30px 0 15px 0;
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* --- Container --- */
+.container {
+  width: 90%;
+  max-width: 1100px;
+  background-color: #f9fafc;
+  border-radius: 12px;
+  padding: 30px 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
+}
+
+/* --- Bulk Upload Button --- */
+.container .btn-add {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.container .btn-add:hover {
+  background: linear-gradient(90deg, #5a0eb8, #1f65e0);
+}
+
+/* --- Product Form --- */
+.product-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 40px;
+  margin-top: 25px;
+  margin-bottom: 40px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccd2e3;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #6a11cb;
+  box-shadow: 0 0 4px rgba(106, 17, 203, 0.3);
+  outline: none;
+}
+
+/* --- Add Product Button --- */
+.product-form .btn-add {
+  grid-column: 1 / -1;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 10px 25px;
+  justify-self: start;
+}
+
+/* --- Status Text --- */
+.product-form p {
+  grid-column: 1 / -1;
+  font-weight: 500;
+}
+
+/* --- Product List --- */
+.product-list {
+  margin-top: 20px;
+}
+
+.product-list h2 {
+  font-size: 22px;
+  color: #222;
+  margin-bottom: 15px;
+}
+
+/* --- Grid of Product Cards --- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.product-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.product-details h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.product-details p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 4px 0;
+}
+
+.btn-delete {
+  display: inline-block;
+  margin-top: 12px;
+  background-color: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #c9302c;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .product-form {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 20px;
+  }
+}

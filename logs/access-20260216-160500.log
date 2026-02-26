@@ -1,0 +1,13 @@
+[2026-02-16T10:35:07.464Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2F - IP: ::1
+[2026-02-16T10:35:07.608Z] GET /images2/car-customization.png - IP: ::1
+[2026-02-16T10:35:07.677Z] GET /api/session - IP: ::1
+[2026-02-16T10:35:07.684Z] GET /api/session - IP: ::1
+[2026-02-16T10:35:17.795Z] POST /login - IP: ::1
+[2026-02-16T10:35:17.969Z] GET /api/session - IP: ::1
+[2026-02-16T10:35:17.982Z] GET /api/session - IP: ::1
+[2026-02-16T10:35:18.334Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T10:35:18.528Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-16T10:35:18.540Z] [HEARTBEAT] log rotation
+[2026-02-16T10:35:18.623Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T10:35:18.987Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T10:35:19.798Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

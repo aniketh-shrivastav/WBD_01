@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Car Customization Hub</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="brand-section">
+                <div class="brand-content">
+                    <h1>AutoCustomizer</h1>
+                    <p>Your one-stop platform for all car customization needs</p>
+                    <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&q=80" alt="Car customization" class="brand-image">
+                </div>
+            </div>
+
+            <div class="auth-section">
+                <h2>Welcome Back</h2>
+                <form id="loginForm" action="/login" method="POST" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" name="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" name="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <div class="form-options">
+                    </div>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+                <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+body {
+  font-family: Arial, sans-serif;
+
+  background: lightgrey;
+  margin: 0;
+  padding: 20px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background: #0f2944;
+  padding: 15px;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 80px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-links a,
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  background: #34495e;
+  border-radius: 5px;
+}
+
+.nav-links a:hover,
+.sidebar a:hover {
+  background: #1abc9c;
+}
+.menu-btn {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #2c3e50;
+  transition: left 0.3s;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 15px;
+  text-align: center;
+}
+
+.sidebar a.close-btn {
+  background: #e74c3c;
+  cursor: pointer;
+}
+
+/* Logo and Brand Container */
+.logo-brand {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Logo Image */
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.profile-container {
+  width: 50%;
+  margin: 50px auto;
+  padding: 20px;
+  margin-top: 140px;
+  background: white;
+  color: black;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  align-items: center;
+}
+
+.profile-container h1 {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+}
+
+/* Profile Picture Styles */
+.profile-pic-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-pic {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px solid #0f2944;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+input {
+  width: 97.5%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+#id_s {
+  background: #e9ecef;
+  cursor: not-allowed;
+}
+input:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+}
+
+/* Error Message */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .profile-container {
+    width: 90%;
+  }
+}
+
+.services-container {
+  background: #fff;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  text-align: center;
+  align-items: center;
+  width: 96%;
+}
+
+.services-container h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 15px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.service-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-item {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  border: 1px solid #ddd;
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+}
+
+/* Base delete button styling (visible by default) */
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Hide delete buttons for services until Edit is enabled */
+.service-item .delete-btn {
+  display: none;
+}
+
+.service-input-container {
+  display: none;
+  margin-top: 10px;
+}
+
+.buttons {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.btn {
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  color: white;
+  transition: 0.3s;
+  margin: 5px;
+}
+
+.edit-btn {
+  background: #007bff;
+}
+.edit-pass-btn {
+  background: #ffc107;
+  display: none;
+}
+.save-btn {
+  background: #28a745;
+  display: none;
+}
+.cancel-btn {
+  background: #dc3545;
+  display: none;
+}
+.add-service-btn {
+  background: #17a2b8;
+  display: none;
+}
+
+.password-container {
+  display: none;
+}
+
+.delete-account-section {
+  margin-top: 40px;
+  padding: 20px;
+  background: #fff3f3;
+  border: 1px solid #f44336;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.delete-account-section h3 {
+  color: #d32f2f;
+  margin-bottom: 10px;
+}
+
+.delete-account-section p {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+.delete-account-section .delete-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: none; /* hidden by default; shown on Edit */
+}
+
+.delete-account-section .delete-btn:hover {
+  background-color: #c62828;
+}

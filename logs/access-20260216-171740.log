@@ -1,0 +1,6 @@
+[2026-02-16T11:47:49.771Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:47:51.099Z] [HEARTBEAT] log rotation
+[2026-02-16T11:47:57.081Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:47:57.087Z] GET /manager/api/payments - IP: ::1
+[2026-02-16T11:47:57.104Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T11:47:57.482Z] GET /manager/api/payments - IP: ::1

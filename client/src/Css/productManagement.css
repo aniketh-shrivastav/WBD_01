@@ -1,0 +1,212 @@
+/* Product Management page styling (scoped and overriding legacy CSS) */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+body.seller-page,
+.seller-page body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.seller-page header {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.seller-page header h1 {
+  margin: 0;
+  font-size: 2.2em;
+  font-weight: 600;
+}
+
+.seller-page .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  /* Force vertical stacking in case global CSS sets flex row */
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px;
+}
+
+.seller-page .container > h1:first-of-type {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: rgb(72, 70, 70);
+  padding: 20px;
+  margin: -20px -20px 30px -20px;
+  width: calc(100% + 40px);
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 2rem;
+  font-weight: 700;
+  position: relative;
+  left: 0;
+}
+
+.seller-page h2 {
+  color: #6a11cb;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.seller-page .product-form {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-bottom: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100% !important;
+}
+.seller-page .product-form:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.seller-page .form-group {
+  margin-bottom: 20px;
+}
+.seller-page .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #6a11cb;
+}
+.seller-page .form-group input,
+.seller-page .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+.seller-page .form-group input:focus,
+.seller-page .form-group textarea:focus {
+  border-color: #6a11cb;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+}
+.seller-page .form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.seller-page .btn-add {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.seller-page .btn-add:hover {
+  background: linear-gradient(135deg, #5c0fb3, #2169e8);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seller-page .product-list {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  width: 100% !important;
+  clear: both;
+}
+
+/* Horizontal scrolling row */
+.seller-page .product-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.seller-page .product-card {
+  flex: 0 0 300px; /* fixed card width for horizontal layout */
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid #6a11cb;
+  scroll-snap-align: start;
+}
+.seller-page .product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+.seller-page .product-details h3 {
+  margin: 0 0 10px;
+  color: #6a11cb;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.seller-page .product-details p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.seller-page .btn-delete {
+  background: linear-gradient(135deg, #ff6f61, #ff4757);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.9em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-end;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+.seller-page .btn-delete:hover {
+  background: linear-gradient(135deg, #ff4757, #ff3545);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.seller-page .no-products {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .seller-page .product-grid {
+    grid-template-columns: 1fr;
+  }
+  .seller-page .container > h1:first-of-type {
+    font-size: 1.6em;
+    padding: 12px;
+  }
+  .seller-page .container {
+    padding: 15px;
+  }
+}
+
+/* Ensure footer doesn't overlay content if global CSS fixes it to bottom */
+.seller-footer {
+  position: static !important;
+  margin-top: 24px;
+}

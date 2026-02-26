@@ -1,0 +1,208 @@
+/**************************************
+  GLOBAL PAGE SCOPE
+**************************************/
+body.seller-page {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/**************************************
+  NAVBAR – sticky and isolated
+**************************************/
+body.seller-page .navbar {
+  background: #1e2a36;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.seller-page .navbar .brand {
+  color: white;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-right: auto;
+}
+
+body.seller-page .navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+body.seller-page .navbar ul li a {
+  color: #ffffff !important;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+body.seller-page .navbar ul li a:hover,
+body.seller-page .navbar ul li a.active {
+  opacity: 0.75;
+}
+
+/**************************************
+  HEADER — MATCH EXACT ORIGINAL DESIGN
+**************************************/
+body.seller-page header {
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  padding: 60px 20px;
+  text-align: center;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.seller-page header h1 {
+  margin: 0;
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/**************************************
+  STATS CARDS — EXACT LAYOUT MATCH
+**************************************/
+body.seller-page .stats {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  gap: 50px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+
+body.seller-page .stats .card {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  width: 360px;
+  padding: 40px 20px;
+  border-radius: 22px;
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+}
+
+body.seller-page .stats .card h2 {
+  margin: 0 0 12px 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+body.seller-page .stats .card p {
+  margin: 0;
+  margin-top: 10px;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/**************************************
+  STOCK ALERTS
+**************************************/
+body.seller-page .alerts {
+  width: 95%;
+  max-width: 1600px;
+  margin: 50px auto 0 auto;
+  background: #fff;
+  padding: 30px 35px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.seller-page .alerts h2 {
+  margin-bottom: 15px;
+  color: #6a11cb;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+body.seller-page .alerts ul {
+  padding: 0;
+  list-style: none;
+}
+
+body.seller-page .alerts li {
+  background: #ffe5e5;
+  border-left: 8px solid #ff4d4d;
+  padding: 14px 18px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/**************************************
+  RECENT ORDERS + PIE CHART
+**************************************/
+body.seller-page .orders-and-chart {
+  width: 95%;
+  max-width: 1600px;
+  margin: 50px auto 80px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+/* Orders */
+body.seller-page .orders {
+  flex: 1;
+  min-width: 350px;
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.seller-page .orders table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+body.seller-page .orders th {
+  text-align: left;
+  padding: 12px;
+  background: #6a11cb;
+  color: #fff;
+}
+
+body.seller-page .orders td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Pie Chart */
+body.seller-page .pie-chart {
+  flex: 1;
+  min-width: 350px;
+  padding: 25px 30px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.seller-page .pie-chart h2 {
+  margin-bottom: 15px;
+  color: #6a11cb;
+  font-size: 1.6rem;
+}
+
+/**************************************
+  FOOTER
+**************************************/
+body.seller-page .seller-footer {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  padding: 18px;
+  text-align: center;
+  margin-top: auto;
+  font-size: 0.95rem;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}

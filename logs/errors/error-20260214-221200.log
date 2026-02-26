@@ -1,0 +1,18 @@
+[2026-02-14T16:42:11.810Z] [GET] /favicon.ico - Status: 404 - Not Found - /favicon.ico
+Error: Not Found - /favicon.ico
+    at notFound (C:\Users\Aniketh\FDFED_MID_REVIEW\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:280:10)
+    at next (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\route.js:141:14)
+    at C:\Users\Aniketh\FDFED_MID_REVIEW\server.js:156:12
+    at Layer.handle [as handle_request] (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\layer.js:95:5)
+    at C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:284:15
+    at param (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:365:14)
+    at param (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (C:\Users\Aniketh\FDFED_MID_REVIEW\node_modules\express\lib\router\index.js:421:3)

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup | AutoCustomizer</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <% if (error) { %>
+    <script>
+      alert("<%= error %>");
+    </script>
+    <% } %>
+
+    <div class="container">
+      <div class="auth-container">
+        <div class="brand-section">
+          <div class="brand-content">
+            <h1>AutoCustomizer</h1>
+            <p>Your one-stop platform for all car customization needs</p>
+            <img
+              src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&q=80"
+              alt="Car customization"
+              class="brand-image"
+            />
+          </div>
+        </div>
+
+        <div class="auth-section">
+          <h2>Create an Account</h2>
+
+          <label for="userType">Select User Type</label>
+          <select id="userType">
+            <option value="customer">Customer</option>
+            <option value="seller">Seller</option>
+            <option value="service-provider">Service Provider</option>
+          </select>
+
+          <!-- Customer Signup -->
+          <form
+            id="customerSignup"
+            action="/signup"
+            method="POST"
+            class="auth-form signup-form"
+          >
+            <input type="hidden" name="role" value="customer" />
+            <div class="form-group">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                required
+              /><span class="error-msg" data-for="name"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                required
+              /><span class="error-msg" data-for="email"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                required
+              /><span class="error-msg" data-for="phone"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+              /><span class="error-msg" data-for="password"></span>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Retype Password</label>
+              <input type="password" name="confirmPassword" required />
+              <span class="error-msg" data-for="confirmPassword"></span>
+            </div>
+            <button type="submit" class="submit-btn">
+              Register as Customer
+            </button>
+          </form>
+
+          <!-- Seller Signup -->
+          <form
+            id="sellerSignup"
+            action="/signup"
+            method="POST"
+            class="auth-form signup-form hidden"
+          >
+            <input type="hidden" name="role" value="seller" />
+            <div class="form-group">
+              <input
+                type="text"
+                name="businessName"
+                placeholder="Business Name"
+                required
+              /><span class="error-msg" data-for="businessName"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Business Email"
+                required
+              /><span class="error-msg" data-for="email"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Business Phone"
+                required
+              /><span class="error-msg" data-for="phone"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+              /><span class="error-msg" data-for="password"></span>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Retype Password</label>
+              <input type="password" name="confirmPassword" required />
+              <span class="error-msg" data-for="confirmPassword"></span>
+            </div>
+            <button type="submit" class="submit-btn">Register as Seller</button>
+          </form>
+
+          <!-- Service Provider Signup -->
+          <form
+            id="serviceProviderSignup"
+            action="/signup"
+            method="POST"
+            class="auth-form signup-form hidden"
+          >
+            <input type="hidden" name="role" value="service-provider" />
+            <div class="form-group">
+              <input
+                type="text"
+                name="workshopName"
+                placeholder="Workshop Name"
+                required
+              /><span class="error-msg" data-for="workshopName"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Workshop Email"
+                required
+              /><span class="error-msg" data-for="email"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Workshop Phone"
+                required
+              /><span class="error-msg" data-for="phone"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+              /><span class="error-msg" data-for="password"></span>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Retype Password</label>
+              <input type="password" name="confirmPassword" required />
+              <span class="error-msg" data-for="confirmPassword"></span>
+            </div>
+            <button type="submit" class="submit-btn">
+              Register as Service Provider
+            </button>
+          </form>
+
+          <!-- Manager Signup -->
+          <form
+            id="managerSignup"
+            action="/signup"
+            method="POST"
+            class="auth-form signup-form hidden"
+          >
+            <input type="hidden" name="role" value="manager" />
+            <div class="form-group">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                required
+              /><span class="error-msg" data-for="name"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Manager Email"
+                required
+              /><span class="error-msg" data-for="email"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                required
+              /><span class="error-msg" data-for="phone"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+              /><span class="error-msg" data-for="password"></span>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Retype Password"
+                required
+              /><span class="error-msg" data-for="confirmPassword"></span>
+            </div>
+            <button type="submit" class="submit-btn">
+              Register as Manager
+            </button>
+          </form>
+
+          <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .error-msg {
+        display: block;
+        font-size: 0.75rem;
+        color: #e53935;
+        margin-top: 4px;
+        min-height: 14px;
+      }
+      .form-group input.invalid {
+        border-color: #e53935 !important;
+        box-shadow: 0 0 0 1px #e53935;
+      }
+    </style>
+    <script>
+      (function () {
+        const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+        const phoneRegex = /^\d{10}$/;
+        const nameRegex = /^[a-zA-Z\s]+$/; // Only letters and spaces
+        const passwordRules = [
+          {
+            test: (v) => v.length >= 6,
+            msg: "Password must be at least 6 characters long",
+          },
+        ];
+        function setError(input, msg) {
+          const span = input.parentElement.querySelector(
+            `.error-msg[data-for="${input.name}"]`
+          );
+          if (span) {
+            span.textContent = msg || "";
+          }
+          input.classList.toggle("invalid", !!msg);
+          if (!msg) input.removeAttribute("aria-describedby");
+          else
+            input.setAttribute(
+              "aria-describedby",
+              span.id || (span.id = input.name + "-err")
+            );
+        }
+        function validateEmail(email) {
+          if (!email) return "Email is required";
+          const atCount = (email.match(/@/g) || []).length;
+          if (atCount === 0) return "Email must contain @ symbol";
+          if (atCount > 1) return "Email can only contain one @ symbol";
+          if (email[0] === "@") return "Email cannot start with @ symbol";
+          if (email[email.length - 1] === "@")
+            return "Email cannot end with @ symbol";
+
+          const [local, domain] = email.split("@");
+          // Local part checks
+          if (!local) return "Email must have text before @ symbol";
+          if (local.length > 64)
+            return "Local part (before @) too long (max 64 chars)";
+          if (local[0] === ".") return "Local part cannot start with a dot";
+          if (local[local.length - 1] === ".")
+            return "Local part cannot end with a dot";
+          if (local.includes(".."))
+            return "Local part cannot contain consecutive dots";
+          if (!/^[A-Za-z0-9._%+\-]+$/.test(local))
+            return "Local part has invalid characters (allowed: letters, numbers, . _ % + -)";
+
+          // Domain checks
+          if (!domain) return "Email must have domain after @ symbol";
+          if (domain.length > 255)
+            return "Domain part too long (max 255 chars)";
+          if (domain[0] === ".") return "Email domain cannot start with a dot";
+          if (domain[domain.length - 1] === ".")
+            return "Email domain cannot end with a dot";
+          if (!domain.includes("."))
+            return "Email domain must contain a dot (.)";
+          if (domain.includes(".."))
+            return "Domain cannot contain consecutive dots";
+          if (!/^[A-Za-z0-9.-]+$/.test(domain))
+            return "Email domain contains invalid characters (letters, numbers, - and . only)";
+          const domainParts = domain.split(".");
+          if (domainParts.some((p) => p.length === 0))
+            return "Email domain cannot have empty labels (e.g. ..)";
+          const tld = domainParts[domainParts.length - 1];
+          if (tld.length < 2)
+            return "Email domain extension must be at least 2 characters";
+          if (!/^[A-Za-z]{2,}$/.test(tld))
+            return "Email domain extension must contain only letters";
+
+          if (email.includes(" ")) return "Email cannot contain spaces";
+          return null; // Valid
+        }
+
+        function validateField(input) {
+          const val = input.value.trim();
+          if (!val) {
+            setError(input, `${input.placeholder || input.name} is required`);
+            return false;
+          }
+
+          // Name validation (for name, businessName, workshopName)
+          if (
+            ["name", "businessName", "workshopName"].includes(input.name) &&
+            !nameRegex.test(val)
+          ) {
+            setError(input, "Name can only contain letters and spaces");
+            return false;
+          }
+
+          if (input.type === "email") {
+            const emailError = validateEmail(val);
+            if (emailError) {
+              setError(input, emailError);
+              return false;
+            }
+          }
+          if (input.type === "tel" && !phoneRegex.test(val)) {
+            setError(input, "Phone number must be exactly 10 digits");
+            return false;
+          }
+          if (input.name === "password") {
+            for (const r of passwordRules) {
+              if (!r.test(val)) {
+                setError(input, r.msg);
+                return false;
+              }
+            }
+          }
+          if (input.name === "confirmPassword") {
+            const pw = input.form.querySelector('input[name="password"]').value;
+            if (pw !== val) {
+              setError(
+                input,
+                "Passwords do not match. Please re-enter your password"
+              );
+              return false;
+            }
+          }
+          setError(input, "");
+          return true;
+        }
+        function attach(form) {
+          form.querySelectorAll("input").forEach((inp) => {
+            inp.addEventListener("blur", () => validateField(inp));
+            inp.addEventListener("input", () => {
+              if (inp.classList.contains("invalid")) validateField(inp);
+            });
+          });
+          form.addEventListener("submit", (e) => {
+            let ok = true;
+            form.querySelectorAll("input[required]").forEach((i) => {
+              if (!validateField(i)) ok = false;
+            });
+            if (!ok) {
+              e.preventDefault();
+            }
+          });
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+          const userTypeSelect = document.getElementById("userType");
+          const formsByRole = {
+            customer: document.getElementById("customerSignup"),
+            seller: document.getElementById("sellerSignup"),
+            "service-provider": document.getElementById(
+              "serviceProviderSignup"
+            ),
+            manager: document.getElementById("managerSignup"),
+          };
+
+          // Attach validation handlers
+          Object.values(formsByRole).forEach((f) => f && attach(f));
+
+          // Show/hide form based on selected user type
+          function showSelectedForm() {
+            const selected = userTypeSelect.value;
+            Object.values(formsByRole).forEach(
+              (f) => f && f.classList.add("hidden")
+            );
+            if (formsByRole[selected])
+              formsByRole[selected].classList.remove("hidden");
+          }
+          userTypeSelect.addEventListener("change", showSelectedForm);
+          showSelectedForm();
+
+          // Intercept submit and use Fetch API for signup
+          Object.values(formsByRole).forEach((form) => {
+            if (!form) return;
+            form.addEventListener("submit", async (e) => {
+              e.preventDefault();
+
+              // Re-validate all required inputs
+              let ok = true;
+              form.querySelectorAll("input[required]").forEach((i) => {
+                if (!validateField(i)) ok = false;
+              });
+              if (!ok) return;
+
+              // Confirm password check
+              const pw = form.querySelector('input[name="password"]').value;
+              const cpw = form.querySelector(
+                'input[name="confirmPassword"]'
+              ).value;
+              if (pw !== cpw) {
+                const cpwInput = form.querySelector(
+                  'input[name="confirmPassword"]'
+                ).value;
+                setError(
+                  form.querySelector('input[name="confirmPassword"]'),
+                  "Passwords do not match. Please re-enter your password"
+                );
+                return;
+              }
+
+              // Build payload from form fields
+              const role =
+                form.querySelector('input[name="role"]').value ||
+                userTypeSelect.value;
+              const fd = new FormData(form);
+              const payload = { role };
+              fd.forEach((v, k) => {
+                if (k === "confirmPassword" || k === "role") return;
+                payload[k] = typeof v === "string" ? v.trim() : v;
+              });
+
+              try {
+                const res = await fetch("/signup", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                });
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                  if (data.redirect) {
+                    window.location.href = data.redirect;
+                  } else {
+                    window.location.href = "/login";
+                  }
+                } else {
+                  const msg =
+                    data.message || "Signup failed. Please try again.";
+                  // Try to set field-specific error when possible; fallback to alert
+                  if (/email/i.test(msg)) {
+                    const emailInput = form.querySelector(
+                      'input[name="email"]'
+                    );
+                    if (emailInput) setError(emailInput, msg);
+                    else alert(msg);
+                  } else if (/phone/i.test(msg)) {
+                    const phoneInput = form.querySelector(
+                      'input[name="phone"]'
+                    );
+                    if (phoneInput) setError(phoneInput, msg);
+                    else alert(msg);
+                  } else if (/name/i.test(msg)) {
+                    const nameInput = form.querySelector(
+                      'input[name="name"], input[name="businessName"], input[name="workshopName"]'
+                    );
+                    if (nameInput) setError(nameInput, msg);
+                    else alert(msg);
+                  } else {
+                    alert(msg);
+                  }
+                }
+              } catch (err) {
+                console.error("Signup error:", err);
+                alert("An error occurred during registration.");
+              }
+            });
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+[
+  { "id": "ORD001", "customer": "Prasath", "item": "Custom Rims", "amount": 1200 },
+  { "id": "ORD002", "customer": "Praneeth", "item": "Oil Change", "amount": 50 },
+  { "id": "ORD003", "customer": "Aaron", "item": "Performance Exhaust", "amount": 900 }
+]

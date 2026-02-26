@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1001",
+        "customerName": "John Doe",
+        "product": "Alloy Wheels",
+        "quantity": 2,
+        "status": "Pending"
+    },
+    {
+        "id": "1002",
+        "customerName": "Jane Smith",
+        "product": "LED Headlights",
+        "quantity": 1,
+        "status": "Shipped"
+    },
+    {
+        "id": "1003",
+        "customerName": "David Johnson",
+        "product": "Performance Exhaust",
+        "quantity": 3,
+        "status": "Delivered"
+    }
+]

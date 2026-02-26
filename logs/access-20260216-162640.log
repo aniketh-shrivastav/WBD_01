@@ -1,0 +1,5 @@
+[2026-02-16T10:56:49.327Z] [HEARTBEAT] log rotation
+[2026-02-16T10:56:50.539Z] POST /login - IP: ::1
+[2026-02-16T10:56:50.849Z] GET /api/session - IP: ::1
+[2026-02-16T10:56:51.170Z] GET /api/session - IP: ::1
+[2026-02-16T10:56:58.095Z] POST /login - IP: ::1

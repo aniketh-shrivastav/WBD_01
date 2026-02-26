@@ -1,0 +1,306 @@
+/* ------------------ GLOBAL ------------------ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  padding-top: 80px;
+}
+
+/* ------------------ NAV ------------------ */
+
+nav {
+  background: #1e1e2d;
+  width: 100%; /* FIXED: full width */
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  background: #ff8c00;
+}
+
+/* ------------------ HEADER ------------------ */
+
+header {
+  background: #1e1e2d;
+  color: white;
+  margin-top: 20px;
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 25px 10px;
+  background: #1e1e2d !important;
+  color: white !important;
+  padding: 40px 10px !important;
+  text-align: center !important;
+  display: block !important;
+}
+
+header h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+header p {
+  margin: 10px 0 0 0;
+  padding: 0;
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* ------------------ HERO ------------------ */
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 20px;
+  background: white;
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+}
+
+.hero img {
+  width: 60%;
+  max-width: 500px;
+  border-radius: 10px;
+}
+
+.hero-content {
+  margin-left: 30px;
+  text-align: left;
+}
+
+.hero-content h2 {
+  color: #1e1e2d;
+}
+
+.hero-content p {
+  color: #666;
+  font-size: 18px;
+}
+
+.cta-buttons {
+  margin-top: 20px;
+}
+
+.btn {
+  text-decoration: none;
+  padding: 12px 20px;
+  margin: 10px;
+  background: #ff8c00;
+  color: white;
+  display: inline-block;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #e67600;
+}
+
+.seller-btn {
+  background: #4caf50;
+}
+
+.seller-btn:hover {
+  background: #3e8e41;
+}
+
+.provider-btn {
+  background: #2196f3;
+}
+
+.provider-btn:hover {
+  background: #0b7dda;
+}
+
+/* ------------------ USER TYPES ------------------ */
+
+.user-types {
+  padding: 50px 20px;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.user-type-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.user-type {
+  background: white;
+  width: 25%;
+  min-width: 250px;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+.user-type:hover {
+  transform: translateY(-10px);
+}
+
+/* ------------------ FEATURES ------------------ */
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 50px 20px;
+}
+
+.feature {
+  background: white;
+  width: 30%;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+.feature:hover {
+  transform: scale(1.05);
+}
+
+.feature img {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ------------------ BENEFITS ------------------ */
+
+.benefits {
+  padding: 50px 20px;
+  background: #1e1e2d;
+  color: white;
+  text-align: center;
+}
+
+.benefits-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.benefit {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 250px;
+  width: 40%;
+  transition: 0.3s;
+}
+
+.benefit:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ------------------ FOOTER ------------------ */
+
+footer {
+  background: #1e1e2d;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+/* ------------------ RESPONSIVE ------------------ */
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .hero img {
+    width: 90%;
+    margin-bottom: 20px;
+  }
+
+  .hero-content {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .features {
+    flex-direction: column;
+  }
+
+  .feature {
+    width: 90%;
+  }
+
+  .user-type,
+  .benefit {
+    width: 90%;
+  }
+}
+
+header h1,
+header p {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root,
+header {
+  background: #1e1e2d !important;
+  border: none !important;
+  outline: none !important;
+}
+
+header {
+  padding: 40px 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+header h1,
+header p {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: white !important;
+}

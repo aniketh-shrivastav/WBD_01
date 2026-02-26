@@ -1,0 +1,100 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Body Kit",
+      "price": 500,
+      "image": "/images/bodykit.jpg",
+      "category": "Exterior",
+      "description": "Complete body kit for customizing your vehicle's appearance"
+    },
+    {
+      "id": 2,
+      "name": "Spoiler",
+      "price": 300,
+      "image": "/images/spoiler.jpg",
+      "category": "Exterior",
+      "description": "Aerodynamic spoiler to enhance your vehicle's performance and look"
+    },
+    {
+      "id": 3,
+      "name": "Alloy Wheels",
+      "price": 800,
+      "image": "/images/alloywheels.jpg",
+      "category": "Wheels",
+      "description": "Premium alloy wheels for improved performance and style"
+    },
+    {
+      "id": 4,
+      "name": "Steering Wheel",
+      "price": 150,
+      "image": "/images/steeringwheel.jpg",
+      "category": "Interior",
+      "description": "Custom steering wheel for improved grip and control"
+    },
+    {
+      "id": 5,
+      "name": "Brake Pads",
+      "price": 120,
+      "image": "/images/brakes.jpg",
+      "category": "Performance",
+      "description": "High-performance brake pads for better stopping power"
+    },
+    {
+      "id": 6,
+      "name": "Performance Exhaust",
+      "price": 600,
+      "image": "/images/exhaust.jpg",
+      "category": "Performance",
+      "description": "Performance exhaust system for improved sound and horsepower"
+    },
+    {
+      "id": 7,
+      "name": "Suspension Kit",
+      "price": 750,
+      "image": "/images/suspension.jpg",
+      "category": "Performance",
+      "description": "Complete suspension kit for improved handling and ride height"
+    },
+    {
+      "id": 8,
+      "name": "LED Headlights",
+      "price": 250,
+      "image": "/images/headlights.jpg",
+      "category": "Lighting",
+      "description": "Bright LED headlights for better visibility and modern look"
+    },
+    {
+      "id": 9,
+      "name": "Turbocharger",
+      "price": 1500,
+      "image": "/images/turbo.jpg",
+      "category": "Performance",
+      "description": "Turbocharger kit to boost engine power and performance"
+    },
+    {
+      "id": 10,
+      "name": "Racing Seats",
+      "price": 900,
+      "image": "/images/seats.jpg",
+      "category": "Interior",
+      "description": "Performance racing seats for better support during spirited driving"
+    },
+    {
+      "id": 11,
+      "name": "Gear Shift Knob",
+      "price": 80,
+      "image": "/images/gearshift.jpg",
+      "category": "Interior",
+      "description": "Custom gear shift knob for improved grip and style"
+    },
+    {
+      "id": 12,
+      "name": "Tail Lights",
+      "price": 220,
+      "image": "/images/tailights.jpg",
+      "category": "Lighting",
+      "description": "Custom tail lights for a distinctive look"
+    }
+  ]
+}

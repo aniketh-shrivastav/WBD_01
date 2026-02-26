@@ -1,0 +1,11 @@
+[2026-02-11T06:53:40.920Z] POST /login - 152ms
+[2026-02-11T06:53:41.269Z] GET /api/session - 1ms
+[2026-02-11T06:53:41.537Z] GET /api/session - 1ms
+[2026-02-11T06:53:41.598Z] GET /images3/logo2.jpg - 1ms
+[2026-02-11T06:53:41.644Z] GET /chat/unread-count - 6ms
+[2026-02-11T06:53:41.705Z] GET /chat/unread-count - 5ms
+[2026-02-11T06:53:42.149Z] GET /manager/api/dashboard - 202ms
+[2026-02-11T06:53:42.271Z] GET /manager/api/dashboard - 56ms
+[2026-02-11T06:53:42.551Z] GET /manager/api/dashboard - 82ms
+[2026-02-11T06:53:47.940Z] [HEARTBEAT] log rotation
+[2026-02-11T06:53:57.268Z] GET /chat/unread-count - 4ms

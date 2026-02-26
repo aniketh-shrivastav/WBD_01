@@ -1,0 +1,12 @@
+[2026-02-26T09:33:01.938Z] GET /chat/unread-count - IP: ::1
+[2026-02-26T09:33:09.794Z] GET /chat/unread-count - IP: ::1
+[2026-02-26T09:33:09.802Z] GET /styles/styles.css - IP: ::1
+[2026-02-26T09:33:09.832Z] GET /chat/unread-count - IP: ::1
+[2026-02-26T09:33:10.108Z] GET /customer/api/booking - IP: ::1
+[2026-02-26T09:33:10.591Z] GET /customer/api/booking - IP: ::1
+[2026-02-26T09:33:11.792Z] [HEARTBEAT] log rotation
+[2026-02-26T09:33:15.605Z] GET /chat/unread-count - IP: ::1
+[2026-02-26T09:33:15.608Z] GET /styles/styles.css - IP: ::1
+[2026-02-26T09:33:15.925Z] GET /customer/api/history - IP: ::1
+[2026-02-26T09:33:16.214Z] GET /chat/unread-count - IP: ::1
+[2026-02-26T09:33:18.472Z] GET /customer/api/history - IP: ::1

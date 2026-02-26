@@ -1,0 +1,155 @@
+body {
+  font-family: Arial, sans-serif;
+
+  background: lightgrey;
+  margin: 0;
+  padding-top: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background: #0f2944;
+  padding: 15px;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 80px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-links a,
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  background: #34495e;
+  border-radius: 5px;
+}
+
+.nav-links a:hover,
+.sidebar a:hover {
+  background: #1abc9c;
+}
+
+.menu-btn {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 50px;
+  height: 100vh;
+  background: #2c3e50;
+  transition: left 0.3s;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 15px;
+  text-align: center;
+}
+
+.sidebar a.close-btn {
+  background: #e74c3c;
+  cursor: pointer;
+}
+
+/* Logo and Brand Container */
+.logo-brand {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Logo Image */
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.container {
+  margin-top: 100px;
+  padding: 20px;
+}
+
+h1 {
+  color: #0f2944;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.reviews-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: bold;
+  color: #0f2944;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #f1c40f;
+}
+
+.rating-value {
+  font-size: 14px;
+  color: #555;
+}
+
+.review-text {
+  color: #333;
+  line-height: 1.6;
+}
+
+.review-date {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+}

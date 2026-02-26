@@ -1,0 +1,8 @@
+[2026-02-16T11:44:41.173Z] POST /login - IP: ::1
+[2026-02-16T11:44:41.416Z] GET /api/session - IP: ::1
+[2026-02-16T11:44:41.739Z] GET /api/session - IP: ::1
+[2026-02-16T11:44:42.124Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T11:44:42.125Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-16T11:44:42.364Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T11:44:42.521Z] GET /admin/api/dashboard - IP: ::1
+[2026-02-16T11:44:51.038Z] [HEARTBEAT] log rotation

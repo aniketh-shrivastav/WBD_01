@@ -1,0 +1,17 @@
+[2026-02-16T16:27:23.541Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:23.550Z] GET /manager/api/profile-overview/67eeb7c46fd1b07c9f93a187 - IP: ::1
+[2026-02-16T16:27:23.559Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:23.921Z] GET /manager/api/profile-overview/67eeb7c46fd1b07c9f93a187 - IP: ::1
+[2026-02-16T16:27:28.651Z] GET /manager/api/users - IP: ::1
+[2026-02-16T16:27:28.909Z] GET /manager/api/users - IP: ::1
+[2026-02-16T16:27:29.044Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:29.056Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:29.827Z] GET /manager/api/services - IP: ::1
+[2026-02-16T16:27:30.205Z] GET /manager/api/services - IP: ::1
+[2026-02-16T16:27:30.336Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:30.349Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:31.487Z] [HEARTBEAT] log rotation
+[2026-02-16T16:27:32.869Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:32.874Z] GET /manager/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-02-16T16:27:32.887Z] GET /chat/unread-count - IP: ::1
+[2026-02-16T16:27:33.266Z] GET /manager/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1

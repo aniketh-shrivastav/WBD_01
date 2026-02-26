@@ -1,0 +1,4 @@
+name,price,description,category,brand,quantity,sku,compatibility,image
+Alloy Wheels,12000,Premium alloy wheels,Wheels,AutoX,10,AXW123,Sedan,images/alloy_wheels.jpg
+Leather Seat Covers,8000,High-quality leather seat covers,Interior,LuxRide,15,LRS456,SUV,images/seat_covers.jpg
+LED Headlights,5000,Bright energy-efficient LED headlights,Lighting,BrightBeam,25,BBH789,Hatchback,images/led_headlights.jpg

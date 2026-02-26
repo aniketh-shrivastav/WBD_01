@@ -1,0 +1,217 @@
+/* 🚗 Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background: lightgrey;
+    margin: 0;
+    padding-top: 0; 
+    padding-left: 20px;
+    padding-right: 20px;
+    overflow-x: hidden;
+}
+
+/* 💻 Navbar Styles (KEPT UNTOUCHED) */
+.navbar {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background: #0f2944;
+    padding: 15px;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 80px;
+    z-index: 1000;
+}
+
+/* ... (Omitted unchanged navigation/sidebar styles) ... */
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links a,
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    background: #34495e;
+    border-radius: 5px;
+}
+
+.nav-links a:hover,
+.sidebar a:hover {
+    background: #1abc9c;
+}
+
+.menu-btn {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 50px;
+    height: 100vh;
+    background: #2c3e50;
+    transition: left 0.3s;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    z-index: 999;
+}
+
+.sidebar a {
+    display: block;
+    padding: 15px;
+    text-align: center;
+}
+
+.sidebar a.close-btn {
+    background: #e74c3c;
+    cursor: pointer;
+}
+
+/* Logo and Brand Container */
+.logo-brand {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Logo Image */
+.logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+/* 📦 Main Content Container */
+.container {
+    margin-top: 80px;        /* exactly the height of the navbar */
+    padding: 0 20px 20px 20px; 
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+}
+
+/* <h1> Heading Fixes — NOW STICKS DIRECTLY UNDER NAVBAR */
+h1 {
+    color: #0f2944;
+    text-align: center; 
+    margin-top: 0;           /* ← removes any gap */
+    margin-bottom: 30px;
+    padding-top: 20px;       /* keeps a little breathing room inside */
+    padding-bottom: 10px;
+    font-size: 2.5em;
+    
+    /* Centered teal underline */
+    display: block;
+    border-bottom: 3px solid #1abc9c;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ⭐️ Reviews Section */
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 20px;
+    width: 100%;
+    padding-bottom: 40px;
+}
+
+.review-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+    width: 100%;
+    max-width: 550px; 
+    transition: transform 0.2s;
+}
+
+.review-card:hover {
+    transform: translateY(-5px); 
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #0f2944;
+    font-size: 1.1em;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #f1c40f;
+}
+
+.rating i {
+    font-size: 1em;
+}
+
+.rating-value {
+    font-size: 14px;
+    color: #555;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.review-text {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+.review-text::before, 
+.review-text::after {
+    content: '"';
+}
+
+.review-date {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+    font-style: normal;
+}
+
+/* 📐 Media Queries (unchanged) */
+@media (max-width: 900px) {
+    .nav-links {
+        display: none; 
+    }
+
+    .menu-btn {
+        display: block; 
+    }
+}

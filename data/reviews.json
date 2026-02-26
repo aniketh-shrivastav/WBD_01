@@ -1,0 +1,54 @@
+[
+    {
+        "id": 1,
+        "customerName": "Alice Johnson",
+        "rating": 5,
+        "product": "Car Spoiler",
+        "image": "/images/car-spoiler.jpg",
+        "comment": "Excellent quality and fast delivery. Highly recommended!",
+        "date": "2025-03-01",
+        "response": "Thank you for your positive feedback!"
+    },
+    {
+        "id": 2,
+        "customerName": "Bob Williams",
+        "rating": 4,
+        "product": "LED Headlights",
+        "image": "/images/led-headlights.jpg",
+        "comment": "Great product, but the packaging could be improved.",
+        "date": "2025-03-03",
+        "response": "We'll work on improving the packaging. Thanks for the feedback!"
+    },
+    {
+        "id": 3,
+        "customerName": "Charlie Smith",
+        "rating": 3,
+        "product": "Performance Exhaust",
+        "image": "/images/performance-exhaust.jpg",
+        "comment": "The product is decent, but delivery took longer than expected.",
+        "date": "2025-03-05",
+        "response": "Apologies for the delay. We'll strive to improve our logistics."
+    },
+    {
+        "id": 4,
+        "customerName": "David Brown",
+        "rating": 5,
+        "product": "Alloy Wheels",
+        "image": "/images/alloy-wheels.jpg",
+        "comment": "Amazing experience! Will order again soon.",
+        "date": "2025-03-07",
+        "response": "Glad you loved it! Looking forward to serving you again."
+    },
+    {
+        "id": 5,
+        "customerName": "Emily Davis",
+        "rating": 2,
+        "product": "Racing Seats",
+        "image": "/images/racing-seats.jpg",
+        "comment": "Not satisfied with the product quality.",
+        "date": "2025-03-09",
+        "response": "We're sorry to hear this. Please contact support for assistance."
+    }
+]
+
+

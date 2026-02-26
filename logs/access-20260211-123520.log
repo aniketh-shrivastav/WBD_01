@@ -1,0 +1,4 @@
+[2026-02-11T07:05:26.199Z] [HEARTBEAT] log rotation
+[2026-02-11T07:05:27.288Z] GET /styles/styles.css - IP: ::1
+[2026-02-11T07:05:27.288Z] GET /customer/api/booking - IP: ::1
+[2026-02-11T07:05:30.080Z] GET /chat/unread-count - IP: ::1

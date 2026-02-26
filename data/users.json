@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Aniketh",
+    "email": "aefa@gmail.com",
+    "password": "hgcykfx",
+    "role": "customer"
+  },
+  {
+    "id": 2,
+    "name": "shyam",
+    "email": "shyam@gmail.com",
+    "password": "qwerty",
+    "role": "customer"
+  },
+  {
+    "id": 3,
+    "name": "nu9",
+    "email": "nu9@gmail.com",
+    "password": "ju",
+    "role": "customer"
+  },
+  {
+    "id": 4,
+    "name": "nu10",
+    "email": "nu10@gmail.com",
+    "password": "yell",
+    "role": "seller"
+  },
+  {
+    "id": 5,
+    "name": "nu11",
+    "email": "nu11@gmail.com",
+    "password": "yell",
+    "role": "customer"
+  },
+  {
+    "id": 6,
+    "name": "nu13",
+    "email": "nu13@gmail.com",
+    "password": "yell",
+    "role": "manager"
+  },
+  {
+    "id": 7,
+    "name": "nu14",
+    "email": "nu14@gmail.com",
+    "password": "yell",
+    "role": "customer"
+  },
+  {
+    "id": 8,
+    "name": "nu15",
+    "email": "nu15@gmail.com",
+    "password": "yell",
+    "role": "service-provider"
+  }
+]

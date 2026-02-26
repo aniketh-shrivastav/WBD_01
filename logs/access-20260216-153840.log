@@ -1,0 +1,9 @@
+[2026-02-16T10:08:41.927Z] GET /api/session - IP: ::1
+[2026-02-16T10:08:42.188Z] GET /api/session - IP: ::1
+[2026-02-16T10:08:42.211Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-16T10:08:42.251Z] GET /Css/CStyle.css - IP: ::1
+[2026-02-16T10:08:42.537Z] GET /Css/sellerBase.css - IP: ::1
+[2026-02-16T10:08:42.540Z] GET /newstyle.css - IP: ::1
+[2026-02-16T10:08:42.540Z] GET /seller/api/products - IP: ::1
+[2026-02-16T10:08:42.560Z] GET /seller/api/products - IP: ::1
+[2026-02-16T10:08:58.158Z] [HEARTBEAT] log rotation
