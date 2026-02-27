@@ -28,12 +28,356 @@ function formatCurrency(v) {
   return "₹" + Number(v || 0).toFixed(2);
 }
 
+// Edit Product Modal Component
+function EditProductModal({ isOpen, onClose, product, onSave, loading }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    description: "",
+    category: "",
+    brand: "",
+    quantity: "",
+    compatibility: "",
+  });
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name || "",
+        price: product.price || "",
+        description: product.description || "",
+        category: product.category || "",
+        brand: product.brand || "",
+        quantity: product.quantity || "",
+        compatibility: product.compatibility || "",
+      });
+      setError("");
+    }
+  }, [product]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    
+    // Basic validation
+    if (!formData.name.trim()) {
+      setError("Product name is required");
+      return;
+    }
+    if (!formData.price || parseFloat(formData.price) < 0) {
+      setError("Valid price is required");
+      return;
+    }
+    if (!formData.quantity || parseInt(formData.quantity) < 0) {
+      setError("Valid quantity is required");
+      return;
+    }
+    if (!formData.description.trim()) {
+      setError("Description is required");
+      return;
+    }
+    if (!formData.category.trim()) {
+      setError("Category is required");
+      return;
+    }
+    if (!formData.brand.trim()) {
+      setError("Brand is required");
+      return;
+    }
+
+    try {
+      await onSave(product._id, formData);
+    } catch (err) {
+      setError(err.message || "Failed to save changes");
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="edit-modal-overlay" onClick={onClose}>
+      <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="edit-modal-header">
+          <h2>Edit Product</h2>
+          <button className="modal-close-btn" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="edit-modal-body">
+            {error && (
+              <div className="edit-error-banner">{error}</div>
+            )}
+            
+            <div className="edit-form-row">
+              <div className="edit-form-group">
+                <label htmlFor="name">Product Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter product name"
+                />
+              </div>
+              <div className="edit-form-group">
+                <label htmlFor="brand">Brand *</label>
+                <input
+                  type="text"
+                  id="brand"
+                  name="brand"
+                  value={formData.brand}
+                  onChange={handleChange}
+                  placeholder="Enter brand"
+                />
+              </div>
+            </div>
+
+            <div className="edit-form-row">
+              <div className="edit-form-group">
+                <label htmlFor="price">Price (₹) *</label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="edit-form-group">
+                <label htmlFor="quantity">Stock Quantity *</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div className="edit-form-row">
+              <div className="edit-form-group">
+                <label htmlFor="category">Category *</label>
+                <input
+                  type="text"
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  placeholder="Enter category"
+                />
+              </div>
+              <div className="edit-form-group">
+                <label htmlFor="compatibility">Compatibility</label>
+                <input
+                  type="text"
+                  id="compatibility"
+                  name="compatibility"
+                  value={formData.compatibility}
+                  onChange={handleChange}
+                  placeholder="E.g., Honda Civic 2020+"
+                />
+              </div>
+            </div>
+
+            <div className="edit-form-group full-width">
+              <label htmlFor="description">Description *</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Enter product description"
+              />
+            </div>
+
+            {product && product.image && (
+              <div className="edit-form-group full-width">
+                <label>Current Image</label>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  style={{ maxWidth: 150, maxHeight: 150, objectFit: "cover", borderRadius: 8 }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="edit-modal-footer">
+            <button type="button" className="btn btn-cancel" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-save" disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+      <style>{`
+        .edit-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+        .edit-modal-content {
+          background: #fff;
+          border-radius: 12px;
+          max-width: 700px;
+          width: 90%;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .edit-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 24px;
+          border-bottom: 1px solid #e5e7eb;
+          background: #f9fafb;
+          border-radius: 12px 12px 0 0;
+        }
+        .edit-modal-header h2 {
+          margin: 0;
+          font-size: 1.25rem;
+          color: #111827;
+        }
+        .modal-close-btn {
+          background: none;
+          border: none;
+          font-size: 1.75rem;
+          cursor: pointer;
+          color: #6b7280;
+          line-height: 1;
+          padding: 0;
+        }
+        .modal-close-btn:hover {
+          color: #111827;
+        }
+        .edit-modal-body {
+          padding: 24px;
+        }
+        .edit-error-banner {
+          background: #fef2f2;
+          color: #b91c1c;
+          border: 1px solid #fecaca;
+          border-radius: 8px;
+          padding: 12px;
+          margin-bottom: 16px;
+        }
+        .edit-form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .edit-form-group {
+          display: flex;
+          flex-direction: column;
+        }
+        .edit-form-group.full-width {
+          grid-column: 1 / -1;
+          margin-bottom: 16px;
+        }
+        .edit-form-group label {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #374151;
+          margin-bottom: 6px;
+        }
+        .edit-form-group input,
+        .edit-form-group textarea {
+          padding: 10px 12px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .edit-form-group input:focus,
+        .edit-form-group textarea:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .edit-form-group textarea {
+          resize: vertical;
+          min-height: 80px;
+        }
+        .edit-modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          padding: 16px 24px;
+          border-top: 1px solid #e5e7eb;
+          background: #f9fafb;
+          border-radius: 0 0 12px 12px;
+        }
+        .btn-cancel {
+          background: #fff;
+          color: #374151;
+          border: 1px solid #d1d5db;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        .btn-cancel:hover {
+          background: #f3f4f6;
+        }
+        .btn-save {
+          background: #3b82f6;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+        .btn-save:hover {
+          background: #2563eb;
+        }
+        .btn-save:disabled {
+          background: #93c5fd;
+          cursor: not-allowed;
+        }
+        @media (max-width: 640px) {
+          .edit-form-row {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 function ProductTable({
   title,
   products,
   type,
   onApprove,
   onReject,
+  onEdit,
   actionState,
 }) {
   if (!products || products.length === 0) {
@@ -81,23 +425,55 @@ function ProductTable({
                 <td>{formatCurrency(p.price)}</td>
                 <td>{p.category || "N/A"}</td>
                 <td>{p.brand || "N/A"}</td>
-                <td>{p.description || "No description"}</td>
+                <td style={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {p.description || "No description"}
+                </td>
                 <td>{p.quantity || 0}</td>
                 <td>
-                  {type === "pending" && (
-                    <>
-                      <button
-                        type="button"
-                        className="btn btn-approve"
-                        onClick={() => onApprove?.(p._id)}
-                        disabled={
-                          actionState?.loadingKey === `${p._id}:approve`
-                        }
-                      >
-                        {actionState?.loadingKey === `${p._id}:approve`
-                          ? "Approving..."
-                          : "Approve"}
-                      </button>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      className="btn btn-edit"
+                      onClick={() => onEdit?.(p)}
+                      style={{
+                        background: "#6366f1",
+                        color: "white",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        cursor: "pointer",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    {type === "pending" && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-approve"
+                          onClick={() => onApprove?.(p._id)}
+                          disabled={
+                            actionState?.loadingKey === `${p._id}:approve`
+                          }
+                        >
+                          {actionState?.loadingKey === `${p._id}:approve`
+                            ? "..."
+                            : "Approve"}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-suspend"
+                          onClick={() => onReject?.(p._id)}
+                          disabled={actionState?.loadingKey === `${p._id}:reject`}
+                        >
+                          {actionState?.loadingKey === `${p._id}:reject`
+                            ? "..."
+                            : "Reject"}
+                        </button>
+                      </>
+                    )}
+                    {type === "approved" && (
                       <button
                         type="button"
                         className="btn btn-suspend"
@@ -105,35 +481,23 @@ function ProductTable({
                         disabled={actionState?.loadingKey === `${p._id}:reject`}
                       >
                         {actionState?.loadingKey === `${p._id}:reject`
-                          ? "Rejecting..."
+                          ? "..."
                           : "Reject"}
                       </button>
-                    </>
-                  )}
-                  {type === "approved" && (
-                    <button
-                      type="button"
-                      className="btn btn-suspend"
-                      onClick={() => onReject?.(p._id)}
-                      disabled={actionState?.loadingKey === `${p._id}:reject`}
-                    >
-                      {actionState?.loadingKey === `${p._id}:reject`
-                        ? "Rejecting..."
-                        : "Reject"}
-                    </button>
-                  )}
-                  {type === "rejected" && (
-                    <button
-                      type="button"
-                      className="btn btn-approve"
-                      onClick={() => onApprove?.(p._id)}
-                      disabled={actionState?.loadingKey === `${p._id}:approve`}
-                    >
-                      {actionState?.loadingKey === `${p._id}:approve`
-                        ? "Approving..."
-                        : "Approve"}
-                    </button>
-                  )}
+                    )}
+                    {type === "rejected" && (
+                      <button
+                        type="button"
+                        className="btn btn-approve"
+                        onClick={() => onApprove?.(p._id)}
+                        disabled={actionState?.loadingKey === `${p._id}:approve`}
+                      >
+                        {actionState?.loadingKey === `${p._id}:approve`
+                          ? "..."
+                          : "Approve"}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -164,6 +528,11 @@ export default function ManagerDashboard() {
     error: null,
   });
   const [reportState, setReportState] = useState({ loading: false, error: "" });
+  
+  // Edit product state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   const revenueChartData = useMemo(() => {
     if (data?.charts?.monthlyRevenue) {
@@ -221,6 +590,51 @@ export default function ManagerDashboard() {
         error: err.message || "Something went wrong.",
       });
     }
+  };
+
+  // Handle opening edit modal
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setEditModalOpen(true);
+  };
+
+  // Handle saving edited product
+  const handleSaveProduct = async (productId, formData) => {
+    setEditLoading(true);
+    try {
+      const res = await fetch(`/manager/products/${productId}/edit`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const ct = res.headers.get("content-type") || "";
+      const payload = ct.includes("application/json") ? await res.json() : null;
+      
+      if (!res.ok) {
+        throw new Error(payload?.message || "Failed to save product changes.");
+      }
+
+      // Refresh dashboard data
+      await dispatch(fetchManagerDashboard()).unwrap();
+      setEditModalOpen(false);
+      setEditingProduct(null);
+    } catch (err) {
+      throw err;
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  // Handle closing edit modal
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setEditingProduct(null);
   };
 
   const handleDownloadReport = async () => {
@@ -677,6 +1091,7 @@ export default function ManagerDashboard() {
                 type="pending"
                 onApprove={(id) => handleProductAction(id, "approve")}
                 onReject={(id) => handleProductAction(id, "reject")}
+                onEdit={handleEditProduct}
                 actionState={productActionState}
               />
             </div>
@@ -689,6 +1104,7 @@ export default function ManagerDashboard() {
                 type="approved"
                 onApprove={(id) => handleProductAction(id, "approve")}
                 onReject={(id) => handleProductAction(id, "reject")}
+                onEdit={handleEditProduct}
                 actionState={productActionState}
               />
             </div>
@@ -701,12 +1117,22 @@ export default function ManagerDashboard() {
                 type="rejected"
                 onApprove={(id) => handleProductAction(id, "approve")}
                 onReject={(id) => handleProductAction(id, "reject")}
+                onEdit={handleEditProduct}
                 actionState={productActionState}
               />
             </div>
           )}
         </div>
       </div>
+
+      {/* Edit Product Modal */}
+      <EditProductModal
+        isOpen={editModalOpen}
+        onClose={handleCloseEditModal}
+        product={editingProduct}
+        onSave={handleSaveProduct}
+        loading={editLoading}
+      />
     </>
   );
 }
