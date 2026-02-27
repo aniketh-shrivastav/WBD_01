@@ -64,7 +64,7 @@ function EditProductModal({ isOpen, onClose, product, onSave, loading }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     // Basic validation
     if (!formData.name.trim()) {
       setError("Product name is required");
@@ -111,10 +111,8 @@ function EditProductModal({ isOpen, onClose, product, onSave, loading }) {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="edit-modal-body">
-            {error && (
-              <div className="edit-error-banner">{error}</div>
-            )}
-            
+            {error && <div className="edit-error-banner">{error}</div>}
+
             <div className="edit-form-row">
               <div className="edit-form-group">
                 <label htmlFor="name">Product Name *</label>
@@ -212,7 +210,12 @@ function EditProductModal({ isOpen, onClose, product, onSave, loading }) {
                 <img
                   src={product.image}
                   alt={product.name}
-                  style={{ maxWidth: 150, maxHeight: 150, objectFit: "cover", borderRadius: 8 }}
+                  style={{
+                    maxWidth: 150,
+                    maxHeight: 150,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                  }}
                 />
               </div>
             )}
@@ -425,7 +428,14 @@ function ProductTable({
                 <td>{formatCurrency(p.price)}</td>
                 <td>{p.category || "N/A"}</td>
                 <td>{p.brand || "N/A"}</td>
-                <td style={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <td
+                  style={{
+                    maxWidth: 200,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {p.description || "No description"}
                 </td>
                 <td>{p.quantity || 0}</td>
@@ -465,7 +475,9 @@ function ProductTable({
                           type="button"
                           className="btn btn-suspend"
                           onClick={() => onReject?.(p._id)}
-                          disabled={actionState?.loadingKey === `${p._id}:reject`}
+                          disabled={
+                            actionState?.loadingKey === `${p._id}:reject`
+                          }
                         >
                           {actionState?.loadingKey === `${p._id}:reject`
                             ? "..."
@@ -490,7 +502,9 @@ function ProductTable({
                         type="button"
                         className="btn btn-approve"
                         onClick={() => onApprove?.(p._id)}
-                        disabled={actionState?.loadingKey === `${p._id}:approve`}
+                        disabled={
+                          actionState?.loadingKey === `${p._id}:approve`
+                        }
                       >
                         {actionState?.loadingKey === `${p._id}:approve`
                           ? "..."
@@ -528,7 +542,7 @@ export default function ManagerDashboard() {
     error: null,
   });
   const [reportState, setReportState] = useState({ loading: false, error: "" });
-  
+
   // Edit product state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -615,7 +629,7 @@ export default function ManagerDashboard() {
 
       const ct = res.headers.get("content-type") || "";
       const payload = ct.includes("application/json") ? await res.json() : null;
-      
+
       if (!res.ok) {
         throw new Error(payload?.message || "Failed to save product changes.");
       }

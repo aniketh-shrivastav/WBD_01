@@ -1294,10 +1294,25 @@ router.put(
         (req.headers.accept || "").includes("application/json") ||
         req.xhr === true;
 
-      const { name, price, description, category, brand, quantity, compatibility } = req.body;
+      const {
+        name,
+        price,
+        description,
+        category,
+        brand,
+        quantity,
+        compatibility,
+      } = req.body;
 
       // Validate required fields
-      if (!name || price === undefined || !description || !category || !brand || quantity === undefined) {
+      if (
+        !name ||
+        price === undefined ||
+        !description ||
+        !category ||
+        !brand ||
+        quantity === undefined
+      ) {
         if (wantsJson) {
           return res
             .status(400)
@@ -1345,7 +1360,7 @@ router.put(
       const product = await Product.findByIdAndUpdate(
         req.params.id,
         updateData,
-        { new: true }
+        { new: true },
       ).populate("seller", "name email");
 
       if (!product) {
@@ -1380,25 +1395,27 @@ router.put(
 );
 
 // Get single product details for editing
-router.get(
-  "/products/:id",
-  isAuthenticated,
-  isManager,
-  async (req, res) => {
-    try {
-      const product = await Product.findById(req.params.id).populate("seller", "name email");
+router.get("/products/:id", isAuthenticated, isManager, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate(
+      "seller",
+      "name email",
+    );
 
-      if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
-      }
-
-      return res.json({ success: true, product });
-    } catch (err) {
-      console.error("Error fetching product:", err);
-      return res.status(500).json({ success: false, message: "Error fetching product" });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
-  },
-);
+
+    return res.json({ success: true, product });
+  } catch (err) {
+    console.error("Error fetching product:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error fetching product" });
+  }
+});
 
 router.post(
   "/cancel-order/:orderId",

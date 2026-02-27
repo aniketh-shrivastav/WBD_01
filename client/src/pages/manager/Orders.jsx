@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import "../../Css/manager.css";
 
-const COMMISSION_RATE = 0.20; // 20% manager commission
+const COMMISSION_RATE = 0.2; // 20% manager commission
 
 function formatCurrency(v) {
   return "₹" + Number(v || 0).toFixed(2);
@@ -254,7 +254,7 @@ export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [active, setActive] = useState("orders"); // 'orders' | 'services'
-  
+
   // Modal state
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -373,11 +373,18 @@ export default function Orders() {
             </div>
             <div className="detail-item">
               <label>Order Status</label>
-              <span><StatusBadge type="order" status={order.computedStatus || order.orderStatus} /></span>
+              <span>
+                <StatusBadge
+                  type="order"
+                  status={order.computedStatus || order.orderStatus}
+                />
+              </span>
             </div>
             <div className="detail-item">
               <label>Payment Status</label>
-              <span style={{ textTransform: "capitalize" }}>{order.paymentStatus || "N/A"}</span>
+              <span style={{ textTransform: "capitalize" }}>
+                {order.paymentStatus || "N/A"}
+              </span>
             </div>
             <div className="detail-item">
               <label>Placed At</label>
@@ -385,7 +392,9 @@ export default function Orders() {
             </div>
             <div className="detail-item">
               <label>Previous Status</label>
-              <span style={{ textTransform: "capitalize" }}>{order.previousStatus || "N/A"}</span>
+              <span style={{ textTransform: "capitalize" }}>
+                {order.previousStatus || "N/A"}
+              </span>
             </div>
           </div>
         </div>
@@ -418,34 +427,57 @@ export default function Orders() {
             {(order.items || []).map((item, idx) => (
               <div className="item-card" key={idx}>
                 <div className="item-header">
-                  <span className="item-name">{item.name || "Unknown Item"}</span>
-                  <StatusBadge type="order" status={item.itemStatus || order.orderStatus} />
+                  <span className="item-name">
+                    {item.name || "Unknown Item"}
+                  </span>
+                  <StatusBadge
+                    type="order"
+                    status={item.itemStatus || order.orderStatus}
+                  />
                 </div>
                 <div className="item-details">
-                  <p><strong>Quantity:</strong> {item.quantity || 0}</p>
-                  <p><strong>Price:</strong> {formatCurrency(item.price)}</p>
-                  <p><strong>Subtotal:</strong> {formatCurrency((item.price || 0) * (item.quantity || 0))}</p>
-                  <p><strong>Seller:</strong> {item.seller?.name || "N/A"} ({item.seller?.email || "N/A"})</p>
-                  {item.deliveryDate && <p><strong>Expected Delivery:</strong> {formatDate(item.deliveryDate)}</p>}
+                  <p>
+                    <strong>Quantity:</strong> {item.quantity || 0}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> {formatCurrency(item.price)}
+                  </p>
+                  <p>
+                    <strong>Subtotal:</strong>{" "}
+                    {formatCurrency((item.price || 0) * (item.quantity || 0))}
+                  </p>
+                  <p>
+                    <strong>Seller:</strong> {item.seller?.name || "N/A"} (
+                    {item.seller?.email || "N/A"})
+                  </p>
+                  {item.deliveryDate && (
+                    <p>
+                      <strong>Expected Delivery:</strong>{" "}
+                      {formatDate(item.deliveryDate)}
+                    </p>
+                  )}
                 </div>
-                {item.itemStatusHistory && item.itemStatusHistory.length > 0 && (
-                  <div style={{ marginTop: 12 }}>
-                    <strong>Item Status History:</strong>
-                    <div className="status-history" style={{ marginTop: 8 }}>
-                      {item.itemStatusHistory.map((h, hIdx) => (
-                        <div className="history-item" key={hIdx}>
-                          <div className="history-dot"></div>
-                          <div className="history-content">
-                            <div className="history-change">
-                              {h.from || "N/A"} → {h.to || "N/A"}
+                {item.itemStatusHistory &&
+                  item.itemStatusHistory.length > 0 && (
+                    <div style={{ marginTop: 12 }}>
+                      <strong>Item Status History:</strong>
+                      <div className="status-history" style={{ marginTop: 8 }}>
+                        {item.itemStatusHistory.map((h, hIdx) => (
+                          <div className="history-item" key={hIdx}>
+                            <div className="history-dot"></div>
+                            <div className="history-content">
+                              <div className="history-change">
+                                {h.from || "N/A"} → {h.to || "N/A"}
+                              </div>
+                              <div className="history-time">
+                                {formatDate(h.changedAt)}
+                              </div>
                             </div>
-                            <div className="history-time">{formatDate(h.changedAt)}</div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ))}
           </div>
@@ -480,7 +512,9 @@ export default function Orders() {
                     <div className="history-change">
                       {h.from || "N/A"} → {h.to || "N/A"}
                     </div>
-                    <div className="history-time">{formatDate(h.changedAt)}</div>
+                    <div className="history-time">
+                      {formatDate(h.changedAt)}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -510,7 +544,9 @@ export default function Orders() {
             </div>
             <div className="detail-item">
               <label>Status</label>
-              <span><StatusBadge type="booking" status={booking.status} /></span>
+              <span>
+                <StatusBadge type="booking" status={booking.status} />
+              </span>
             </div>
             <div className="detail-item">
               <label>Previous Status</label>
@@ -532,7 +568,11 @@ export default function Orders() {
           <div className="detail-grid">
             <div className="detail-item">
               <label>Services</label>
-              <span>{Array.isArray(booking.selectedServices) ? booking.selectedServices.join(", ") : "N/A"}</span>
+              <span>
+                {Array.isArray(booking.selectedServices)
+                  ? booking.selectedServices.join(", ")
+                  : "N/A"}
+              </span>
             </div>
             <div className="detail-item">
               <label>Description</label>
@@ -550,13 +590,15 @@ export default function Orders() {
               <div className="detail-item">
                 <label>Paint Color</label>
                 <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ 
-                    width: 20, 
-                    height: 20, 
-                    borderRadius: 4, 
-                    backgroundColor: booking.paintColor, 
-                    border: "1px solid #ccc" 
-                  }}></span>
+                  <span
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 4,
+                      backgroundColor: booking.paintColor,
+                      border: "1px solid #ccc",
+                    }}
+                  ></span>
                   {booking.paintColor}
                 </span>
               </div>
@@ -632,7 +674,10 @@ export default function Orders() {
             <div className="detail-grid">
               <div className="detail-item">
                 <label>Rating</label>
-                <span>{"★".repeat(booking.rating)}{"☆".repeat(5 - booking.rating)} ({booking.rating}/5)</span>
+                <span>
+                  {"★".repeat(booking.rating)}
+                  {"☆".repeat(5 - booking.rating)} ({booking.rating}/5)
+                </span>
               </div>
               {booking.review && (
                 <div className="detail-item" style={{ gridColumn: "1 / -1" }}>
@@ -655,7 +700,9 @@ export default function Orders() {
                     <div className="history-change">
                       {h.from || "N/A"} → {h.to || "N/A"}
                     </div>
-                    <div className="history-time">{formatDate(h.changedAt)}</div>
+                    <div className="history-time">
+                      {formatDate(h.changedAt)}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -673,7 +720,7 @@ export default function Orders() {
       const earnings = calculateOrderEarnings(o);
       const itemCount = (o.items || []).length;
       const firstSeller = (o.items || [])[0]?.seller || {};
-      
+
       rows.push(
         <tr key={o._id}>
           <td>
@@ -684,15 +731,21 @@ export default function Orders() {
           <td>
             <div>{firstSeller.name || "N/A"}</div>
             <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-              {itemCount > 1 ? `+${itemCount - 1} more sellers` : firstSeller.email || ""}
+              {itemCount > 1
+                ? `+${itemCount - 1} more sellers`
+                : firstSeller.email || ""}
             </div>
           </td>
           <td>
             <div>{user.name || "N/A"}</div>
-            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>{user.email || ""}</div>
+            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              {user.email || ""}
+            </div>
           </td>
           <td>
-            <div>{itemCount} item{itemCount !== 1 ? "s" : ""}</div>
+            <div>
+              {itemCount} item{itemCount !== 1 ? "s" : ""}
+            </div>
             <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
               {formatCurrency(o.totalAmount)}
             </div>
@@ -702,7 +755,9 @@ export default function Orders() {
               type="order"
               status={o.computedStatus || o.orderStatus}
             />
-            <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: 4 }}>
+            <div
+              style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: 4 }}
+            >
               {o.orderStatus}
             </div>
           </td>
@@ -714,14 +769,14 @@ export default function Orders() {
               <button
                 className="btn btn-view"
                 onClick={() => handleViewOrderDetails(o)}
-                style={{ 
-                  background: "#3b82f6", 
-                  color: "white", 
+                style={{
+                  background: "#3b82f6",
+                  color: "white",
                   padding: "6px 12px",
                   borderRadius: 6,
                   border: "none",
                   cursor: "pointer",
-                  fontSize: "0.85rem"
+                  fontSize: "0.85rem",
                 }}
               >
                 View Details
@@ -740,7 +795,7 @@ export default function Orders() {
               )}
             </div>
           </td>
-        </tr>
+        </tr>,
       );
     });
     return rows;
@@ -760,21 +815,29 @@ export default function Orders() {
           </td>
           <td>
             {Array.isArray(b.selectedServices)
-              ? b.selectedServices.slice(0, 2).join(", ") + 
-                (b.selectedServices.length > 2 ? ` +${b.selectedServices.length - 2} more` : "")
+              ? b.selectedServices.slice(0, 2).join(", ") +
+                (b.selectedServices.length > 2
+                  ? ` +${b.selectedServices.length - 2} more`
+                  : "")
               : ""}
           </td>
           <td>
             <div>{customer.name || "N/A"}</div>
-            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>{customer.email || ""}</div>
+            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              {customer.email || ""}
+            </div>
           </td>
           <td>
             <div>{provider.workshopName || provider.name || "N/A"}</div>
-            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>{provider.email || ""}</div>
+            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              {provider.email || ""}
+            </div>
           </td>
           <td>
             <StatusBadge type="booking" status={b.status} />
-            <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: 4 }}>
+            <div
+              style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: 4 }}
+            >
               {b.status}
             </div>
           </td>
@@ -786,14 +849,14 @@ export default function Orders() {
               <button
                 className="btn btn-view"
                 onClick={() => handleViewBookingDetails(b)}
-                style={{ 
-                  background: "#3b82f6", 
-                  color: "white", 
+                style={{
+                  background: "#3b82f6",
+                  color: "white",
                   padding: "6px 12px",
                   borderRadius: 6,
                   border: "none",
                   cursor: "pointer",
-                  fontSize: "0.85rem"
+                  fontSize: "0.85rem",
                 }}
               >
                 View Details
@@ -879,7 +942,13 @@ export default function Orders() {
                   <tbody>{orderRows}</tbody>
                 </table>
                 {orders.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "2rem",
+                      color: "#6b7280",
+                    }}
+                  >
                     No orders found.
                   </div>
                 )}
@@ -901,7 +970,13 @@ export default function Orders() {
                   <tbody>{bookingRows}</tbody>
                 </table>
                 {bookings.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "2rem",
+                      color: "#6b7280",
+                    }}
+                  >
                     No service bookings found.
                   </div>
                 )}
