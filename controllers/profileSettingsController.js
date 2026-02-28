@@ -114,3 +114,147 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating profile" });
   }
 };
+
+// Allowed verification document types
+const VERIFICATION_DOC_TYPES = [
+  "GST Registration Certificate",
+  "PAN Card",
+  "Business Registration Proof",
+  "MSME / Udyam Registration",
+  "Shop & Establishment License",
+  "Certificate of Incorporation",
+  "Aadhaar Card (Masked)",
+  "Shop License",
+];
+exports.VERIFICATION_DOC_TYPES = VERIFICATION_DOC_TYPES;
+
+// Upload a verification document
+exports.uploadVerificationDocument = async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const { docType } = req.body;
+    if (!docType || !VERIFICATION_DOC_TYPES.includes(docType)) {
+      if (req.file?.path && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid document type" });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+
+    // Upload to Cloudinary
+    let docUrl;
+    try {
+      const uploadRes = await cloudinary.uploader.upload(req.file.path, {
+        folder: "sp_verification_docs",
+        resource_type: "auto",
+        timeout: 120000,
+      });
+      docUrl = uploadRes.secure_url;
+    } finally {
+      if (req.file.path && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+    }
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    // Remove existing document of the same type (replace)
+    user.verificationDocuments = (user.verificationDocuments || []).filter(
+      (d) => d.docType !== docType,
+    );
+    user.verificationDocuments.push({
+      docType,
+      docUrl,
+      fileName: req.file.originalname,
+      uploadedAt: new Date(),
+    });
+
+    // Set status to pending if currently unverified or rejected
+    if (
+      user.verificationStatus === "unverified" ||
+      user.verificationStatus === "rejected"
+    ) {
+      user.verificationStatus = "pending";
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Document uploaded successfully",
+      verificationDocuments: user.verificationDocuments,
+      verificationStatus: user.verificationStatus,
+    });
+  } catch (error) {
+    console.error("Error uploading verification document:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error uploading document" });
+  }
+};
+
+// Delete a verification document
+exports.deleteVerificationDocument = async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const { docType } = req.params;
+    if (!docType)
+      return res
+        .status(400)
+        .json({ success: false, message: "Document type is required" });
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    const before = (user.verificationDocuments || []).length;
+    user.verificationDocuments = (user.verificationDocuments || []).filter(
+      (d) => d.docType !== decodeURIComponent(docType),
+    );
+
+    if (user.verificationDocuments.length === before) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Document not found" });
+    }
+
+    // If all docs removed, revert to unverified
+    if (
+      user.verificationDocuments.length === 0 &&
+      user.verificationStatus === "pending"
+    ) {
+      user.verificationStatus = "unverified";
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Document deleted",
+      verificationDocuments: user.verificationDocuments,
+      verificationStatus: user.verificationStatus,
+    });
+  } catch (error) {
+    console.error("Error deleting verification document:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting document" });
+  }
+};

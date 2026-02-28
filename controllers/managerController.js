@@ -334,7 +334,7 @@ exports.getApiServices = async (req, res) => {
   try {
     const serviceProvidersRaw = await User.find(
       { role: "service-provider", suspended: { $ne: true } },
-      "name email phone servicesOffered district profilePicture",
+      "name email phone servicesOffered district profilePicture verificationStatus",
     );
 
     const providerIds = serviceProvidersRaw.map((p) => p._id).filter(Boolean);
@@ -1613,6 +1613,12 @@ exports.getProfileOverview = async (req, res) => {
           pickupRate: serviceProvider.pickupRate || 0,
           dropoffRate: serviceProvider.dropoffRate || 0,
         },
+        verification: {
+          status: serviceProvider.verificationStatus || "unverified",
+          documents: serviceProvider.verificationDocuments || [],
+          note: serviceProvider.verificationNote || "",
+          verifiedAt: serviceProvider.verifiedAt || null,
+        },
         totals: {
           totalEarnings: n(earnings?.totalEarnings),
           completedCount: earnings?.completedCount || 0,
@@ -1656,4 +1662,47 @@ exports.getPaymentsHtml = (req, res) => {
 
 exports.getSupportHtml = (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "manager", "support.html"));
+};
+
+// Verify or reject a service provider
+exports.verifyProvider = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action, note } = req.body; // action: "verify" or "reject"
+
+    if (!["verify", "reject"].includes(action)) {
+      return res.status(400).json({ error: "Invalid action" });
+    }
+
+    const provider = await User.findById(id);
+    if (!provider || provider.role !== "service-provider") {
+      return res.status(404).json({ error: "Service provider not found" });
+    }
+
+    if (action === "verify") {
+      provider.verificationStatus = "verified";
+      provider.verifiedAt = new Date();
+      provider.verifiedBy = req.session.user.id;
+      provider.verificationNote = note || "";
+    } else {
+      provider.verificationStatus = "rejected";
+      provider.verificationNote = note || "Documents rejected by manager";
+      provider.verifiedAt = undefined;
+      provider.verifiedBy = undefined;
+    }
+
+    await provider.save();
+
+    res.json({
+      success: true,
+      message:
+        action === "verify"
+          ? "Provider verified successfully"
+          : "Provider verification rejected",
+      verificationStatus: provider.verificationStatus,
+    });
+  } catch (err) {
+    console.error("Verify provider error:", err);
+    res.status(500).json({ error: "Failed to update verification" });
+  }
 };

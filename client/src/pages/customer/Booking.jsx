@@ -633,7 +633,17 @@ export default function CustomerBooking() {
                           className={`booking-provider-card ${selected ? "selected" : ""}`}
                         >
                           <div className="booking-provider-header">
-                            <h3 className="booking-provider-name">{p.name}</h3>
+                            <h3 className="booking-provider-name">
+                              {p.name}
+                              {p.verificationStatus === "verified" && (
+                                <span
+                                  className="booking-verified-badge"
+                                  title="Verified Service Provider"
+                                >
+                                  ✓ Verified
+                                </span>
+                              )}
+                            </h3>
                             <span className="booking-provider-district">
                               {p.district || ""}
                             </span>

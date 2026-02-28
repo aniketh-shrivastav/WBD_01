@@ -50,6 +50,26 @@ export default function ServiceProfileSettings() {
   const [newCost, setNewCost] = useState("");
   const [errors, setErrors] = useState({});
 
+  // Verification documents
+  const [verificationDocs, setVerificationDocs] = useState([]);
+  const [verificationStatus, setVerificationStatus] = useState("unverified");
+  const [verificationNote, setVerificationNote] = useState("");
+  const [docUploadType, setDocUploadType] = useState("");
+  const [docFile, setDocFile] = useState(null);
+  const [docUploading, setDocUploading] = useState(false);
+  const [docError, setDocError] = useState("");
+
+  const VERIFICATION_DOC_TYPES = [
+    "GST Registration Certificate",
+    "PAN Card",
+    "Business Registration Proof",
+    "MSME / Udyam Registration",
+    "Shop & Establishment License",
+    "Certificate of Incorporation",
+    "Aadhaar Card (Masked)",
+    "Shop License",
+  ];
+
   const hasCarPainting = useMemo(() => {
     return services.some((s) => {
       const name = String(s?.name || "").toLowerCase();
@@ -146,6 +166,9 @@ export default function ServiceProfileSettings() {
             .filter(Boolean)
             .slice(0, 24),
         );
+        setVerificationDocs(u.verificationDocuments || []);
+        setVerificationStatus(u.verificationStatus || "unverified");
+        setVerificationNote(u.verificationNote || "");
       } catch (e) {
         setStatus(e.message || "Failed to load");
         setStatusColor("red");
@@ -305,6 +328,53 @@ export default function ServiceProfileSettings() {
     })();
   }
 
+  // Document upload handler
+  async function handleDocUpload() {
+    if (!docUploadType || !docFile) {
+      setDocError("Please select a document type and file.");
+      return;
+    }
+    setDocUploading(true);
+    setDocError("");
+    try {
+      const fd = new FormData();
+      fd.append("docType", docUploadType);
+      fd.append("document", docFile);
+      const res = await fetch("/profile/upload-document", {
+        method: "POST",
+        body: fd,
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!out.success) throw new Error(out.message || "Upload failed");
+      setVerificationDocs(out.verificationDocuments || []);
+      setVerificationStatus(out.verificationStatus || "pending");
+      setDocUploadType("");
+      setDocFile(null);
+      setStatus("Document uploaded successfully!");
+      setStatusColor("green");
+    } catch (e) {
+      setDocError(e.message || "Failed to upload document");
+    } finally {
+      setDocUploading(false);
+    }
+  }
+
+  async function handleDocDelete(docType) {
+    if (!window.confirm(`Delete ${docType}?`)) return;
+    try {
+      const res = await fetch(
+        `/profile/delete-document/${encodeURIComponent(docType)}`,
+        { method: "DELETE", headers: { Accept: "application/json" } },
+      );
+      const out = await res.json().catch(() => ({}));
+      if (!out.success) throw new Error(out.message || "Delete failed");
+      setVerificationDocs(out.verificationDocuments || []);
+      setVerificationStatus(out.verificationStatus || "unverified");
+    } catch (e) {
+      setDocError(e.message || "Failed to delete document");
+    }
+  }
+
   async function onDeleteAccount() {
     if (!userId) return;
     if (
@@ -355,7 +425,25 @@ export default function ServiceProfileSettings() {
               ) : null}
             </label>
           </div>
-          <h1>Profile Settings</h1>
+          <h1>
+            Profile Settings
+            {verificationStatus === "verified" && (
+              <span
+                className="sp-verification-badge sp-badge-verified"
+                style={{ marginLeft: 10 }}
+              >
+                ✓ Verified
+              </span>
+            )}
+            {verificationStatus === "pending" && (
+              <span
+                className="sp-verification-badge sp-badge-pending"
+                style={{ marginLeft: 10 }}
+              >
+                ⏳ Pending
+              </span>
+            )}
+          </h1>
 
           <form
             onSubmit={(e) => {
@@ -656,6 +744,116 @@ export default function ServiceProfileSettings() {
               )}
             </div>
           </form>
+
+          {/* Verification Documents Section */}
+          <div className="services-container sp-verification-section">
+            <h2>
+              Verification Documents
+              <span
+                className={`sp-verification-badge sp-badge-${verificationStatus}`}
+              >
+                {verificationStatus === "verified"
+                  ? "✓ Verified"
+                  : verificationStatus === "pending"
+                    ? "⏳ Pending Verification"
+                    : verificationStatus === "rejected"
+                      ? "✗ Rejected"
+                      : "Unverified"}
+              </span>
+            </h2>
+
+            {verificationNote && verificationStatus === "rejected" && (
+              <div className="sp-verification-note sp-note-rejected">
+                <strong>Manager Note:</strong> {verificationNote}
+              </div>
+            )}
+
+            <div className="sp-hint">
+              Upload your business documents for verification. Once verified by
+              a manager, a verified badge will appear on your profile.
+            </div>
+
+            {/* Uploaded documents list */}
+            {verificationDocs.length > 0 && (
+              <div className="sp-doc-list">
+                {verificationDocs.map((doc, idx) => (
+                  <div key={idx} className="sp-doc-item">
+                    <div className="sp-doc-info">
+                      <span className="sp-doc-type">{doc.docType}</span>
+                      <span className="sp-doc-filename">
+                        {doc.fileName || "Document"}
+                      </span>
+                    </div>
+                    <div className="sp-doc-actions">
+                      <a
+                        href={doc.docUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn sp-doc-view-btn"
+                      >
+                        View
+                      </a>
+                      {verificationStatus !== "verified" && (
+                        <button
+                          type="button"
+                          className="btn sp-doc-delete-btn"
+                          onClick={() => handleDocDelete(doc.docType)}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upload new document */}
+            {verificationStatus !== "verified" && (
+              <div className="sp-doc-upload">
+                <select
+                  value={docUploadType}
+                  onChange={(e) => setDocUploadType(e.target.value)}
+                  className="sp-select-service"
+                >
+                  <option value="">-- Select Document Type --</option>
+                  {VERIFICATION_DOC_TYPES.filter(
+                    (t) => !verificationDocs.some((d) => d.docType === t),
+                  ).map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.webp"
+                  onChange={(e) => setDocFile(e.target.files?.[0] || null)}
+                  className="sp-doc-file-input"
+                />
+                <button
+                  type="button"
+                  className="btn add-service-btn"
+                  onClick={handleDocUpload}
+                  disabled={docUploading || !docUploadType || !docFile}
+                >
+                  {docUploading ? "Uploading..." : "Upload Document"}
+                </button>
+                {docError && (
+                  <div className="error" style={{ display: "block" }}>
+                    {docError}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="sp-hint" style={{ marginTop: 12 }}>
+              Required: GST Registration Certificate, PAN Card, Business
+              Registration Proof (MSME/Udyam, Shop &amp; Establishment, or
+              Certificate of Incorporation). Sole Proprietors: Aadhaar (masked),
+              PAN, Shop License.
+            </div>
+          </div>
 
           {/* Show Danger Zone only while editing */}
           {editing && (

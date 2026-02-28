@@ -1,0 +1,7 @@
+[2026-02-28T20:43:21.446Z] GET /styles/profileSettings.css - IP: ::1
+[2026-02-28T20:43:21.447Z] GET /api/service-categories/active - IP: ::1
+[2026-02-28T20:43:21.454Z] GET /images3/image5.jpg - IP: ::1
+[2026-02-28T20:43:21.704Z] GET /api/service-categories/active - IP: ::1
+[2026-02-28T20:43:21.858Z] GET /service/api/profile - IP: ::1
+[2026-02-28T20:43:21.900Z] GET /service/api/profile - IP: ::1
+[2026-02-28T20:43:34.212Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

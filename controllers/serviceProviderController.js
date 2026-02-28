@@ -525,6 +525,9 @@ exports.getProfile = async (req, res) => {
       profilePicture = "",
       pickupRate = 0,
       dropoffRate = 0,
+      verificationDocuments = [],
+      verificationStatus = "unverified",
+      verificationNote = "",
     } = user;
     res.json({
       success: true,
@@ -539,6 +542,9 @@ exports.getProfile = async (req, res) => {
         profilePicture,
         pickupRate,
         dropoffRate,
+        verificationDocuments,
+        verificationStatus,
+        verificationNote,
       },
     });
   } catch (err) {

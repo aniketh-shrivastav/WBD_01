@@ -1,0 +1,11 @@
+[2026-02-28T20:43:08.333Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-02-28T20:43:18.382Z] POST /login - IP: ::1
+[2026-02-28T20:43:18.598Z] GET /api/session - IP: ::1
+[2026-02-28T20:43:18.612Z] GET /api/session - IP: ::1
+[2026-02-28T20:43:18.955Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-28T20:43:18.957Z] GET /service/api/dashboard - IP: ::1
+[2026-02-28T20:43:19.155Z] GET /service/api/dashboard - IP: ::1
+[2026-02-28T20:43:19.216Z] GET /service/api/earnings-data?timeRange=1 - IP: ::1
+[2026-02-28T20:43:19.467Z] GET /service/api/earnings-data?timeRange=1 - IP: ::1
+[2026-02-28T20:43:19.711Z] GET /service/api/recent-activity?limit=5 - IP: ::1
+[2026-02-28T20:43:19.785Z] GET /service/api/recent-activity?limit=5 - IP: ::1

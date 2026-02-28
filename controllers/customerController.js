@@ -137,7 +137,7 @@ exports.getBookingApi = async (req, res) => {
           },
         },
       },
-      "name servicesOffered district paintColors pickupRate dropoffRate",
+      "name servicesOffered district paintColors pickupRate dropoffRate verificationStatus",
     );
 
     const uniqueServicesSet = new Set();

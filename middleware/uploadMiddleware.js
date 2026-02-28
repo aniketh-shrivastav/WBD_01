@@ -75,6 +75,40 @@ const documentFilter = (req, file, cb) => {
   cb(new Error("Only CSV, Excel, or ZIP files are allowed"));
 };
 
+/**
+ * File filter for verification documents (images + PDF)
+ */
+const verificationDocFilter = (req, file, cb) => {
+  const allowedMimes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+  ];
+  const allowedExts = [".jpeg", ".jpg", ".png", ".gif", ".webp", ".pdf"];
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+    return cb(null, true);
+  }
+  cb(
+    new Error(
+      "Only image files (jpeg, jpg, png, gif, webp) and PDF files are allowed",
+    ),
+  );
+};
+
+/**
+ * Verification document upload to disk (10MB limit)
+ */
+const uploadVerificationDoc = multer({
+  storage: diskStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: verificationDocFilter,
+});
+
 // Pre-configured upload instances
 
 /**
@@ -158,9 +192,11 @@ module.exports = {
   memoryStorage,
   imageFilter,
   documentFilter,
+  verificationDocFilter,
   uploadImageToDisk,
   uploadImageToMemory,
   uploadDocumentToDisk,
+  uploadVerificationDoc,
   uploadGeneric,
   handleUploadError,
   cleanupUpload,

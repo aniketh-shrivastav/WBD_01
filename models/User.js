@@ -31,6 +31,25 @@ const UserSchema = new mongoose.Schema({
   dropoffRate: { type: Number, default: 0 },
   // For service providers offering Car Painting: list of available paint colors (hex strings like #ff0000)
   paintColors: { type: [String], default: [] },
+
+  // Service provider verification documents & status
+  verificationDocuments: [
+    {
+      docType: { type: String, required: true },
+      docUrl: { type: String, required: true },
+      fileName: { type: String },
+      uploadedAt: { type: Date, default: Date.now },
+    },
+  ],
+  verificationStatus: {
+    type: String,
+    enum: ["unverified", "pending", "verified", "rejected"],
+    default: "unverified",
+  },
+  verifiedAt: { type: Date },
+  verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  verificationNote: { type: String },
+
   // Password reset flow
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

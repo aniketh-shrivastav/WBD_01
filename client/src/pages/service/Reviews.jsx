@@ -17,14 +17,25 @@ function Stars({ rating }) {
   const full = Math.floor(rating || 0);
   const half = (rating || 0) % 1 >= 0.5;
   const empty = 5 - full - (half ? 1 : 0);
+  const d =
+    "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z";
   return (
     <div className="rating">
       {Array.from({ length: full }).map((_, i) => (
-        <i key={`f${i}`} className="fas fa-star" />
+        <svg key={`f${i}`} className="star-icon" viewBox="0 0 24 24">
+          <path d={d} fill="#f59e0b" />
+        </svg>
       ))}
-      {half ? <i className="fas fa-star-half-alt" /> : null}
+      {half ? (
+        <svg className="star-icon" viewBox="0 0 24 24">
+          <path d={d} fill="#e2e8f0" />
+          <path d={d} fill="#f59e0b" style={{ clipPath: "inset(0 50% 0 0)" }} />
+        </svg>
+      ) : null}
       {Array.from({ length: empty }).map((_, i) => (
-        <i key={`e${i}`} className="far fa-star" />
+        <svg key={`e${i}`} className="star-icon" viewBox="0 0 24 24">
+          <path d={d} fill="#e2e8f0" />
+        </svg>
       ))}
       <span className="rating-value">{Number(rating || 0).toFixed(1)}</span>
     </div>
@@ -33,9 +44,6 @@ function Stars({ rating }) {
 
 export default function Reviews() {
   useLink("/styles/reviews.css");
-  useLink(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
-  );
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

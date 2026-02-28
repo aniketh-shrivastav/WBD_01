@@ -6,6 +6,7 @@ const profileSettingsController = require("../controllers/profileSettingsControl
 const {
   serviceOnly,
   uploadImageToDisk,
+  uploadVerificationDoc,
   handleUploadError,
 } = require("../middleware");
 
@@ -15,6 +16,21 @@ router.post(
   uploadImageToDisk.single("profilePicture"),
   handleUploadError,
   profileSettingsController.updateProfile,
+);
+
+// Verification document routes
+router.post(
+  "/profile/upload-document",
+  serviceOnly,
+  uploadVerificationDoc.single("document"),
+  handleUploadError,
+  profileSettingsController.uploadVerificationDocument,
+);
+
+router.delete(
+  "/profile/delete-document/:docType",
+  serviceOnly,
+  profileSettingsController.deleteVerificationDocument,
 );
 
 module.exports = router;

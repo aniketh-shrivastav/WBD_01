@@ -1,0 +1,17 @@
+[2026-02-28T20:40:46.705Z] POST /login - IP: ::1
+[2026-02-28T20:40:46.896Z] GET /api/session - IP: ::1
+[2026-02-28T20:40:47.213Z] GET /api/session - IP: ::1
+[2026-02-28T20:40:47.252Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:47.305Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:47.561Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T20:40:47.562Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-28T20:40:47.948Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T20:40:48.596Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T20:40:50.624Z] GET /manager/api/services - IP: ::1
+[2026-02-28T20:40:50.887Z] GET /manager/api/services - IP: ::1
+[2026-02-28T20:40:51.152Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:51.190Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:53.909Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:53.913Z] GET /manager/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-02-28T20:40:53.949Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:40:54.437Z] GET /manager/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1

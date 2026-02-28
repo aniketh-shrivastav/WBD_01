@@ -1,0 +1,9 @@
+[2026-02-28T20:11:16.659Z] GET /service/api/dashboard - IP: ::1
+[2026-02-28T20:11:16.839Z] GET /service/api/dashboard - IP: ::1
+[2026-02-28T20:11:16.920Z] GET /service/api/earnings-data?timeRange=1 - IP: ::1
+[2026-02-28T20:11:17.155Z] GET /service/api/dashboard - IP: ::1
+[2026-02-28T20:11:17.308Z] GET /service/api/earnings-data?timeRange=1 - IP: ::1
+[2026-02-28T20:11:17.369Z] GET /service/api/recent-activity?limit=5 - IP: ::1
+[2026-02-28T20:11:17.445Z] GET /service/api/earnings-data?timeRange=1 - IP: ::1
+[2026-02-28T20:11:17.776Z] GET /service/api/recent-activity?limit=5 - IP: ::1
+[2026-02-28T20:11:18.150Z] GET /service/api/recent-activity?limit=5 - IP: ::1

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import ManagerNav from "../../components/ManagerNav";
 import "../../Css/manager.css";
@@ -107,6 +107,50 @@ export default function ManagerProfileOverview() {
       </Link>
     ),
     [],
+  );
+
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyMsg, setVerifyMsg] = useState("");
+
+  const handleVerification = useCallback(
+    async (action) => {
+      const note =
+        action === "reject"
+          ? window.prompt("Reason for rejection (optional):") || ""
+          : "";
+      if (action === "reject" && note === null) return; // cancelled prompt
+      setVerifyLoading(true);
+      setVerifyMsg("");
+      try {
+        const resp = await fetch(`/manager/verify-provider/${id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ action, note }),
+        });
+        const j = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(j?.error || "Failed to update");
+        setVerifyMsg(
+          j.message ||
+            (action === "verify"
+              ? "Provider verified!"
+              : "Verification rejected"),
+        );
+        // Refresh data
+        const refreshResp = await fetch(`/manager/api/profile-overview/${id}`, {
+          headers: { Accept: "application/json" },
+        });
+        const refreshData = await refreshResp.json().catch(() => ({}));
+        if (refreshResp.ok) setData(refreshData);
+      } catch (e) {
+        setVerifyMsg(e.message || "Error");
+      } finally {
+        setVerifyLoading(false);
+      }
+    },
+    [id],
   );
 
   if (loading)
@@ -243,6 +287,194 @@ export default function ManagerProfileOverview() {
         {/* Service Provider */}
         {role === "Service Provider" ? (
           <>
+            {/* Verification Documents */}
+            <Section
+              title="Verification"
+              right={
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    padding: "4px 12px",
+                    borderRadius: 20,
+                    color: "#fff",
+                    background:
+                      data?.verification?.status === "verified"
+                        ? "linear-gradient(135deg,#059669,#10b981)"
+                        : data?.verification?.status === "pending"
+                          ? "linear-gradient(135deg,#d97706,#f59e0b)"
+                          : data?.verification?.status === "rejected"
+                            ? "linear-gradient(135deg,#dc2626,#ef4444)"
+                            : "#94a3b8",
+                  }}
+                >
+                  {data?.verification?.status === "verified"
+                    ? "✓ Verified"
+                    : data?.verification?.status === "pending"
+                      ? "⏳ Pending"
+                      : data?.verification?.status === "rejected"
+                        ? "✗ Rejected"
+                        : "Unverified"}
+                </span>
+              }
+            >
+              {(data?.verification?.documents || []).length === 0 ? (
+                <p style={{ color: "#6b7280" }}>
+                  No verification documents uploaded.
+                </p>
+              ) : (
+                <div style={{ display: "grid", gap: 10 }}>
+                  {(data?.verification?.documents || []).map((doc, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "10px 14px",
+                        borderRadius: 10,
+                        background: "#f8fafc",
+                        border: "1px solid rgba(17,24,39,0.08)",
+                        gap: 12,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 14 }}>
+                          {doc.docType}
+                        </div>
+                        <div style={{ fontSize: 12, color: "#6b7280" }}>
+                          {doc.fileName || "Document"} •{" "}
+                          {doc.uploadedAt
+                            ? new Date(doc.uploadedAt).toLocaleDateString()
+                            : ""}
+                        </div>
+                      </div>
+                      <a
+                        href={doc.docUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "6px 14px",
+                          borderRadius: 6,
+                          background: "#e8f4fd",
+                          color: "#2563eb",
+                          textDecoration: "none",
+                          fontSize: 13,
+                          fontWeight: 600,
+                        }}
+                      >
+                        📄 View
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {data?.verification?.note && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: 10,
+                    borderRadius: 8,
+                    background:
+                      data.verification.status === "rejected"
+                        ? "#fef2f2"
+                        : "#f0fdf4",
+                    border:
+                      data.verification.status === "rejected"
+                        ? "1px solid #fecaca"
+                        : "1px solid #bbf7d0",
+                    fontSize: 13,
+                  }}
+                >
+                  <strong>Note:</strong> {data.verification.note}
+                </div>
+              )}
+
+              {data?.verification?.verifiedAt && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    fontSize: 12,
+                    color: "#6b7280",
+                  }}
+                >
+                  Verified on:{" "}
+                  {new Date(data.verification.verifiedAt).toLocaleString()}
+                </div>
+              )}
+
+              {/* Verify / Reject buttons */}
+              {(data?.verification?.documents || []).length > 0 &&
+                data?.verification?.status !== "verified" && (
+                  <div
+                    style={{
+                      marginTop: 14,
+                      display: "flex",
+                      gap: 10,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <button
+                      onClick={() => handleVerification("verify")}
+                      disabled={verifyLoading}
+                      style={{
+                        padding: "8px 20px",
+                        borderRadius: 8,
+                        border: "none",
+                        background: "linear-gradient(135deg,#059669,#10b981)",
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: verifyLoading ? "not-allowed" : "pointer",
+                        opacity: verifyLoading ? 0.6 : 1,
+                      }}
+                    >
+                      ✓ Verify Provider
+                    </button>
+                    <button
+                      onClick={() => handleVerification("reject")}
+                      disabled={verifyLoading}
+                      style={{
+                        padding: "8px 20px",
+                        borderRadius: 8,
+                        border: "none",
+                        background: "linear-gradient(135deg,#dc2626,#ef4444)",
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: verifyLoading ? "not-allowed" : "pointer",
+                        opacity: verifyLoading ? 0.6 : 1,
+                      }}
+                    >
+                      ✗ Reject
+                    </button>
+                  </div>
+                )}
+
+              {verifyMsg && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: 8,
+                    borderRadius: 8,
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  {verifyMsg}
+                </div>
+              )}
+            </Section>
+
             <Section
               title="Totals"
               right={

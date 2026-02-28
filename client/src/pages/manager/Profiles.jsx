@@ -56,6 +56,41 @@ function Card({ type, data, onView }) {
         <div className="profile-body">
           <h3 className="profile-name">{text(data.name)}</h3>
           <div className="service-provider-badge">Service Provider</div>
+          {data.verificationStatus === "verified" ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg,#059669,#10b981)",
+                color: "#fff",
+                marginBottom: 6,
+              }}
+            >
+              ✓ Verified
+            </div>
+          ) : data.verificationStatus === "pending" ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg,#d97706,#f59e0b)",
+                color: "#fff",
+                marginBottom: 6,
+              }}
+            >
+              ⏳ Pending Verification
+            </div>
+          ) : null}
           <div className="profile-info">
             <p>
               <strong>Email:</strong> <span>{text(data.email)}</span>

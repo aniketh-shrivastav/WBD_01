@@ -1,0 +1,10 @@
+[2026-02-28T20:42:26.306Z] POST /manager/verify-provider/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-02-28T20:42:26.708Z] GET /manager/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-02-28T20:42:28.874Z] GET /manager/api/services - IP: ::1
+[2026-02-28T20:42:29.411Z] GET /manager/api/services - IP: ::1
+[2026-02-28T20:42:29.677Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:42:29.720Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T20:42:32.725Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-02-28T20:42:39.548Z] POST /login - IP: ::1
+[2026-02-28T20:42:39.844Z] GET /api/session - IP: ::1
+[2026-02-28T20:42:39.857Z] GET /api/session - IP: ::1
