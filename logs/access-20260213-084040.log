@@ -1,4 +1,0 @@
-[2026-02-13T03:10:40.260Z] [HEARTBEAT] log rotation
-[2026-02-13T03:10:43.578Z] GET /chat/unread-count - IP: ::1
-[2026-02-13T03:10:45.139Z] GET /chat/unread-count - IP: ::1
-[2026-02-13T03:10:46.589Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

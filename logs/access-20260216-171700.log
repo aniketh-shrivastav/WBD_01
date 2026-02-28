@@ -1,7 +1,0 @@
-[2026-02-16T11:47:04.332Z] GET /manager/api/users - IP: ::1
-[2026-02-16T11:47:04.676Z] GET /manager/api/users - IP: ::1
-[2026-02-16T11:47:04.768Z] GET /chat/unread-count - IP: ::1
-[2026-02-16T11:47:04.776Z] GET /chat/unread-count - IP: ::1
-[2026-02-16T11:47:04.943Z] GET /images3/logo2.jpg - IP: ::1
-[2026-02-16T11:47:11.093Z] [HEARTBEAT] log rotation
-[2026-02-16T11:47:19.777Z] GET /chat/unread-count - IP: ::1

@@ -1,5 +1,0 @@
-[2026-02-16T11:09:00.349Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2F - IP: ::1
-[2026-02-16T11:09:00.484Z] GET /images2/car-customization.png - IP: ::1
-[2026-02-16T11:09:00.525Z] GET /api/session - IP: ::1
-[2026-02-16T11:09:00.559Z] GET /api/session - IP: ::1
-[2026-02-16T11:09:10.176Z] [HEARTBEAT] log rotation

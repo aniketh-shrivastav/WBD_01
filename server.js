@@ -70,7 +70,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 app.use(responseTime);
-startLogRotation();
+// startLogRotation(); // Disabled: prevents creating log files every 20s
 
 // Security headers
 app.use(securityHeaders);
