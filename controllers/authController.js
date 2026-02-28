@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
+const firebaseAdmin = require("../config/firebaseAdmin");
 
 // Helper to detect if client expects JSON
 function wantsJson(req) {
@@ -526,3 +527,80 @@ exports.validateResetToken = exports.getResetPassword;
 exports.resetPassword = exports.postResetPassword;
 exports.verifyOtp = exports.postVerifyOtp;
 exports.resendOtp = exports.postResendOtp;
+
+// Google Sign-In with Firebase
+exports.googleSignIn = async (req, res) => {
+  const { idToken, role } = req.body;
+
+  if (!idToken) {
+    return res.status(400).json({ success: false, message: "ID token is required" });
+  }
+
+  try {
+    // Verify the Firebase ID token
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+    const { email, name, picture, uid } = decodedToken;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email not found in Google account" });
+    }
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Existing user - log them in
+      if (user.suspended) {
+        return res.status(403).json({ success: false, message: "Account is suspended" });
+      }
+
+      // Update profile picture if not set
+      if (!user.profilePicture && picture) {
+        user.profilePicture = picture;
+        await user.save();
+      }
+
+      // Create session
+      req.session.user = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      };
+
+      // Determine redirect based on role
+      const redirectMap = {
+        customer: "/customer/index",
+        seller: "/seller/dashboard",
+        "service-provider": "/service/dashboardService",
+        manager: "/manager/dashboard",
+        admin: "/admin/dashboard",
+      };
+
+      return res.json({
+        success: true,
+        message: "Login successful",
+        redirect: redirectMap[user.role] || "/",
+        user: req.session.user,
+      });
+    } else {
+      // New user - Google Sign-In is only for login, not signup
+      return res.status(400).json({ 
+        success: false, 
+        message: "No account found with this email. Please sign up first using the registration form." 
+      });
+    }
+  } catch (error) {
+    console.error("Google Sign-In error:", error);
+    
+    if (error.code === "auth/id-token-expired") {
+      return res.status(401).json({ success: false, message: "Token expired. Please try again." });
+    }
+    if (error.code === "auth/invalid-id-token") {
+      return res.status(401).json({ success: false, message: "Invalid token. Please try again." });
+    }
+    
+    return res.status(500).json({ success: false, message: "Google Sign-In failed. Please try again." });
+  }
+};
