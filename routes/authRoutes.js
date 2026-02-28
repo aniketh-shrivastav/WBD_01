@@ -41,4 +41,7 @@ router.post("/verify-otp", authController.verifyOtp);
 // POST Resend Signup OTP
 router.post("/resend-otp", authController.resendOtp);
 
+// POST Google Sign-In with Firebase
+router.post("/auth/google", authController.googleSignIn);
+
 module.exports = router;
