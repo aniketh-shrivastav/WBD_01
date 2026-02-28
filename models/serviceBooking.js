@@ -20,6 +20,23 @@ const ServiceBookingSchema = new mongoose.Schema({
   description: { type: String, required: true },
   district: { type: String, required: true },
   carYear: { type: Number, min: 1900, max: new Date().getFullYear() },
+
+  // Extended vehicle details
+  registrationNumber: { type: String, default: "" },
+  vehicleMake: { type: String, default: "" },
+  vehicleModel: { type: String, default: "" },
+  vehicleVariant: { type: String, default: "" },
+  fuelType: { type: String, default: "" },
+  transmission: { type: String, default: "" },
+  yearOfManufacture: { type: Number, default: null },
+  vin: { type: String, default: "" },
+  currentMileage: { type: Number, default: null },
+  insuranceProvider: { type: String, default: "" },
+  insuranceValidTill: { type: Date, default: null },
+  rcBook: { type: String, default: "" },
+  insuranceCopy: { type: String, default: "" },
+  vehiclePhotos: [{ type: String }],
+
   // For Car Painting bookings: chosen paint color (hex string like #ff0000)
   paintColor: { type: String },
   totalCost: {

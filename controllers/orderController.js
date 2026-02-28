@@ -74,17 +74,29 @@ exports.createOrderFromCart = async (req, res) => {
     let address = "";
     let district = "";
 
-    const profile = await CustomerProfile.findOne({ userId });
-    if (profile) {
-      address = profile.address;
-      district = profile.district;
+    const { deliveryAddress: customAddress, deliveryDistrict: customDistrict } =
+      req.body || {};
+
+    if (customAddress && customDistrict) {
+      // Customer provided a custom delivery address
+      address = customAddress;
+      district = customDistrict;
     } else {
-      const user = await User.findById(userId);
-      if (user) {
-        address = user.address;
-        district = user.district;
+      // Use profile address
+      const profile = await CustomerProfile.findOne({ userId });
+      if (profile) {
+        address = profile.address;
+        district = profile.district;
+      } else {
+        const user = await User.findById(userId);
+        if (user) {
+          address = user.address;
+          district = user.district;
+        }
       }
     }
+
+    const useCustomAddress = !!(customAddress && customDistrict);
 
     if (!address || !district) {
       return res.status(400).json({
@@ -109,6 +121,7 @@ exports.createOrderFromCart = async (req, res) => {
         totalAmount,
         deliveryAddress: address,
         district,
+        useCustomAddress,
         orderStatus: "pending",
         paymentStatus: "paid",
         orderStatusHistory: [

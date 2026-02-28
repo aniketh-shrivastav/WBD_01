@@ -1,0 +1,12 @@
+[2026-02-28T09:12:40.541Z] GET /api/session - IP: ::1
+[2026-02-28T09:12:40.550Z] GET /api/session - IP: ::1
+[2026-02-28T09:12:40.827Z] GET /service/api/bookings - IP: ::1
+[2026-02-28T09:12:40.880Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-28T09:12:40.959Z] GET /service/api/bookings - IP: ::1
+[2026-02-28T09:12:44.406Z] GET /api/session - IP: ::1
+[2026-02-28T09:12:44.674Z] GET /api/session - IP: ::1
+[2026-02-28T09:12:44.698Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-28T09:12:44.725Z] GET /styles/profileSettings.css - IP: ::1
+[2026-02-28T09:12:45.013Z] GET /service/api/profile - IP: ::1
+[2026-02-28T09:12:45.015Z] GET /images3/image5.jpg - IP: ::1
+[2026-02-28T09:12:45.091Z] GET /service/api/profile - IP: ::1

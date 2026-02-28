@@ -209,6 +209,23 @@ export default function ManagerProfileOverview() {
                     <strong>Car Model:</strong> {profile.carModel}
                   </div>
                 ) : null}
+                {profile.vehicleMake || profile.vehicleModel ? (
+                  <div>
+                    <strong>Vehicle:</strong>{" "}
+                    {[
+                      profile.vehicleMake,
+                      profile.vehicleModel,
+                      profile.vehicleVariant,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  </div>
+                ) : null}
+                {profile.registrationNumber ? (
+                  <div>
+                    <strong>Reg. No:</strong> {profile.registrationNumber}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -422,6 +439,157 @@ export default function ManagerProfileOverview() {
         {/* Customer */}
         {role === "Customer" ? (
           <>
+            {/* Vehicle Details Section */}
+            {(profile.registrationNumber ||
+              profile.vehicleMake ||
+              profile.vin ||
+              profile.fuelType) && (
+              <Section title="🚗 Vehicle Details">
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "10px 20px",
+                    fontSize: 14,
+                  }}
+                >
+                  {[
+                    ["Registration Number", profile.registrationNumber],
+                    ["Make", profile.vehicleMake],
+                    ["Model", profile.vehicleModel],
+                    ["Variant", profile.vehicleVariant],
+                    ["Fuel Type", profile.fuelType],
+                    ["Transmission", profile.transmission],
+                    ["Year of Manufacture", profile.yearOfManufacture],
+                    ["VIN", profile.vin],
+                    [
+                      "Current Mileage",
+                      profile.currentMileage
+                        ? `${profile.currentMileage} km`
+                        : "",
+                    ],
+                    ["Insurance Provider", profile.insuranceProvider],
+                    [
+                      "Insurance Valid Till",
+                      profile.insuranceValidTill
+                        ? new Date(
+                            profile.insuranceValidTill,
+                          ).toLocaleDateString()
+                        : "",
+                    ],
+                  ]
+                    .filter(([, v]) => v)
+                    .map(([label, val]) => (
+                      <div key={label}>
+                        <div
+                          style={{
+                            fontWeight: 600,
+                            color: "#6b7280",
+                            fontSize: 12,
+                            marginBottom: 2,
+                          }}
+                        >
+                          {label}
+                        </div>
+                        <div>{val}</div>
+                      </div>
+                    ))}
+                </div>
+
+                {(profile.rcBook || profile.insuranceCopy) && (
+                  <div
+                    style={{
+                      marginTop: 14,
+                      display: "flex",
+                      gap: 12,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {profile.rcBook && (
+                      <a
+                        href={profile.rcBook}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "6px 14px",
+                          borderRadius: 6,
+                          background: "#e8f4fd",
+                          color: "#2563eb",
+                          textDecoration: "none",
+                          fontSize: 13,
+                        }}
+                      >
+                        📄 View RC Book
+                      </a>
+                    )}
+                    {profile.insuranceCopy && (
+                      <a
+                        href={profile.insuranceCopy}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "6px 14px",
+                          borderRadius: 6,
+                          background: "#e8f4fd",
+                          color: "#2563eb",
+                          textDecoration: "none",
+                          fontSize: 13,
+                        }}
+                      >
+                        📄 View Insurance Copy
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {Array.isArray(profile.vehiclePhotos) &&
+                  profile.vehiclePhotos.length > 0 && (
+                    <div style={{ marginTop: 14 }}>
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          marginBottom: 8,
+                          fontSize: 13,
+                          color: "#6b7280",
+                        }}
+                      >
+                        Vehicle Photos
+                      </div>
+                      <div
+                        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                      >
+                        {profile.vehiclePhotos.map((url, i) => (
+                          <a
+                            key={i}
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <img
+                              src={url}
+                              alt={`Vehicle ${i + 1}`}
+                              style={{
+                                width: 100,
+                                height: 75,
+                                objectFit: "cover",
+                                borderRadius: 8,
+                                border: "1px solid rgba(17,24,39,0.12)",
+                              }}
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </Section>
+            )}
+
             <Section title="Last 3 Orders">
               {(data?.recent?.orders || []).length === 0 ? (
                 <p style={{ color: "#6b7280" }}>No orders found.</p>

@@ -1,0 +1,18 @@
+[2026-02-28T09:09:54.932Z] [GET] /favicon.ico - Status: 404 - Not Found - /favicon.ico
+Error: Not Found - /favicon.ico
+    at notFound (F:\WBD-01\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\WBD-01\node_modules\express\lib\router\index.js:328:13)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:346:12)
+    at next (F:\WBD-01\node_modules\express\lib\router\index.js:280:10)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:141:14)
+    at F:\WBD-01\server.js:146:12
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (F:\WBD-01\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:284:15
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:365:14)
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:421:3)

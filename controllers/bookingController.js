@@ -15,6 +15,21 @@ exports.createBooking = async (req, res) => {
       description,
       district,
       paintColor,
+      // Extended vehicle details
+      registrationNumber,
+      vehicleMake,
+      vehicleModel,
+      vehicleVariant,
+      fuelType,
+      transmission,
+      yearOfManufacture,
+      vin,
+      currentMileage,
+      insuranceProvider,
+      insuranceValidTill,
+      rcBook,
+      insuranceCopy,
+      vehiclePhotos,
     } = req.body;
 
     const customerId = req.user.id;
@@ -97,6 +112,25 @@ exports.createBooking = async (req, res) => {
       district,
       paintColor: normalizedPaintColor,
       totalCost,
+      // Extended vehicle details
+      registrationNumber: registrationNumber || "",
+      vehicleMake: vehicleMake || "",
+      vehicleModel: vehicleModel || "",
+      vehicleVariant: vehicleVariant || "",
+      fuelType: fuelType || "",
+      transmission: transmission || "",
+      yearOfManufacture: yearOfManufacture ? Number(yearOfManufacture) : null,
+      vin: vin || "",
+      currentMileage: currentMileage ? Number(currentMileage) : null,
+      insuranceProvider: insuranceProvider || "",
+      insuranceValidTill: insuranceValidTill || null,
+      rcBook: rcBook || "",
+      insuranceCopy: insuranceCopy || "",
+      vehiclePhotos: Array.isArray(vehiclePhotos)
+        ? vehiclePhotos
+        : vehiclePhotos
+          ? [vehiclePhotos]
+          : [],
       statusHistory: [
         {
           from: null,

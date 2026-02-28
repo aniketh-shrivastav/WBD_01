@@ -43,8 +43,9 @@ const OrderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Same as Cart userId
   items: { type: [OrderItemSchema], required: true },
   totalAmount: { type: Number, required: true },
-  deliveryAddress: { type: String, required: true }, // Get from CustomerProfile or User
+  deliveryAddress: { type: String, required: true },
   district: { type: String, required: true },
+  useCustomAddress: { type: Boolean, default: false }, // true if customer provided a different address
   orderStatus: {
     type: String,
     enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],

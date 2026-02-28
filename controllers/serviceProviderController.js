@@ -648,6 +648,22 @@ exports.getBookings = async (req, res) => {
       status: b.status,
       createdAt: b.createdAt,
       totalCost: b.totalCost || 0,
+      // Extended vehicle details
+      registrationNumber: b.registrationNumber || "",
+      vehicleMake: b.vehicleMake || "",
+      vehicleModel: b.vehicleModel || "",
+      vehicleVariant: b.vehicleVariant || "",
+      fuelType: b.fuelType || "",
+      transmission: b.transmission || "",
+      yearOfManufacture: b.yearOfManufacture || null,
+      vin: b.vin || "",
+      currentMileage: b.currentMileage || null,
+      insuranceProvider: b.insuranceProvider || "",
+      insuranceValidTill: b.insuranceValidTill || null,
+      rcBook: b.rcBook || "",
+      insuranceCopy: b.insuranceCopy || "",
+      vehiclePhotos: b.vehiclePhotos || [],
+      carYear: b.carYear || null,
     }));
 
     res.json({ success: true, bookings: shaped });

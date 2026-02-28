@@ -25,11 +25,34 @@ export default function CustomerProfile() {
     carModel: "",
     payments: "",
     profilePicture: "",
+    // Vehicle details - Basic
+    registrationNumber: "",
+    vehicleMake: "",
+    vehicleModel: "",
+    vehicleVariant: "",
+    fuelType: "",
+    transmission: "",
+    // Vehicle details - Technical
+    yearOfManufacture: "",
+    vin: "",
+    currentMileage: "",
+    insuranceProvider: "",
+    insuranceValidTill: "",
+    // Vehicle documents
+    rcBook: "",
+    insuranceCopy: "",
+    vehiclePhotos: [],
   });
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [fileName, setFileName] = useState("");
   const fileInputRef = useRef(null);
+  const rcBookInputRef = useRef(null);
+  const insuranceCopyInputRef = useRef(null);
+  const vehiclePhotosInputRef = useRef(null);
+  const [rcBookFile, setRcBookFile] = useState(null);
+  const [insuranceCopyFile, setInsuranceCopyFile] = useState(null);
+  const [vehiclePhotoFiles, setVehiclePhotoFiles] = useState([]);
   const [status, setStatus] = useState("");
   const [statusColor, setStatusColor] = useState("#333");
   const [userId, setUserId] = useState("");
@@ -56,6 +79,22 @@ export default function CustomerProfile() {
           carModel: profile.carModel || "",
           payments: profile.payments || "",
           profilePicture: profile.profilePicture || "",
+          registrationNumber: profile.registrationNumber || "",
+          vehicleMake: profile.vehicleMake || "",
+          vehicleModel: profile.vehicleModel || "",
+          vehicleVariant: profile.vehicleVariant || "",
+          fuelType: profile.fuelType || "",
+          transmission: profile.transmission || "",
+          yearOfManufacture: profile.yearOfManufacture || "",
+          vin: profile.vin || "",
+          currentMileage: profile.currentMileage || "",
+          insuranceProvider: profile.insuranceProvider || "",
+          insuranceValidTill: profile.insuranceValidTill
+            ? profile.insuranceValidTill.split("T")[0]
+            : "",
+          rcBook: profile.rcBook || "",
+          insuranceCopy: profile.insuranceCopy || "",
+          vehiclePhotos: profile.vehiclePhotos || [],
         });
         if (profile.profilePicture) {
           setImagePreview(profile.profilePicture);
@@ -223,9 +262,30 @@ export default function CustomerProfile() {
       formData.append("district", form.district);
       formData.append("carModel", form.carModel);
       formData.append("payments", form.payments);
+      // Vehicle details
+      formData.append("registrationNumber", form.registrationNumber);
+      formData.append("vehicleMake", form.vehicleMake);
+      formData.append("vehicleModel", form.vehicleModel);
+      formData.append("vehicleVariant", form.vehicleVariant);
+      formData.append("fuelType", form.fuelType);
+      formData.append("transmission", form.transmission);
+      formData.append("yearOfManufacture", form.yearOfManufacture || "");
+      formData.append("vin", form.vin);
+      formData.append("currentMileage", form.currentMileage || "");
+      formData.append("insuranceProvider", form.insuranceProvider);
+      formData.append("insuranceValidTill", form.insuranceValidTill || "");
 
       if (profileImage) {
         formData.append("profilePicture", profileImage);
+      }
+      if (rcBookFile) {
+        formData.append("rcBook", rcBookFile);
+      }
+      if (insuranceCopyFile) {
+        formData.append("insuranceCopy", insuranceCopyFile);
+      }
+      if (vehiclePhotoFiles.length > 0) {
+        vehiclePhotoFiles.forEach((f) => formData.append("vehiclePhotos", f));
       }
 
       const res = await fetch("/customer/profile", {
@@ -254,6 +314,22 @@ export default function CustomerProfile() {
       setStatusColor("green");
       setProfileImage(null);
       setFileName("");
+      setRcBookFile(null);
+      setInsuranceCopyFile(null);
+      setVehiclePhotoFiles([]);
+      // Reload to get fresh data (updated photos, docs URLs)
+      const reload = await fetch("/customer/api/profile", {
+        headers: { Accept: "application/json" },
+      });
+      if (reload.ok) {
+        const { profile: p } = await reload.json();
+        setForm((f) => ({
+          ...f,
+          rcBook: p.rcBook || "",
+          insuranceCopy: p.insuranceCopy || "",
+          vehiclePhotos: p.vehiclePhotos || [],
+        }));
+      }
     } catch (err) {
       setStatus(err.message || "Unexpected error");
       setStatusColor("red");
@@ -447,12 +523,106 @@ export default function CustomerProfile() {
               {/* Vehicle & Payment Section */}
               <div className="customer-profile-section">
                 <h3 className="customer-profile-section-title">
-                  <span>🚗</span> Vehicle & Payment
+                  <span>🚗</span> Vehicle Basic Details
                 </h3>
                 <div className="customer-profile-grid">
                   <div className="customer-form-group">
+                    <label
+                      className="customer-label"
+                      htmlFor="registrationNumber"
+                    >
+                      Registration Number
+                    </label>
+                    <input
+                      id="registrationNumber"
+                      name="registrationNumber"
+                      placeholder="e.g., KA01AB1234"
+                      value={form.registrationNumber || ""}
+                      onChange={(e) =>
+                        setField("registrationNumber", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="vehicleMake">
+                      Make (Brand)
+                    </label>
+                    <input
+                      id="vehicleMake"
+                      name="vehicleMake"
+                      placeholder="e.g., Hyundai, Honda, BMW"
+                      value={form.vehicleMake || ""}
+                      onChange={(e) => setField("vehicleMake", e.target.value)}
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="vehicleModel">
+                      Model
+                    </label>
+                    <input
+                      id="vehicleModel"
+                      name="vehicleModel"
+                      placeholder="e.g., i20, City, X5"
+                      value={form.vehicleModel || ""}
+                      onChange={(e) => setField("vehicleModel", e.target.value)}
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="vehicleVariant">
+                      Variant
+                    </label>
+                    <input
+                      id="vehicleVariant"
+                      name="vehicleVariant"
+                      placeholder="e.g., Sportz, ZX"
+                      value={form.vehicleVariant || ""}
+                      onChange={(e) =>
+                        setField("vehicleVariant", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="fuelType">
+                      Fuel Type
+                    </label>
+                    <select
+                      id="fuelType"
+                      name="fuelType"
+                      value={form.fuelType || ""}
+                      onChange={(e) => setField("fuelType", e.target.value)}
+                      className="customer-input"
+                    >
+                      <option value="">Select Fuel Type</option>
+                      <option value="Petrol">Petrol</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Electric">Electric</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="CNG">CNG</option>
+                    </select>
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="transmission">
+                      Transmission
+                    </label>
+                    <select
+                      id="transmission"
+                      name="transmission"
+                      value={form.transmission || ""}
+                      onChange={(e) => setField("transmission", e.target.value)}
+                      className="customer-input"
+                    >
+                      <option value="">Select Transmission</option>
+                      <option value="Manual">Manual</option>
+                      <option value="Automatic">Automatic</option>
+                    </select>
+                  </div>
+                  <div className="customer-form-group">
                     <label className="customer-label" htmlFor="carModel">
-                      Car Model
+                      Car Model (Legacy)
                     </label>
                     <input
                       id="carModel"
@@ -469,6 +639,263 @@ export default function CustomerProfile() {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+
+              {/* Vehicle Technical Details */}
+              <div className="customer-profile-section">
+                <h3 className="customer-profile-section-title">
+                  <span>🔧</span> Vehicle Technical Details
+                </h3>
+                <div className="customer-profile-grid">
+                  <div className="customer-form-group">
+                    <label
+                      className="customer-label"
+                      htmlFor="yearOfManufacture"
+                    >
+                      Year of Manufacture
+                    </label>
+                    <input
+                      id="yearOfManufacture"
+                      name="yearOfManufacture"
+                      type="number"
+                      placeholder="e.g., 2020"
+                      min="1980"
+                      max={new Date().getFullYear()}
+                      value={form.yearOfManufacture || ""}
+                      onChange={(e) =>
+                        setField("yearOfManufacture", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="vin">
+                      VIN (Optional)
+                    </label>
+                    <input
+                      id="vin"
+                      name="vin"
+                      placeholder="Vehicle Identification Number"
+                      value={form.vin || ""}
+                      onChange={(e) => setField("vin", e.target.value)}
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="currentMileage">
+                      Current Mileage (km)
+                    </label>
+                    <input
+                      id="currentMileage"
+                      name="currentMileage"
+                      type="number"
+                      placeholder="e.g., 45000"
+                      min="0"
+                      value={form.currentMileage || ""}
+                      onChange={(e) =>
+                        setField("currentMileage", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label
+                      className="customer-label"
+                      htmlFor="insuranceProvider"
+                    >
+                      Insurance Provider
+                    </label>
+                    <input
+                      id="insuranceProvider"
+                      name="insuranceProvider"
+                      placeholder="e.g., ICICI Lombard"
+                      value={form.insuranceProvider || ""}
+                      onChange={(e) =>
+                        setField("insuranceProvider", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                  <div className="customer-form-group">
+                    <label
+                      className="customer-label"
+                      htmlFor="insuranceValidTill"
+                    >
+                      Insurance Valid Till
+                    </label>
+                    <input
+                      id="insuranceValidTill"
+                      name="insuranceValidTill"
+                      type="date"
+                      value={form.insuranceValidTill || ""}
+                      onChange={(e) =>
+                        setField("insuranceValidTill", e.target.value)
+                      }
+                      className="customer-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Vehicle Documents Upload Section */}
+              <div className="customer-profile-section">
+                <h3 className="customer-profile-section-title">
+                  <span>📄</span> Vehicle Documents & Photos
+                </h3>
+                <div className="customer-profile-grid">
+                  {/* RC Book */}
+                  <div className="customer-form-group">
+                    <label className="customer-label">RC Book</label>
+                    {form.rcBook && (
+                      <div style={{ marginBottom: 8 }}>
+                        <a
+                          href={form.rcBook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: "var(--customer-primary)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          View Current RC Book
+                        </a>
+                      </div>
+                    )}
+                    <input
+                      ref={rcBookInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setRcBookFile(file);
+                      }}
+                      className="customer-input"
+                    />
+                  </div>
+                  {/* Insurance Copy */}
+                  <div className="customer-form-group">
+                    <label className="customer-label">Insurance Copy</label>
+                    {form.insuranceCopy && (
+                      <div style={{ marginBottom: 8 }}>
+                        <a
+                          href={form.insuranceCopy}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: "var(--customer-primary)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          View Current Insurance Copy
+                        </a>
+                      </div>
+                    )}
+                    <input
+                      ref={insuranceCopyInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setInsuranceCopyFile(file);
+                      }}
+                      className="customer-input"
+                    />
+                  </div>
+                </div>
+                {/* Vehicle Photos */}
+                <div className="customer-form-group" style={{ marginTop: 16 }}>
+                  <label className="customer-label">
+                    Vehicle Photos (Front, Rear, Interior - up to 5)
+                  </label>
+                  {form.vehiclePhotos && form.vehiclePhotos.length > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        flexWrap: "wrap",
+                        marginBottom: 12,
+                      }}
+                    >
+                      {form.vehiclePhotos.map((url, idx) => (
+                        <div key={idx} style={{ position: "relative" }}>
+                          <img
+                            src={url}
+                            alt={`Vehicle ${idx + 1}`}
+                            style={{
+                              width: 100,
+                              height: 75,
+                              objectFit: "cover",
+                              borderRadius: 8,
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (!window.confirm("Remove this vehicle photo?"))
+                                return;
+                              try {
+                                await fetch("/customer/delete-vehicle-photo", {
+                                  method: "DELETE",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Accept: "application/json",
+                                  },
+                                  body: JSON.stringify({ photoUrl: url }),
+                                });
+                                setForm((f) => ({
+                                  ...f,
+                                  vehiclePhotos: f.vehiclePhotos.filter(
+                                    (_, i) => i !== idx,
+                                  ),
+                                }));
+                              } catch (e) {
+                                alert("Failed to remove photo");
+                              }
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: -6,
+                              right: -6,
+                              width: 22,
+                              height: 22,
+                              borderRadius: "50%",
+                              background: "#e74c3c",
+                              color: "#fff",
+                              border: "none",
+                              cursor: "pointer",
+                              fontSize: 12,
+                              lineHeight: "22px",
+                              textAlign: "center",
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <input
+                    ref={vehiclePhotosInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      setVehiclePhotoFiles(files.slice(0, 5));
+                    }}
+                    className="customer-input"
+                  />
+                </div>
+              </div>
+
+              {/* Payment Section */}
+              <div className="customer-profile-section">
+                <h3 className="customer-profile-section-title">
+                  <span>💳</span> Payment
+                </h3>
+                <div className="customer-profile-grid">
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="payments">
                       Payment Method

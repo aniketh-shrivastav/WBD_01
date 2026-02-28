@@ -13,13 +13,14 @@ function useLink(href) {
 export default function BookingManagement() {
   useLink("/styles/bookingManagement.css");
   useLink(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
   );
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [bookings, setBookings] = useState([]);
+  const [viewDetail, setViewDetail] = useState(null);
 
   // UI filters
   const [activeTab, setActiveTab] = useState("Open");
@@ -118,8 +119,8 @@ export default function BookingManagement() {
       list.map((b) =>
         orderIds.includes(String(b._id)) || orderIds.includes(b.id)
           ? { ...b, status: newStatus }
-          : b
-      )
+          : b,
+      ),
     );
   }
 
@@ -235,7 +236,7 @@ export default function BookingManagement() {
         </div>
 
         <div className="order-header">
-          {['Open', 'Confirmed', 'Ready', 'Rejected'].map((tab) => (
+          {["Open", "Confirmed", "Ready", "Rejected"].map((tab) => (
             <button
               key={tab}
               className={`tab ${activeTab === tab ? "active" : ""}`}
@@ -304,25 +305,45 @@ export default function BookingManagement() {
                     )}
                   </td>
                   <td>
-                    {o.status === "Confirmed" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "6px",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
                       <button
-                        className="btn btn-ready"
-                        onClick={async () => {
-                          await updateBooking(id, "Ready");
-                          setBookings((list) =>
-                            list.map((b) =>
-                              String(b._id) === id || String(b.id) === id
-                                ? { ...b, status: "Ready" }
-                                : b
-                            )
-                          );
+                        className="btn"
+                        style={{
+                          background: "#3498db",
+                          color: "#fff",
+                          padding: "4px 10px",
+                          borderRadius: 4,
+                          fontSize: 12,
                         }}
+                        onClick={() => setViewDetail(o)}
                       >
-                        Mark as Ready
+                        View Details
                       </button>
-                    ) : (
-                      <span>—</span>
-                    )}
+                      {o.status === "Confirmed" ? (
+                        <button
+                          className="btn btn-ready"
+                          onClick={async () => {
+                            await updateBooking(id, "Ready");
+                            setBookings((list) =>
+                              list.map((b) =>
+                                String(b._id) === id || String(b.id) === id
+                                  ? { ...b, status: "Ready" }
+                                  : b,
+                              ),
+                            );
+                          }}
+                        >
+                          Mark as Ready
+                        </button>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               );
@@ -347,6 +368,222 @@ export default function BookingManagement() {
           </div>
         ) : null}
       </div>
+
+      {/* Vehicle Details Modal */}
+      {viewDetail && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setViewDetail(null)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 12,
+              width: "90%",
+              maxWidth: 600,
+              maxHeight: "85vh",
+              overflowY: "auto",
+              padding: "24px",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setViewDetail(null)}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 16,
+                background: "none",
+                border: "none",
+                fontSize: 22,
+                cursor: "pointer",
+              }}
+            >
+              ×
+            </button>
+            <h3 style={{ marginBottom: 16 }}>🚗 Vehicle & Booking Details</h3>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "10px 20px",
+                fontSize: 14,
+              }}
+            >
+              {[
+                ["Customer", viewDetail.customerName],
+                ["Email", viewDetail.customerEmail],
+                ["Phone", viewDetail.phone],
+                ["Address", viewDetail.address],
+                ["District", viewDetail.district],
+                ["Car Model", viewDetail.carModel],
+                ["Reg. Number", viewDetail.registrationNumber],
+                ["Make", viewDetail.vehicleMake],
+                ["Model", viewDetail.vehicleModel],
+                ["Variant", viewDetail.vehicleVariant],
+                ["Fuel Type", viewDetail.fuelType],
+                ["Transmission", viewDetail.transmission],
+                ["Year of Mfg", viewDetail.yearOfManufacture],
+                ["VIN", viewDetail.vin],
+                [
+                  "Mileage",
+                  viewDetail.currentMileage
+                    ? `${viewDetail.currentMileage} km`
+                    : "",
+                ],
+                ["Insurance Provider", viewDetail.insuranceProvider],
+                [
+                  "Insurance Valid Till",
+                  viewDetail.insuranceValidTill
+                    ? new Date(
+                        viewDetail.insuranceValidTill,
+                      ).toLocaleDateString()
+                    : "",
+                ],
+                ["Services", (viewDetail.selectedServices || []).join(", ")],
+                ["Description", viewDetail.description],
+                ["Status", viewDetail.status],
+                [
+                  "Total Cost",
+                  viewDetail.totalCost ? `₹${viewDetail.totalCost}` : "—",
+                ],
+              ]
+                .filter(([, v]) => v)
+                .map(([label, val]) => (
+                  <div key={label}>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        color: "#555",
+                        fontSize: 12,
+                        marginBottom: 2,
+                      }}
+                    >
+                      {label}
+                    </div>
+                    <div>{val}</div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Document Links */}
+            {(viewDetail.rcBook || viewDetail.insuranceCopy) && (
+              <div
+                style={{
+                  marginTop: 16,
+                  display: "flex",
+                  gap: 12,
+                  flexWrap: "wrap",
+                }}
+              >
+                {viewDetail.rcBook && (
+                  <a
+                    href={viewDetail.rcBook}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      background: "#e8f4fd",
+                      color: "#2980b9",
+                      textDecoration: "none",
+                      fontSize: 13,
+                    }}
+                  >
+                    📄 RC Book
+                  </a>
+                )}
+                {viewDetail.insuranceCopy && (
+                  <a
+                    href={viewDetail.insuranceCopy}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      background: "#e8f4fd",
+                      color: "#2980b9",
+                      textDecoration: "none",
+                      fontSize: 13,
+                    }}
+                  >
+                    📄 Insurance Copy
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Vehicle Photos */}
+            {viewDetail.vehiclePhotos &&
+              viewDetail.vehiclePhotos.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      marginBottom: 8,
+                      fontSize: 13,
+                      color: "#555",
+                    }}
+                  >
+                    Vehicle Photos
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {viewDetail.vehiclePhotos.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noreferrer">
+                        <img
+                          src={url}
+                          alt={`Vehicle ${i + 1}`}
+                          style={{
+                            width: 90,
+                            height: 70,
+                            objectFit: "cover",
+                            borderRadius: 6,
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            <div style={{ textAlign: "right", marginTop: 20 }}>
+              <button
+                onClick={() => setViewDetail(null)}
+                style={{
+                  padding: "8px 24px",
+                  borderRadius: 6,
+                  background: "#3498db",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error ? (
         <div

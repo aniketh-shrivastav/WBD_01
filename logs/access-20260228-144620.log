@@ -1,0 +1,4 @@
+[2026-02-28T09:16:24.053Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2F - IP: ::1
+[2026-02-28T09:16:24.143Z] GET /images2/car-customization.png - IP: ::1
+[2026-02-28T09:16:24.158Z] GET /api/session - IP: ::1
+[2026-02-28T09:16:24.305Z] GET /api/session - IP: ::1

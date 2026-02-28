@@ -889,12 +889,10 @@ exports.createManager = async (req, res) => {
     if (!emailRegex.test(email))
       return res.status(400).json({ success: false, message: "Invalid email" });
     if (password.length < 6)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Password must be at least 6 characters",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
     if (phone && !/^\d{10}$/.test(String(phone).trim())) {
       return res
         .status(400)
@@ -1437,6 +1435,20 @@ exports.getProfileOverview = async (req, res) => {
           district: customerProfile.district || "",
           address: customerProfile.address || "",
           carModel: customerProfile.carModel || "",
+          registrationNumber: customerProfile.registrationNumber || "",
+          vehicleMake: customerProfile.vehicleMake || "",
+          vehicleModel: customerProfile.vehicleModel || "",
+          vehicleVariant: customerProfile.vehicleVariant || "",
+          fuelType: customerProfile.fuelType || "",
+          transmission: customerProfile.transmission || "",
+          yearOfManufacture: customerProfile.yearOfManufacture || "",
+          vin: customerProfile.vin || "",
+          currentMileage: customerProfile.currentMileage || "",
+          insuranceProvider: customerProfile.insuranceProvider || "",
+          insuranceValidTill: customerProfile.insuranceValidTill || "",
+          rcBook: customerProfile.rcBook || "",
+          insuranceCopy: customerProfile.insuranceCopy || "",
+          vehiclePhotos: customerProfile.vehiclePhotos || [],
         },
         recent: {
           orders: recentOrders || [],

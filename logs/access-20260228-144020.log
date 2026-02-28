@@ -1,0 +1,8 @@
+[2026-02-28T09:10:30.484Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T09:10:39.321Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T09:10:39.330Z] GET /customer/api/cart - IP: ::1
+[2026-02-28T09:10:39.362Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T09:10:39.634Z] GET /styles/styles.css - IP: ::1
+[2026-02-28T09:10:39.635Z] GET /api/payments/config - IP: ::1
+[2026-02-28T09:10:39.694Z] GET /customer/api/cart - IP: ::1
+[2026-02-28T09:10:39.952Z] GET /api/payments/config - IP: ::1

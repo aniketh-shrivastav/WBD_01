@@ -625,14 +625,64 @@ exports.getProfileApi = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { name, phone, address, district, carModel, payments } = req.body;
+    const {
+      name,
+      phone,
+      address,
+      district,
+      carModel,
+      payments,
+      registrationNumber,
+      vehicleMake,
+      vehicleModel,
+      vehicleVariant,
+      fuelType,
+      transmission,
+      yearOfManufacture,
+      vin,
+      currentMileage,
+      insuranceProvider,
+      insuranceValidTill,
+    } = req.body;
 
     await User.findByIdAndUpdate(userId, { name, phone }, { new: true });
 
-    const updateData = { address, district, carModel, payments };
+    const updateData = {
+      address,
+      district,
+      carModel,
+      payments,
+      registrationNumber: registrationNumber || "",
+      vehicleMake: vehicleMake || "",
+      vehicleModel: vehicleModel || "",
+      vehicleVariant: vehicleVariant || "",
+      fuelType: fuelType || "",
+      transmission: transmission || "",
+      yearOfManufacture: yearOfManufacture ? Number(yearOfManufacture) : null,
+      vin: vin || "",
+      currentMileage: currentMileage ? Number(currentMileage) : null,
+      insuranceProvider: insuranceProvider || "",
+      insuranceValidTill: insuranceValidTill || null,
+    };
 
     // Handle profile picture upload to Cloudinary
-    if (req.file) {
+    if (req.files && req.files.profilePicture && req.files.profilePicture[0]) {
+      const file = req.files.profilePicture[0];
+      try {
+        const uploadRes = await cloudinary.uploader.upload(file.path, {
+          folder: "customer_profiles",
+          resource_type: "image",
+          timeout: 120000,
+        });
+        updateData.profilePicture = uploadRes.secure_url;
+        fs.unlinkSync(file.path);
+      } catch (uploadErr) {
+        console.error("Cloudinary upload error:", uploadErr);
+        if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        throw new Error("Failed to upload profile picture");
+      }
+    } else if (req.file) {
+      // Backward compat for single upload
       try {
         const uploadRes = await cloudinary.uploader.upload(req.file.path, {
           folder: "customer_profiles",
@@ -640,15 +690,73 @@ exports.updateProfile = async (req, res) => {
           timeout: 120000,
         });
         updateData.profilePicture = uploadRes.secure_url;
-
         fs.unlinkSync(req.file.path);
       } catch (uploadErr) {
         console.error("Cloudinary upload error:", uploadErr);
-        if (req.file.path && fs.existsSync(req.file.path)) {
+        if (req.file.path && fs.existsSync(req.file.path))
           fs.unlinkSync(req.file.path);
-        }
         throw new Error("Failed to upload profile picture");
       }
+    }
+
+    // Handle RC Book upload
+    if (req.files && req.files.rcBook && req.files.rcBook[0]) {
+      const file = req.files.rcBook[0];
+      try {
+        const uploadRes = await cloudinary.uploader.upload(file.path, {
+          folder: "customer_vehicle_docs",
+          resource_type: "image",
+          timeout: 120000,
+        });
+        updateData.rcBook = uploadRes.secure_url;
+        fs.unlinkSync(file.path);
+      } catch (uploadErr) {
+        console.error("RC Book upload error:", uploadErr);
+        if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      }
+    }
+
+    // Handle Insurance Copy upload
+    if (req.files && req.files.insuranceCopy && req.files.insuranceCopy[0]) {
+      const file = req.files.insuranceCopy[0];
+      try {
+        const uploadRes = await cloudinary.uploader.upload(file.path, {
+          folder: "customer_vehicle_docs",
+          resource_type: "image",
+          timeout: 120000,
+        });
+        updateData.insuranceCopy = uploadRes.secure_url;
+        fs.unlinkSync(file.path);
+      } catch (uploadErr) {
+        console.error("Insurance copy upload error:", uploadErr);
+        if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      }
+    }
+
+    // Handle Vehicle Photos upload (multiple)
+    if (
+      req.files &&
+      req.files.vehiclePhotos &&
+      req.files.vehiclePhotos.length > 0
+    ) {
+      const urls = [];
+      for (const file of req.files.vehiclePhotos) {
+        try {
+          const uploadRes = await cloudinary.uploader.upload(file.path, {
+            folder: "customer_vehicle_photos",
+            resource_type: "image",
+            timeout: 120000,
+          });
+          urls.push(uploadRes.secure_url);
+          fs.unlinkSync(file.path);
+        } catch (uploadErr) {
+          console.error("Vehicle photo upload error:", uploadErr);
+          if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        }
+      }
+      // Append to existing photos
+      const existing = await CustomerProfile.findOne({ userId });
+      updateData.vehiclePhotos = [...(existing?.vehiclePhotos || []), ...urls];
     }
 
     await CustomerProfile.findOneAndUpdate({ userId }, updateData, {
@@ -673,6 +781,26 @@ exports.updateProfile = async (req, res) => {
       });
     }
     res.status(500).send("Error updating profile");
+  }
+};
+
+// DELETE /customer/delete-vehicle-photo
+exports.deleteVehiclePhoto = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const { photoUrl } = req.body;
+    if (!photoUrl)
+      return res
+        .status(400)
+        .json({ success: false, message: "Photo URL required" });
+    await CustomerProfile.findOneAndUpdate(
+      { userId },
+      { $pull: { vehiclePhotos: photoUrl } },
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete vehicle photo error:", err);
+    res.status(500).json({ success: false, message: "Failed to delete photo" });
   }
 };
 

@@ -49,6 +49,21 @@ export default function CustomerBooking() {
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
 
+  // Extended vehicle details
+  const [registrationNumber, setRegistrationNumber] = useState("");
+  const [vehicleMake, setVehicleMake] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
+  const [vehicleVariant, setVehicleVariant] = useState("");
+  const [fuelType, setFuelType] = useState("");
+  const [transmission, setTransmission] = useState("");
+  const [yearOfManufacture, setYearOfManufacture] = useState("");
+  const [vin, setVin] = useState("");
+  const [currentMileage, setCurrentMileage] = useState("");
+  const [insuranceProvider, setInsuranceProvider] = useState("");
+  const [insuranceValidTill, setInsuranceValidTill] = useState("");
+  const [profileVehicleData, setProfileVehicleData] = useState(null);
+  const [useProfileVehicle, setUseProfileVehicle] = useState(false);
+
   // Car Painting selection
   const [paintColor, setPaintColor] = useState("");
 
@@ -86,6 +101,10 @@ export default function CustomerBooking() {
         );
         setServiceCostMap(j.serviceCostMap || {});
         setRatingsMap(j.ratingsMap || {});
+        // Store profile vehicle data for fetch-from-profile feature
+        if (j.customerProfile) {
+          setProfileVehicleData(j.customerProfile);
+        }
       } catch (e) {
         if (!cancelled) setError(e.message || "Failed to load booking data");
       } finally {
@@ -400,6 +419,23 @@ export default function CustomerBooking() {
           paintColor: paintColor
             ? String(paintColor).trim().toLowerCase()
             : undefined,
+          // Extended vehicle details
+          registrationNumber: registrationNumber.trim(),
+          vehicleMake: vehicleMake.trim(),
+          vehicleModel: vehicleModel.trim(),
+          vehicleVariant: vehicleVariant.trim(),
+          fuelType,
+          transmission,
+          yearOfManufacture: yearOfManufacture
+            ? Number(yearOfManufacture)
+            : null,
+          vin: vin.trim(),
+          currentMileage: currentMileage ? Number(currentMileage) : null,
+          insuranceProvider: insuranceProvider.trim(),
+          insuranceValidTill: insuranceValidTill || null,
+          rcBook: profileVehicleData?.rcBook || "",
+          insuranceCopy: profileVehicleData?.insuranceCopy || "",
+          vehiclePhotos: profileVehicleData?.vehiclePhotos || [],
         }),
       });
       const j = await res.json().catch(() => ({}));
@@ -929,6 +965,334 @@ export default function CustomerBooking() {
                     </div>
                   </div>
 
+                  {/* Vehicle Details Section */}
+                  <div
+                    style={{
+                      background: "rgba(99, 102, 241, 0.05)",
+                      border: "1px solid rgba(99, 102, 241, 0.15)",
+                      borderRadius: 12,
+                      padding: "20px",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: 16,
+                        flexWrap: "wrap",
+                        gap: 12,
+                      }}
+                    >
+                      <h3 style={{ margin: 0, fontSize: 16, color: "#1e293b" }}>
+                        🚘 Vehicle Details
+                      </h3>
+                      {profileVehicleData &&
+                        (profileVehicleData.registrationNumber ||
+                          profileVehicleData.vehicleMake) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!useProfileVehicle) {
+                                const p = profileVehicleData;
+                                setRegistrationNumber(
+                                  p.registrationNumber || "",
+                                );
+                                setVehicleMake(p.vehicleMake || "");
+                                setVehicleModel(p.vehicleModel || "");
+                                setVehicleVariant(p.vehicleVariant || "");
+                                setFuelType(p.fuelType || "");
+                                setTransmission(p.transmission || "");
+                                setYearOfManufacture(p.yearOfManufacture || "");
+                                setVin(p.vin || "");
+                                setCurrentMileage(p.currentMileage || "");
+                                setInsuranceProvider(p.insuranceProvider || "");
+                                setInsuranceValidTill(
+                                  p.insuranceValidTill
+                                    ? String(p.insuranceValidTill).split("T")[0]
+                                    : "",
+                                );
+                                if (p.carModel) setCarModel(p.carModel);
+                              } else {
+                                setRegistrationNumber("");
+                                setVehicleMake("");
+                                setVehicleModel("");
+                                setVehicleVariant("");
+                                setFuelType("");
+                                setTransmission("");
+                                setYearOfManufacture("");
+                                setVin("");
+                                setCurrentMileage("");
+                                setInsuranceProvider("");
+                                setInsuranceValidTill("");
+                              }
+                              setUseProfileVehicle(!useProfileVehicle);
+                            }}
+                            className={`booking-form-input`}
+                            style={{
+                              cursor: "pointer",
+                              background: useProfileVehicle
+                                ? "#6366f1"
+                                : "#fff",
+                              color: useProfileVehicle ? "#fff" : "#6366f1",
+                              border: "2px solid #6366f1",
+                              borderRadius: 8,
+                              padding: "8px 16px",
+                              fontWeight: 600,
+                              fontSize: 13,
+                              width: "auto",
+                            }}
+                          >
+                            {useProfileVehicle
+                              ? "✓ Fetched from Profile"
+                              : "📥 Fetch from Profile"}
+                          </button>
+                        )}
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label
+                          className="booking-form-label"
+                          htmlFor="reg-number"
+                        >
+                          <span className="booking-form-label-icon">🔢</span>
+                          Registration Number
+                        </label>
+                        <input
+                          type="text"
+                          id="reg-number"
+                          placeholder="e.g., KA01AB1234"
+                          value={registrationNumber}
+                          onChange={(e) =>
+                            setRegistrationNumber(e.target.value)
+                          }
+                          className="booking-form-input"
+                        />
+                      </div>
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-make">
+                          <span className="booking-form-label-icon">🏭</span>
+                          Make (Brand)
+                        </label>
+                        <input
+                          type="text"
+                          id="v-make"
+                          placeholder="e.g., Hyundai, Honda, BMW"
+                          value={vehicleMake}
+                          onChange={(e) => setVehicleMake(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-model">
+                          <span className="booking-form-label-icon">🚗</span>
+                          Model
+                        </label>
+                        <input
+                          type="text"
+                          id="v-model"
+                          placeholder="e.g., i20, City, X5"
+                          value={vehicleModel}
+                          onChange={(e) => setVehicleModel(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                      <div className="booking-form-group">
+                        <label
+                          className="booking-form-label"
+                          htmlFor="v-variant"
+                        >
+                          <span className="booking-form-label-icon">🔖</span>
+                          Variant
+                        </label>
+                        <input
+                          type="text"
+                          id="v-variant"
+                          placeholder="e.g., Sportz, ZX"
+                          value={vehicleVariant}
+                          onChange={(e) => setVehicleVariant(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-fuel">
+                          <span className="booking-form-label-icon">⛽</span>
+                          Fuel Type
+                        </label>
+                        <select
+                          id="v-fuel"
+                          value={fuelType}
+                          onChange={(e) => setFuelType(e.target.value)}
+                          className="booking-form-input"
+                        >
+                          <option value="">Select</option>
+                          <option value="Petrol">Petrol</option>
+                          <option value="Diesel">Diesel</option>
+                          <option value="Electric">Electric</option>
+                          <option value="Hybrid">Hybrid</option>
+                          <option value="CNG">CNG</option>
+                        </select>
+                      </div>
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-trans">
+                          <span className="booking-form-label-icon">⚙️</span>
+                          Transmission
+                        </label>
+                        <select
+                          id="v-trans"
+                          value={transmission}
+                          onChange={(e) => setTransmission(e.target.value)}
+                          className="booking-form-input"
+                        >
+                          <option value="">Select</option>
+                          <option value="Manual">Manual</option>
+                          <option value="Automatic">Automatic</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-yom">
+                          <span className="booking-form-label-icon">📅</span>
+                          Year of Manufacture
+                        </label>
+                        <input
+                          type="number"
+                          id="v-yom"
+                          placeholder="e.g., 2020"
+                          min="1980"
+                          max={new Date().getFullYear()}
+                          value={yearOfManufacture}
+                          onChange={(e) => setYearOfManufacture(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                      <div className="booking-form-group">
+                        <label className="booking-form-label" htmlFor="v-vin">
+                          <span className="booking-form-label-icon">🔐</span>
+                          VIN (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          id="v-vin"
+                          placeholder="Vehicle Identification Number"
+                          value={vin}
+                          onChange={(e) => setVin(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label
+                          className="booking-form-label"
+                          htmlFor="v-mileage"
+                        >
+                          <span className="booking-form-label-icon">🛣️</span>
+                          Current Mileage (km)
+                        </label>
+                        <input
+                          type="number"
+                          id="v-mileage"
+                          placeholder="e.g., 45000"
+                          min="0"
+                          value={currentMileage}
+                          onChange={(e) => setCurrentMileage(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                      <div className="booking-form-group">
+                        <label
+                          className="booking-form-label"
+                          htmlFor="v-ins-provider"
+                        >
+                          <span className="booking-form-label-icon">🏢</span>
+                          Insurance Provider
+                        </label>
+                        <input
+                          type="text"
+                          id="v-ins-provider"
+                          placeholder="e.g., ICICI Lombard"
+                          value={insuranceProvider}
+                          onChange={(e) => setInsuranceProvider(e.target.value)}
+                          className="booking-form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="booking-form-row">
+                      <div className="booking-form-group">
+                        <label
+                          className="booking-form-label"
+                          htmlFor="v-ins-till"
+                        >
+                          <span className="booking-form-label-icon">📆</span>
+                          Insurance Valid Till
+                        </label>
+                        <input
+                          type="date"
+                          id="v-ins-till"
+                          value={insuranceValidTill}
+                          onChange={(e) =>
+                            setInsuranceValidTill(e.target.value)
+                          }
+                          className="booking-form-input"
+                        />
+                      </div>
+                      <div className="booking-form-group"></div>
+                    </div>
+
+                    {/* Show uploaded docs from profile if available */}
+                    {useProfileVehicle && profileVehicleData && (
+                      <div
+                        style={{
+                          marginTop: 12,
+                          display: "flex",
+                          gap: 16,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {profileVehicleData.rcBook && (
+                          <a
+                            href={profileVehicleData.rcBook}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "#6366f1", fontSize: 13 }}
+                          >
+                            📄 View RC Book
+                          </a>
+                        )}
+                        {profileVehicleData.insuranceCopy && (
+                          <a
+                            href={profileVehicleData.insuranceCopy}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "#6366f1", fontSize: 13 }}
+                          >
+                            📄 View Insurance Copy
+                          </a>
+                        )}
+                        {(profileVehicleData.vehiclePhotos || []).length >
+                          0 && (
+                          <span style={{ color: "#6366f1", fontSize: 13 }}>
+                            📸 {profileVehicleData.vehiclePhotos.length} Vehicle
+                            Photo(s) attached
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Address */}
                   <div className="booking-form-group">
                     <label className="booking-form-label" htmlFor="address">
@@ -1081,6 +1445,104 @@ export default function CustomerBooking() {
                           {description.trim()}
                         </div>
                       </div>
+
+                      {/* Vehicle Details in Summary */}
+                      {registrationNumber && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            🔢 Registration
+                          </div>
+                          <div className="booking-summary-value">
+                            {registrationNumber}
+                          </div>
+                        </div>
+                      )}
+                      {vehicleMake && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">🏭 Make</div>
+                          <div className="booking-summary-value">
+                            {vehicleMake}
+                          </div>
+                        </div>
+                      )}
+                      {vehicleModel && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            🚗 Vehicle Model
+                          </div>
+                          <div className="booking-summary-value">
+                            {vehicleModel}
+                          </div>
+                        </div>
+                      )}
+                      {vehicleVariant && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            🔖 Variant
+                          </div>
+                          <div className="booking-summary-value">
+                            {vehicleVariant}
+                          </div>
+                        </div>
+                      )}
+                      {fuelType && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">⛽ Fuel</div>
+                          <div className="booking-summary-value">
+                            {fuelType}
+                          </div>
+                        </div>
+                      )}
+                      {transmission && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            ⚙️ Transmission
+                          </div>
+                          <div className="booking-summary-value">
+                            {transmission}
+                          </div>
+                        </div>
+                      )}
+                      {yearOfManufacture && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            📅 Mfg Year
+                          </div>
+                          <div className="booking-summary-value">
+                            {yearOfManufacture}
+                          </div>
+                        </div>
+                      )}
+                      {currentMileage && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            🛣️ Mileage
+                          </div>
+                          <div className="booking-summary-value">
+                            {currentMileage} km
+                          </div>
+                        </div>
+                      )}
+                      {insuranceProvider && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            🏢 Insurance
+                          </div>
+                          <div className="booking-summary-value">
+                            {insuranceProvider}
+                          </div>
+                        </div>
+                      )}
+                      {insuranceValidTill && (
+                        <div className="booking-summary-item">
+                          <div className="booking-summary-label">
+                            📆 Insurance Till
+                          </div>
+                          <div className="booking-summary-value">
+                            {insuranceValidTill}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="booking-summary-total">

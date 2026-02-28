@@ -26,6 +26,11 @@ export default function CustomerCart() {
   const [cardPaymentEnabled, setCardPaymentEnabled] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
 
+  // Delivery address choice
+  const [addressMode, setAddressMode] = useState("profile"); // "profile" or "custom"
+  const [customAddress, setCustomAddress] = useState("");
+  const [customDistrict, setCustomDistrict] = useState("");
+
   function backendBase() {
     const { protocol, hostname, port } = window.location;
     if (port === "5173") return `${protocol}//${hostname}:3000`;
@@ -168,14 +173,32 @@ export default function CustomerCart() {
       return;
     }
 
+    // Validate custom address if selected
+    if (addressMode === "custom") {
+      if (!customAddress.trim() || customAddress.trim().length < 5) {
+        alert("Please enter a valid delivery address (min 5 characters).");
+        return;
+      }
+      if (!customDistrict.trim() || customDistrict.trim().length < 2) {
+        alert("Please enter a valid district.");
+        return;
+      }
+    }
+
     try {
+      const orderBody = { paymentMethod };
+      if (addressMode === "custom") {
+        orderBody.deliveryAddress = customAddress.trim();
+        orderBody.deliveryDistrict = customDistrict.trim();
+      }
+
       const res = await fetch("/customer/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ paymentMethod }),
+        body: JSON.stringify(orderBody),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -348,6 +371,142 @@ export default function CustomerCart() {
                   ₹{totalAmount.toFixed(2)}
                 </span>
               </div>
+            </div>
+
+            {/* Delivery Address Choice */}
+            <div
+              style={{
+                background: "var(--customer-card-bg)",
+                borderRadius: "12px",
+                padding: "20px",
+                marginTop: "20px",
+                border: "1px solid var(--customer-border)",
+              }}
+            >
+              <h4 style={{ marginBottom: "14px", fontWeight: 600 }}>
+                📍 Delivery Address
+              </h4>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "16px",
+                  flexWrap: "wrap",
+                  marginBottom: "12px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    cursor: "pointer",
+                    padding: "10px 18px",
+                    borderRadius: "8px",
+                    border:
+                      addressMode === "profile"
+                        ? "2px solid var(--customer-primary)"
+                        : "2px solid var(--customer-border)",
+                    background:
+                      addressMode === "profile"
+                        ? "var(--customer-primary-light, rgba(37,99,235,0.08))"
+                        : "transparent",
+                    fontWeight: addressMode === "profile" ? 600 : 400,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="addressMode"
+                    value="profile"
+                    checked={addressMode === "profile"}
+                    onChange={() => setAddressMode("profile")}
+                  />
+                  Use Profile Address
+                </label>
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    cursor: "pointer",
+                    padding: "10px 18px",
+                    borderRadius: "8px",
+                    border:
+                      addressMode === "custom"
+                        ? "2px solid var(--customer-primary)"
+                        : "2px solid var(--customer-border)",
+                    background:
+                      addressMode === "custom"
+                        ? "var(--customer-primary-light, rgba(37,99,235,0.08))"
+                        : "transparent",
+                    fontWeight: addressMode === "custom" ? 600 : 400,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="addressMode"
+                    value="custom"
+                    checked={addressMode === "custom"}
+                    onChange={() => setAddressMode("custom")}
+                  />
+                  Enter Different Address
+                </label>
+              </div>
+
+              {addressMode === "custom" && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                    marginTop: "8px",
+                  }}
+                >
+                  <div style={{ flex: "2 1 220px" }}>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      Delivery Address
+                    </label>
+                    <input
+                      type="text"
+                      className="customer-input"
+                      placeholder="Enter full delivery address"
+                      value={customAddress}
+                      onChange={(e) => setCustomAddress(e.target.value)}
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                  <div style={{ flex: "1 1 140px" }}>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      District
+                    </label>
+                    <input
+                      type="text"
+                      className="customer-input"
+                      placeholder="District"
+                      value={customDistrict}
+                      onChange={(e) => setCustomDistrict(e.target.value)}
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
