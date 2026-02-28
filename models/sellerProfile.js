@@ -10,6 +10,11 @@ const SellerProfileSchema = new mongoose.Schema(
     },
     ownerName: { type: String, required: true }, // Added owner's name
     address: { type: String, required: true },
+    sellerType: {
+      type: String,
+      enum: ["individual", "business"],
+      default: "individual",
+    },
   },
   { timestamps: true },
 );
@@ -18,7 +23,8 @@ const SellerProfileSchema = new mongoose.Schema(
 SellerProfileSchema.pre(/^find/, function (next) {
   this.populate({
     path: "sellerId",
-    select: "name email phone suspended profilePicture",
+    select:
+      "name email phone suspended profilePicture verificationStatus verificationDocuments verifiedAt verificationNote",
   });
   next();
 });

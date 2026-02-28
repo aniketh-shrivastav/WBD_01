@@ -143,6 +143,7 @@ function Card({ type, data, onView }) {
   if (type === "seller") {
     const user = data.sellerId || {};
     const needsUpdate = isEmpty(data.ownerName) || isEmpty(data.address);
+    const sellerVerificationStatus = user.verificationStatus || "";
     return (
       <div
         className="profile-card seller"
@@ -154,6 +155,41 @@ function Card({ type, data, onView }) {
         <div className="profile-body">
           <h3 className="profile-name">{text(user.name)}</h3>
           <div className="seller-badge">Seller</div>
+          {sellerVerificationStatus === "verified" ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg,#059669,#10b981)",
+                color: "#fff",
+                marginBottom: 6,
+              }}
+            >
+              ✓ Verified
+            </div>
+          ) : sellerVerificationStatus === "pending" ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg,#d97706,#f59e0b)",
+                color: "#fff",
+                marginBottom: 6,
+              }}
+            >
+              ⏳ Pending Verification
+            </div>
+          ) : null}
           <div className="profile-info">
             <p>
               <strong>Contact Email:</strong> <span>{text(user.email)}</span>

@@ -26,6 +26,14 @@ export default function ProductManagement() {
   const [stockError, setStockError] = useState("");
   const [stockLoading, setStockLoading] = useState(false);
 
+  // Edit product state
+  const [editProduct, setEditProduct] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editImages, setEditImages] = useState([]);
+  const [editErrors, setEditErrors] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+  const editImageRef = useRef(null);
+
   const imageInputRef = useRef(null);
 
   // Validation rules (like your JS version)
@@ -224,6 +232,79 @@ export default function ProductManagement() {
       setStockError(err?.message || "Failed to update stock");
     } finally {
       setStockLoading(false);
+    }
+  }
+
+  // Open edit modal
+  function openEditModal(product) {
+    setEditProduct(product);
+    setEditForm({
+      name: product.name || "",
+      price: String(product.price ?? ""),
+      description: product.description || "",
+      category: product.category || "",
+      brand: product.brand || "",
+      quantity: String(product.quantity ?? ""),
+      sku: product.sku || "",
+      compatibility: product.compatibility || "",
+    });
+    setEditImages([]);
+    setEditErrors({});
+    setEditLoading(false);
+  }
+
+  function setEditField(key, value) {
+    setEditForm((prev) => ({ ...prev, [key]: value }));
+    setEditErrors((prev) => ({ ...prev, [key]: undefined }));
+  }
+
+  function validateEditForm() {
+    const errs = {};
+    const d = { ...editForm };
+    if (!d.name?.trim()) errs.name = "Product Name required";
+    if (!d.category?.trim()) errs.category = "Category required";
+    if (!d.brand?.trim()) errs.brand = "Brand required";
+    if (!d.description?.trim()) errs.description = "Description required";
+    if (d.sku && d.sku.length !== 6)
+      errs.sku = "SKU must be exactly 6 characters";
+    if (!/^\d+(\.\d{1,2})?$/.test(d.price)) errs.price = "Invalid price format";
+    if (String(parseInt(d.quantity, 10)) !== String(d.quantity))
+      errs.quantity = "Quantity must be integer";
+    setEditErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  async function handleEditSubmit() {
+    if (!validateEditForm()) return;
+    setEditLoading(true);
+    try {
+      const formData = new FormData();
+      Object.entries(editForm).forEach(([k, v]) => {
+        formData.append(k, v ?? "");
+      });
+      if (editImages.length > 0) {
+        editImages.forEach((file) => formData.append("images", file));
+      }
+      const res = await fetch(`/seller/edit-product/${editProduct._id}`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!data.success)
+        throw new Error(data.message || "Failed to update product");
+      setEditProduct(null);
+      setStatus("Product updated successfully!");
+      await loadProducts();
+    } catch (err) {
+      console.error(err);
+      setEditErrors((prev) => ({
+        ...prev,
+        _form: err?.message || "Failed to update product",
+      }));
+    } finally {
+      setEditLoading(false);
     }
   }
 
@@ -441,6 +522,13 @@ export default function ProductManagement() {
                       }}
                     >
                       <button
+                        className="seller-btn seller-btn-secondary"
+                        style={{ flex: 1 }}
+                        onClick={() => openEditModal(p)}
+                      >
+                        Edit
+                      </button>
+                      <button
                         className="seller-btn seller-btn-primary"
                         style={{ flex: 1 }}
                         onClick={() => openStockModal(p._id)}
@@ -506,6 +594,168 @@ export default function ProductManagement() {
                   <button
                     className="seller-btn seller-btn-secondary"
                     onClick={() => setStockProductId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Product Modal */}
+        {editProduct && (
+          <div
+            className="seller-modal-overlay"
+            onClick={() => setEditProduct(null)}
+          >
+            <div
+              className="seller-card"
+              style={{
+                maxWidth: 600,
+                width: "95%",
+                margin: "auto",
+                maxHeight: "90vh",
+                overflowY: "auto",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="seller-card-header">
+                <h2 className="seller-card-title">✏️ Edit Product</h2>
+              </div>
+              <div className="seller-card-body">
+                {editErrors._form && (
+                  <div
+                    className="seller-alert seller-alert-error seller-mb-2"
+                    style={{ marginBottom: 12 }}
+                  >
+                    {editErrors._form}
+                  </div>
+                )}
+                <div className="seller-form-grid">
+                  {[
+                    { label: "Product Name", key: "name", type: "text" },
+                    {
+                      label: "Product Price (₹)",
+                      key: "price",
+                      type: "number",
+                      step: "0.01",
+                    },
+                    {
+                      label: "Product Category",
+                      key: "category",
+                      type: "text",
+                    },
+                    { label: "Product Brand", key: "brand", type: "text" },
+                    {
+                      label: "Product Quantity",
+                      key: "quantity",
+                      type: "number",
+                    },
+                    {
+                      label: "Product SKU",
+                      key: "sku",
+                      type: "text",
+                      maxLength: 6,
+                    },
+                    {
+                      label: "Compatibility",
+                      key: "compatibility",
+                      type: "text",
+                    },
+                  ].map((f) => (
+                    <div className="seller-form-group" key={f.key}>
+                      <label className="seller-label" htmlFor={`edit-${f.key}`}>
+                        {f.label}
+                      </label>
+                      <input
+                        className="seller-input"
+                        id={`edit-${f.key}`}
+                        type={f.type}
+                        step={f.step}
+                        maxLength={f.maxLength}
+                        value={editForm[f.key] || ""}
+                        onChange={(e) => setEditField(f.key, e.target.value)}
+                      />
+                      {editErrors[f.key] && (
+                        <small className="seller-error-text">
+                          {editErrors[f.key]}
+                        </small>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="seller-form-group seller-mt-2">
+                  <label className="seller-label" htmlFor="edit-description">
+                    Product Description
+                  </label>
+                  <textarea
+                    className="seller-input"
+                    id="edit-description"
+                    rows={3}
+                    value={editForm.description || ""}
+                    onChange={(e) =>
+                      setEditField("description", e.target.value)
+                    }
+                    style={{ resize: "vertical" }}
+                  />
+                  {editErrors.description && (
+                    <small className="seller-error-text">
+                      {editErrors.description}
+                    </small>
+                  )}
+                </div>
+
+                <div className="seller-form-group seller-mt-2">
+                  <label className="seller-label" htmlFor="edit-images">
+                    Replace Images (optional, up to 5)
+                  </label>
+                  <input
+                    className="seller-input"
+                    id="edit-images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    ref={editImageRef}
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []).slice(
+                        0,
+                        5,
+                      );
+                      setEditImages(files);
+                    }}
+                    style={{ padding: 10 }}
+                  />
+                  {editImages.length > 0 && (
+                    <div className="seller-text-sm seller-text-muted seller-mt-1">
+                      {editImages.length} new image(s) selected
+                    </div>
+                  )}
+                </div>
+
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#6b7280",
+                    marginTop: 8,
+                  }}
+                >
+                  Note: Editing a product will reset its status to "On Hold" for
+                  re-approval.
+                </p>
+
+                <div className="seller-flex seller-gap-2 seller-mt-2">
+                  <button
+                    className="seller-btn seller-btn-primary"
+                    onClick={handleEditSubmit}
+                    disabled={editLoading}
+                  >
+                    {editLoading ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    className="seller-btn seller-btn-secondary"
+                    onClick={() => setEditProduct(null)}
                   >
                     Cancel
                   </button>

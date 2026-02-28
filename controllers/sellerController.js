@@ -14,6 +14,23 @@ const Order = require("../models/Orders");
 const Cart = require("../models/Cart");
 const ProductReview = require("../models/ProductReview");
 
+// Allowed seller verification document types
+const SELLER_DOC_TYPES_INDIVIDUAL = [
+  "PAN Card",
+  "Aadhaar Card (Masked)",
+  "Selfie Verification",
+];
+const SELLER_DOC_TYPES_BUSINESS = [
+  "PAN Card (Business)",
+  "GST Certificate",
+  "Certificate of Incorporation",
+  "Shop & Establishment License",
+];
+const ALL_SELLER_DOC_TYPES = [
+  ...SELLER_DOC_TYPES_INDIVIDUAL,
+  ...SELLER_DOC_TYPES_BUSINESS,
+];
+
 function deriveOrderStatus(items, fallback = "pending") {
   if (!Array.isArray(items) || items.length === 0) return fallback;
   const statuses = items.map((item) => item.itemStatus || fallback);
@@ -161,11 +178,14 @@ exports.getProfileSettings = async (req, res) => {
   try {
     const sellerProfile = await SellerProfile.findOne({
       sellerId: req.user.id,
-    }).populate("sellerId", "name email phone profilePicture");
+    }).populate(
+      "sellerId",
+      "name email phone profilePicture verificationStatus verificationDocuments verifiedAt verificationNote",
+    );
 
     if (!sellerProfile) {
       const user = await User.findById(req.user.id).select(
-        "name email phone profilePicture",
+        "name email phone profilePicture verificationStatus verificationDocuments verifiedAt verificationNote",
       );
       return res.json({
         success: true,
@@ -176,7 +196,14 @@ exports.getProfileSettings = async (req, res) => {
           phone: user?.phone || req.session.user.phone || "",
           address: "",
           profilePicture: user?.profilePicture || "",
+          sellerType: "individual",
+          verificationStatus: user?.verificationStatus || "unverified",
+          verificationDocuments: user?.verificationDocuments || [],
+          verificationNote: user?.verificationNote || "",
+          verifiedAt: user?.verifiedAt || null,
         },
+        docTypesIndividual: SELLER_DOC_TYPES_INDIVIDUAL,
+        docTypesBusiness: SELLER_DOC_TYPES_BUSINESS,
       });
     }
     res.json({
@@ -188,7 +215,16 @@ exports.getProfileSettings = async (req, res) => {
         phone: sellerProfile.sellerId.phone || "",
         address: sellerProfile.address || "",
         profilePicture: sellerProfile.sellerId.profilePicture || "",
+        sellerType: sellerProfile.sellerType || "individual",
+        verificationStatus:
+          sellerProfile.sellerId.verificationStatus || "unverified",
+        verificationDocuments:
+          sellerProfile.sellerId.verificationDocuments || [],
+        verificationNote: sellerProfile.sellerId.verificationNote || "",
+        verifiedAt: sellerProfile.sellerId.verifiedAt || null,
       },
+      docTypesIndividual: SELLER_DOC_TYPES_INDIVIDUAL,
+      docTypesBusiness: SELLER_DOC_TYPES_BUSINESS,
     });
   } catch (err) {
     console.error("Profile settings GET API error", err);
@@ -199,7 +235,8 @@ exports.getProfileSettings = async (req, res) => {
 // Update profile settings
 exports.updateProfileSettings = async (req, res) => {
   try {
-    const { storeName, contactEmail, phone, ownerName, address } = req.body;
+    const { storeName, contactEmail, phone, ownerName, address, sellerType } =
+      req.body;
 
     if (!storeName?.trim() || !ownerName?.trim()) {
       return res
@@ -226,9 +263,18 @@ exports.updateProfileSettings = async (req, res) => {
 
     await User.findByIdAndUpdate(req.user.id, userUpdate);
 
+    const profileUpdate = {
+      ownerName,
+      address,
+      sellerId: req.user.id,
+    };
+    if (sellerType && ["individual", "business"].includes(sellerType)) {
+      profileUpdate.sellerType = sellerType;
+    }
+
     await SellerProfile.findOneAndUpdate(
       { sellerId: req.user.id },
-      { ownerName, address, sellerId: req.user.id },
+      profileUpdate,
       { new: true, upsert: true },
     );
 
@@ -463,12 +509,10 @@ exports.updateStock = async (req, res) => {
 
     const addQty = Number(quantity);
     if (!Number.isInteger(addQty) || addQty < 1) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Quantity must be a positive integer",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be a positive integer",
+      });
     }
 
     const sellerId = req.user.id;
@@ -756,6 +800,228 @@ exports.getApiReviews = exports.getReviews;
 exports.getProductManagement = exports.getProducts;
 exports.getApiProducts = exports.getProducts;
 exports.getApiBulkUploadResult = exports.getBulkUploadResult;
+
+// Upload a verification document for seller
+exports.uploadVerificationDocument = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { docType } = req.body;
+
+    if (!docType || !ALL_SELLER_DOC_TYPES.includes(docType)) {
+      if (req.file?.path && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid document type" });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+
+    // Upload to Cloudinary
+    let docUrl;
+    try {
+      const uploadRes = await cloudinary.uploader.upload(req.file.path, {
+        folder: "seller_verification_docs",
+        resource_type: "auto",
+        timeout: 120000,
+      });
+      docUrl = uploadRes.secure_url;
+    } finally {
+      if (req.file.path && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+    }
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    // Remove existing document of the same type (replace)
+    user.verificationDocuments = (user.verificationDocuments || []).filter(
+      (d) => d.docType !== docType,
+    );
+    user.verificationDocuments.push({
+      docType,
+      docUrl,
+      fileName: req.file.originalname,
+      uploadedAt: new Date(),
+    });
+
+    // Set status to pending if currently unverified or rejected
+    if (
+      user.verificationStatus === "unverified" ||
+      user.verificationStatus === "rejected"
+    ) {
+      user.verificationStatus = "pending";
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Document uploaded successfully",
+      verificationDocuments: user.verificationDocuments,
+      verificationStatus: user.verificationStatus,
+    });
+  } catch (error) {
+    console.error("Error uploading seller verification document:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error uploading document" });
+  }
+};
+
+// Delete a verification document for seller
+exports.deleteVerificationDocument = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { docType } = req.params;
+    if (!docType)
+      return res
+        .status(400)
+        .json({ success: false, message: "Document type is required" });
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    const before = (user.verificationDocuments || []).length;
+    user.verificationDocuments = (user.verificationDocuments || []).filter(
+      (d) => d.docType !== decodeURIComponent(docType),
+    );
+
+    if (user.verificationDocuments.length === before) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Document not found" });
+    }
+
+    // If all docs removed, revert to unverified
+    if (
+      user.verificationDocuments.length === 0 &&
+      user.verificationStatus === "pending"
+    ) {
+      user.verificationStatus = "unverified";
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Document deleted",
+      verificationDocuments: user.verificationDocuments,
+      verificationStatus: user.verificationStatus,
+    });
+  } catch (error) {
+    console.error("Error deleting seller verification document:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting document" });
+  }
+};
+
+// Edit product details
+exports.editProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid product id" });
+    }
+
+    const sellerId = req.user.id;
+    const product = await Product.findOne({ _id: productId, seller: sellerId });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    const {
+      name,
+      price,
+      description,
+      category,
+      brand,
+      quantity,
+      sku,
+      compatibility,
+    } = req.body;
+
+    if (name !== undefined) product.name = name;
+    if (price !== undefined) product.price = Number(price);
+    if (description !== undefined) product.description = description;
+    if (category !== undefined) product.category = category;
+    if (brand !== undefined) product.brand = brand;
+    if (quantity !== undefined) product.quantity = Number(quantity);
+    if (sku !== undefined) product.sku = sku;
+    if (compatibility !== undefined) product.compatibility = compatibility;
+
+    // If new images are uploaded, replace images
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = [];
+      for (const file of req.files) {
+        const uploadRes = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: "autocustomizer/products",
+              fetch_format: "auto",
+              quality: "auto",
+              resource_type: "image",
+              timeout: 120000,
+            },
+            (err, result) => {
+              if (err) return reject(err);
+              return resolve(result);
+            },
+          );
+          stream.end(file.buffer);
+        });
+        uploadedImages.push({
+          url: uploadRes.secure_url,
+          publicId: uploadRes.public_id,
+        });
+      }
+
+      // Delete old images from Cloudinary
+      if (product.imagePublicId) {
+        try {
+          await cloudinary.uploader.destroy(product.imagePublicId);
+        } catch (e) {
+          console.warn("Cloudinary delete failed:", e.message);
+        }
+      }
+
+      product.image = uploadedImages[0].url;
+      product.imagePublicId = uploadedImages[0].publicId;
+      product.images = uploadedImages;
+    }
+
+    // Reset status to pending after edit
+    product.status = "pending";
+
+    await product.save();
+
+    return res.json({
+      success: true,
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (err) {
+    console.error("Error editing product:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to update product" });
+  }
+};
 
 // Earnings & Payouts (placeholder)
 exports.getEarningsPayouts = async (req, res) => {

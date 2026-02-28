@@ -1,0 +1,16 @@
+[2026-02-28T22:18:02.658Z] GET /manager/api/users - IP: ::1
+[2026-02-28T22:18:03.006Z] GET /manager/api/users - IP: ::1
+[2026-02-28T22:18:03.080Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:03.112Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:05.382Z] GET /manager/api/services - IP: ::1
+[2026-02-28T22:18:05.904Z] GET /manager/api/services - IP: ::1
+[2026-02-28T22:18:06.131Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:06.165Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:11.746Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:11.750Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1
+[2026-02-28T22:18:11.779Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:12.223Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1
+[2026-02-28T22:18:18.589Z] GET /manager/api/services - IP: ::1
+[2026-02-28T22:18:18.857Z] GET /manager/api/services - IP: ::1
+[2026-02-28T22:18:19.115Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T22:18:19.160Z] GET /chat/unread-count - IP: ::1

@@ -10,6 +10,7 @@ const {
   uploadImageToMemory,
   uploadImageToDisk,
   uploadDocumentToDisk,
+  uploadVerificationDoc,
   handleUploadError,
 } = require("../middleware");
 
@@ -137,6 +138,31 @@ router.post(
   isAuthenticated,
   isSeller,
   sellerController.updateDeliveryDate,
+);
+
+// Verification document routes
+router.post(
+  "/upload-document",
+  isAuthenticated,
+  isSeller,
+  uploadVerificationDoc.single("document"),
+  handleUploadError,
+  sellerController.uploadVerificationDocument,
+);
+router.delete(
+  "/delete-document/:docType",
+  isAuthenticated,
+  isSeller,
+  sellerController.deleteVerificationDocument,
+);
+
+// Edit product route
+router.put(
+  "/edit-product/:id",
+  isAuthenticated,
+  isSeller,
+  memoryUpload.array("images", 5),
+  sellerController.editProduct,
 );
 
 // Bulk Upload routes

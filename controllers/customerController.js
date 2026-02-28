@@ -32,7 +32,16 @@ exports.getIndex = async (req, res) => {
 // API endpoint for customer index
 exports.getIndexApi = async (req, res) => {
   try {
-    const products = await Product.find({ status: "approved" });
+    const products = await Product.find({ status: "approved" }).populate(
+      "seller",
+      "verificationStatus",
+    );
+    // Sort: verified sellers first, then rest
+    products.sort((a, b) => {
+      const aVerified = a.seller?.verificationStatus === "verified" ? 0 : 1;
+      const bVerified = b.seller?.verificationStatus === "verified" ? 0 : 1;
+      return aVerified - bVerified;
+    });
     res.json({
       products,
       user: req.session.user,

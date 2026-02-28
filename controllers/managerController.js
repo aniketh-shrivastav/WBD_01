@@ -377,7 +377,7 @@ exports.getApiServices = async (req, res) => {
 
     const sellersAll = await SellerProfile.find().populate(
       "sellerId",
-      "name email phone profilePicture suspended",
+      "name email phone profilePicture suspended verificationStatus verificationDocuments verifiedAt verificationNote",
     );
     const sellers = sellersAll.filter(
       (s) => s.sellerId && !s.sellerId.suspended,
@@ -1458,7 +1458,7 @@ exports.getProfileOverview = async (req, res) => {
     // 2) Seller profile document
     const sellerProfile = await SellerProfile.findById(id).populate(
       "sellerId",
-      "name email phone profilePicture suspended",
+      "name email phone profilePicture suspended verificationStatus verificationDocuments verifiedAt verificationNote",
     );
     if (sellerProfile && sellerProfile.sellerId) {
       const sellerUser = sellerProfile.sellerId;
@@ -1523,6 +1523,12 @@ exports.getProfileOverview = async (req, res) => {
             sellerUser.profilePicture || "https://via.placeholder.com/120",
           ownerName: sellerProfile.ownerName || "",
           address: sellerProfile.address || "",
+        },
+        verification: {
+          status: sellerUser.verificationStatus || "unverified",
+          documents: sellerUser.verificationDocuments || [],
+          note: sellerUser.verificationNote || "",
+          verifiedAt: sellerUser.verifiedAt || null,
         },
         totals: {
           totalEarnings: n(sellerEarnings?.totalEarnings),
@@ -1664,7 +1670,7 @@ exports.getSupportHtml = (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "manager", "support.html"));
 };
 
-// Verify or reject a service provider
+// Verify or reject a service provider or seller
 exports.verifyProvider = async (req, res) => {
   try {
     const { id } = req.params;
@@ -1675,8 +1681,13 @@ exports.verifyProvider = async (req, res) => {
     }
 
     const provider = await User.findById(id);
-    if (!provider || provider.role !== "service-provider") {
-      return res.status(404).json({ error: "Service provider not found" });
+    if (
+      !provider ||
+      (provider.role !== "service-provider" && provider.role !== "seller")
+    ) {
+      return res
+        .status(404)
+        .json({ error: "Service provider or seller not found" });
     }
 
     if (action === "verify") {
@@ -1698,10 +1709,11 @@ exports.verifyProvider = async (req, res) => {
 
     await provider.save();
 
+    const label = provider.role === "seller" ? "Seller" : "Provider";
     const messages = {
-      verify: "Provider verified successfully",
-      reject: "Provider verification rejected",
-      unverify: "Provider verification revoked",
+      verify: `${label} verified successfully`,
+      reject: `${label} verification rejected`,
+      unverify: `${label} verification revoked`,
     };
 
     res.json({
