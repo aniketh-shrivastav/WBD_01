@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import ServiceNav from "../../components/ServiceNav";
+import ServiceFooter from "../../components/ServiceFooter";
+import "../../Css/service.css";
 
 function useLink(href) {
   useEffect(() => {
@@ -31,10 +34,9 @@ function Stars({ rating }) {
 export default function Reviews() {
   useLink("/styles/reviews.css");
   useLink(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
   );
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reviews, setReviews] = useState([]);
@@ -66,86 +68,45 @@ export default function Reviews() {
   }, []);
 
   return (
-    <>
-      <nav className="navbar">
-        <div className="logo-brand">
-          <img src="/images3/logo2.jpg" alt="Logo" className="logo" />
-          <span className="brand">AutoCustomizer</span>
-        </div>
-        <a
-          href="#"
-          className="menu-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            setSidebarOpen((s) => !s);
-          }}
-        >
-          ☰
-        </a>
-        <div className="nav-links" id="navLinks">
-          <a href="/service/dashboard">Dashboard</a>
-          <a href="/service/profileSettings">Profile Settings</a>
-          <a href="/service/bookingManagement">Booking Management</a>
-          <a href="/service/reviews" className="active">
-            Reviews & Ratings
-          </a>
-          <a href="/logout">Logout</a>
-        </div>
-      </nav>
-
-      <div className={`sidebar ${sidebarOpen ? "active" : ""}`} id="sidebar">
-        <a className="close-btn" onClick={() => setSidebarOpen(false)}>
-          Close ×
-        </a>
-        <a href="/service/dashboard">
-          <i className="fas fa-tachometer-alt" />
-        </a>
-        <a href="/service/profileSettings">
-          <i className="fas fa-user-cog" />
-        </a>
-        <a href="/service/bookingManagement">
-          <i className="fas fa-calendar-alt" />
-        </a>
-        <a href="/service/customerCommunication">
-          <i className="fas fa-comments" />
-        </a>
-        <a href="/service/earnings">
-          <i className="fas fa-money-bill-wave" />
-        </a>
-        <a href="/service/reviews" className="active">
-          <i className="fas fa-star" />
-        </a>
-      </div>
-
-      <div className="container">
-        <h1>Reviews & Ratings</h1>
-        <div className="reviews-container">
-          {loading ? (
-            <p style={{ textAlign: "center" }}>Loading...</p>
-          ) : error ? (
-            <p style={{ textAlign: "center", color: "#e74c3c" }}>{error}</p>
-          ) : reviews.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#555" }}>
-              No reviews yet.
-            </p>
-          ) : (
-            reviews.map((r) => (
-              <div key={r.id} className="review-card">
-                <div className="review-header">
-                  <div className="user-info">
-                    <span className="user-name">{r.customerName}</span>
-                    <Stars rating={r.rating} />
-                  </div>
-                </div>
-                <p className="review-text">"{r.reviewText}"</p>
-                <span className="review-date">
-                  {new Date(r.createdAt).toLocaleDateString()}
-                </span>
+    <div className="service-page">
+      <ServiceNav />
+      <main className="service-main">
+        <div className="container">
+          <h1>Reviews & Ratings</h1>
+          <div className="reviews-container">
+            {loading ? (
+              <div className="sp-state-message">
+                <div className="sp-spinner"></div>
+                <p>Loading reviews...</p>
               </div>
-            ))
-          )}
+            ) : error ? (
+              <div className="sp-state-message sp-state-error">
+                <p>⚠️ {error}</p>
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="sp-state-message">
+                <p>📝 No reviews yet.</p>
+              </div>
+            ) : (
+              reviews.map((r) => (
+                <div key={r.id} className="review-card">
+                  <div className="review-header">
+                    <div className="user-info">
+                      <span className="user-name">{r.customerName}</span>
+                      <Stars rating={r.rating} />
+                    </div>
+                  </div>
+                  <p className="review-text">"{r.reviewText}"</p>
+                  <span className="review-date">
+                    {new Date(r.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
-    </>
+      </main>
+      <ServiceFooter />
+    </div>
   );
 }

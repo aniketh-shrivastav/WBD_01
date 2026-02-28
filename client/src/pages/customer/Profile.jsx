@@ -22,7 +22,6 @@ export default function CustomerProfile() {
     phone: "",
     address: "",
     district: "",
-    carModel: "",
     payments: "",
     profilePicture: "",
     // Vehicle details - Basic
@@ -76,7 +75,6 @@ export default function CustomerProfile() {
           phone: user.phone || "",
           address: profile.address || "",
           district: profile.district || "",
-          carModel: profile.carModel || "",
           payments: profile.payments || "",
           profilePicture: profile.profilePicture || "",
           registrationNumber: profile.registrationNumber || "",
@@ -203,19 +201,6 @@ export default function CustomerProfile() {
     }
     return true;
   }
-  function validateCarModel() {
-    const v = form.carModel.trim();
-    const re = /^[A-Za-z0-9\s\-\/\.]{1,}$/;
-    if (v.length === 0) {
-      showError("carModel", "Car model cannot be empty.");
-      return false;
-    }
-    if (!re.test(v)) {
-      showError("carModel", "Car model contains invalid characters.");
-      return false;
-    }
-    return true;
-  }
   function validatePayments() {
     const v = form.payments.trim();
     if (v.length === 0) {
@@ -237,7 +222,6 @@ export default function CustomerProfile() {
       validatePhone(),
       validateAddress(),
       validateDistrict(),
-      validateCarModel(),
       validatePayments(),
     ].every(Boolean);
     return ok;
@@ -260,7 +244,6 @@ export default function CustomerProfile() {
       formData.append("phone", form.phone);
       formData.append("address", form.address);
       formData.append("district", form.district);
-      formData.append("carModel", form.carModel);
       formData.append("payments", form.payments);
       // Vehicle details
       formData.append("registrationNumber", form.registrationNumber);
@@ -620,26 +603,9 @@ export default function CustomerProfile() {
                       <option value="Automatic">Automatic</option>
                     </select>
                   </div>
-                  <div className="customer-form-group">
-                    <label className="customer-label" htmlFor="carModel">
-                      Car Model (Legacy)
-                    </label>
-                    <input
-                      id="carModel"
-                      name="carModel"
-                      placeholder="Enter your car model"
-                      value={form.carModel || ""}
-                      onChange={(e) => setField("carModel", e.target.value)}
-                      onBlur={validateCarModel}
-                      className={`customer-input ${errors.carModel ? "customer-input-error" : ""}`}
-                    />
-                    {errors.carModel && (
-                      <div className="customer-error-text">
-                        {errors.carModel}
-                      </div>
-                    )}
-                  </div>
+                  \n{" "}
                 </div>
+                \n{" "}
               </div>
 
               {/* Vehicle Technical Details */}

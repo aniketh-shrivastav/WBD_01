@@ -158,8 +158,7 @@ function Card({ type, data, onView }) {
 
   if (type === "customer") {
     const user = data.userId || {};
-    const needsUpdate =
-      isEmpty(data.address) || isEmpty(data.district) || isEmpty(data.carModel);
+    const needsUpdate = isEmpty(data.address) || isEmpty(data.district);
     return (
       <div
         className="profile-card customer"
@@ -185,9 +184,6 @@ function Card({ type, data, onView }) {
           </p>
           <p>
             <strong>District:</strong> {text(data.district)}
-          </p>
-          <p>
-            <strong>Car Model:</strong> {text(data.carModel)}
           </p>
           <p>
             <strong>Payments:</strong> {text(data.payments)}

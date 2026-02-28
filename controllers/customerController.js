@@ -585,7 +585,6 @@ exports.getProfile = async (req, res) => {
         phone: user.phone,
         address: "",
         district: "",
-        carModel: "",
         payments: "",
       };
     }
@@ -607,7 +606,6 @@ exports.getProfileApi = async (req, res) => {
       profile = {
         address: "",
         district: "",
-        carModel: "",
         payments: "",
       };
     }
@@ -630,7 +628,6 @@ exports.updateProfile = async (req, res) => {
       phone,
       address,
       district,
-      carModel,
       payments,
       registrationNumber,
       vehicleMake,
@@ -650,7 +647,6 @@ exports.updateProfile = async (req, res) => {
     const updateData = {
       address,
       district,
-      carModel,
       payments,
       registrationNumber: registrationNumber || "",
       vehicleMake: vehicleMake || "",

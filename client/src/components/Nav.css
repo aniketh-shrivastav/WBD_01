@@ -45,12 +45,17 @@ body:has(.ac-navbar) {
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.025em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .ac-navbar .brand img {
-  height: 44px;
-  width: auto;
-  border-radius: 10px;
+  height: 40px !important;
+  width: 40px !important;
+  border-radius: 10px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  object-fit: cover !important;
+  border: none !important;
+  flex-shrink: 0;
 }
 .ac-navbar .nav-toggle {
   display: none;

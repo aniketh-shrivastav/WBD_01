@@ -1254,7 +1254,6 @@ exports.getProfileData = async (req, res) => {
       details = `
         <p><strong>Address:</strong> ${customer.address || "N/A"}</p>
         <p><strong>District:</strong> ${customer.district || "N/A"}</p>
-        <p><strong>Car Model:</strong> ${customer.carModel || "N/A"}</p>
       `;
     }
 
@@ -1434,7 +1433,6 @@ exports.getProfileOverview = async (req, res) => {
             "https://via.placeholder.com/120",
           district: customerProfile.district || "",
           address: customerProfile.address || "",
-          carModel: customerProfile.carModel || "",
           registrationNumber: customerProfile.registrationNumber || "",
           vehicleMake: customerProfile.vehicleMake || "",
           vehicleModel: customerProfile.vehicleModel || "",

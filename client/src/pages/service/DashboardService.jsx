@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
 import { fetchServiceDashboard } from "../../store/serviceSlice";
+import ServiceNav from "../../components/ServiceNav";
+import ServiceFooter from "../../components/ServiceFooter";
+import "../../Css/service.css";
 
 function useLink(href) {
   useEffect(() => {
@@ -21,11 +24,9 @@ export default function ServiceDashboard() {
   // Match legacy CSS and icons
   useLink("/styles/dashboardService.css");
   useLink(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
   );
 
-  const [navOpen, setNavOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const { dashboard, status, error, lastFetched, hydratedFromStorage } =
     useSelector((state) => state.service);
@@ -37,8 +38,8 @@ export default function ServiceDashboard() {
         refreshing ? " • Refreshing..." : ""
       }`
     : loading
-    ? "Loading dashboard..."
-    : "Data will refresh shortly.";
+      ? "Loading dashboard..."
+      : "Data will refresh shortly.";
   const refreshDisabled = status === "loading";
   const serviceLabels = dashboard?.serviceLabels || [];
   const serviceCounts = dashboard?.serviceCounts || [];
@@ -58,25 +59,6 @@ export default function ServiceDashboard() {
   const pieChart = useRef(null);
   const barChart = useRef(null);
   const socketRef = useRef(null);
-
-  // Compute backend base for dev (Vite at 5173) vs prod (same-origin)
-  const backendBase = useMemo(() => {
-    try {
-      const hinted = window.__API_BASE__ || process.env.REACT_APP_API_BASE;
-      if (hinted) return hinted;
-      const { protocol, hostname, port } = window.location;
-      if (port === "5173") return `${protocol}//${hostname}:3000`;
-      return ""; // same-origin in prod
-    } catch {
-      return "";
-    }
-  }, []);
-
-  function handleLogout(e) {
-    e.preventDefault();
-    const next = encodeURIComponent(`${window.location.origin}/`);
-    window.location.href = `${backendBase}/logout?next=${next}`;
-  }
 
   // When data is coming from persisted cache, immediately fetch the
   // server-authoritative snapshot so different providers don't see stale data.
@@ -209,217 +191,135 @@ export default function ServiceDashboard() {
   }, [dispatch]);
 
   return (
-    <>
-      <nav className="navbar">
-        <div className="logo-brand">
-          <img src="/images3/logo2.jpg" alt="Logo" className="logo" />
-          <span className="brand">AutoCustomizer</span>
-        </div>
-        <a
-          href="#"
-          className="menu-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            setSidebarOpen((s) => !s);
-          }}
-        >
-          ☰
-        </a>
-        <div className={`nav-links ${navOpen ? "active" : ""}`} id="navLinks">
-          <a href="/service/dashboard" className="active">
-            Dashboard
-          </a>
-          <a href="/service/profileSettings">Profile Settings</a>
-          <a href="/service/bookingManagement">Booking Management</a>
-          <a href="/service/reviews">Reviews & Ratings</a>
-          <a href="/logout" onClick={handleLogout}>
-            Logout
-          </a>
-        </div>
-      </nav>
-
-      <div className={`sidebar ${sidebarOpen ? "active" : ""}`} id="sidebar">
-        <a className="close-btn" onClick={() => setSidebarOpen(false)}>
-          Close ×
-        </a>
-        <a href="/service/dashboard">
-          <i className="fas fa-tachometer-alt" /> Dashboard
-        </a>
-        <a href="/service/profileSettings">
-          <i className="fas fa-user-cog" /> Profile Settings
-        </a>
-        <a href="/service/bookingManagement">
-          <i className="fas fa-calendar-alt" /> Bookings
-        </a>
-        <a href="/service/customerCommunication">
-          <i className="fas fa-comments" /> Communication
-        </a>
-        <a href="/service/earnings">
-          <i className="fas fa-money-bill-wave" /> Earnings
-        </a>
-        <a href="/service/reviews">
-          <i className="fas fa-star" /> Reviews
-        </a>
-        <a href="/logout" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt" /> Logout
-        </a>
-      </div>
-
-      <div className="dashboard-container">
-        <div className="dashboard-header">
-          <h2>Welcome! Here's your daily overview.</h2>
-          <div
-            className="dashboard-status"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 12,
-              alignItems: "center",
-            }}
-          >
-            <span style={{ color: "#6b7280", fontSize: 14 }}>
-              {lastUpdatedText}
-            </span>
-            <button
-              className="btn"
-              onClick={() => dispatch(fetchServiceDashboard())}
-              disabled={refreshDisabled}
-              style={{
-                padding: "6px 14px",
-                backgroundColor: "#071f4eff",
-                color: "white",
-                border: "1px solid #071f4eff",
-                opacity: refreshDisabled ? 0.6 : 1,
-                transition: "background-color 0.3s",
-              }}
-            >
-              {refreshDisabled ? "Refreshing" : "Refresh Data"}
-            </button>
+    <div className="service-page">
+      <ServiceNav />
+      <main className="service-main">
+        <div className="dashboard-container">
+          <div className="dashboard-header">
+            <h2>Welcome! Here's your daily overview.</h2>
+            <div className="dashboard-status sp-dashboard-status">
+              <span className="sp-last-updated">{lastUpdatedText}</span>
+              <button
+                className="btn"
+                onClick={() => dispatch(fetchServiceDashboard())}
+                disabled={refreshDisabled}
+              >
+                {refreshDisabled ? "Refreshing..." : "↻ Refresh Data"}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {loading && !hasData ? (
-          <p className="loading" style={{ marginTop: 24 }}>
-            Loading dashboard...
-          </p>
-        ) : !hasData && error ? (
-          <p className="no-data" style={{ marginTop: 24, color: "#c0392b" }}>
-            {error}
-          </p>
-        ) : (
-          <>
-            <div className="cards" id="metricCards">
-              <div className="card">
-                <div className="card-icon">
-                  <i className="fas fa-rupee-sign"></i>
-                </div>
-                <div className="card-content">
-                  <h2>Total Earnings</h2>
-                  <p className="amount" id="earningsValue">
-                    ₹{totals.earnings || 0}
-                  </p>
-                  <p className="subtext">After 20% commission</p>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-icon">
-                  <i className="fas fa-tools"></i>
-                </div>
-                <div className="card-content">
-                  <h2>Confirmed Services</h2>
-                  <p className="amount" id="ongoingValue">
-                    {totals.ongoing || 0}
-                  </p>
-                  <p className="subtext">Currently active</p>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-icon">
-                  <i className="fas fa-check-circle"></i>
-                </div>
-                <div className="card-content">
-                  <h2>Ready for Delivery</h2>
-                  <p className="amount" id="completedValue">
-                    {totals.completed || 0}
-                  </p>
-                  <p className="subtext">Total completed</p>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-icon">
-                  <i className="fas fa-smile"></i>
-                </div>
-                <div className="card-content">
-                  <h2>Customer Satisfaction</h2>
-                  <p className="amount" id="ratingValue">
-                    {totals.avgRating ?? "N/A"}
-                  </p>
-                  <p className="subtext" id="reviewsValue">
-                    Based on {totals.totalReviews || 0} reviews
-                  </p>
-                </div>
-              </div>
+          {loading && !hasData ? (
+            <div className="sp-state-message">
+              <div className="sp-spinner"></div>
+              <p>Loading dashboard...</p>
             </div>
-
-            <div className="charts">
-              <div className="chart-card">
-                <h2>Service Distribution</h2>
-                <div className="chart-wrapper" style={{ height: 300 }}>
-                  <canvas ref={pieRef} id="servicePieChart"></canvas>
-                </div>
-              </div>
-              <div className="chart-card">
-                <h2>Monthly Earnings Overview (Weekly Basis)</h2>
-                <div className="chart-wrapper" style={{ height: 300 }}>
-                  <canvas ref={barRef} id="earningsBarChart"></canvas>
-                </div>
-              </div>
+          ) : !hasData && error ? (
+            <div className="sp-state-message sp-state-error">
+              <p>⚠️ {error}</p>
             </div>
+          ) : (
+            <>
+              <div className="cards" id="metricCards">
+                <div className="card">
+                  <div className="card-icon">
+                    <i className="fas fa-rupee-sign"></i>
+                  </div>
+                  <div className="card-content">
+                    <h2>Total Earnings</h2>
+                    <p className="amount" id="earningsValue">
+                      ₹{totals.earnings || 0}
+                    </p>
+                    <p className="subtext">After 20% commission</p>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-icon">
+                    <i className="fas fa-tools"></i>
+                  </div>
+                  <div className="card-content">
+                    <h2>Confirmed Services</h2>
+                    <p className="amount" id="ongoingValue">
+                      {totals.ongoing || 0}
+                    </p>
+                    <p className="subtext">Currently active</p>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-icon">
+                    <i className="fas fa-check-circle"></i>
+                  </div>
+                  <div className="card-content">
+                    <h2>Ready for Delivery</h2>
+                    <p className="amount" id="completedValue">
+                      {totals.completed || 0}
+                    </p>
+                    <p className="subtext">Total completed</p>
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-icon">
+                    <i className="fas fa-smile"></i>
+                  </div>
+                  <div className="card-content">
+                    <h2>Customer Satisfaction</h2>
+                    <p className="amount" id="ratingValue">
+                      {totals.avgRating ?? "N/A"}
+                    </p>
+                    <p className="subtext" id="reviewsValue">
+                      Based on {totals.totalReviews || 0} reviews
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            <div className="recent-activity">
-              <h2>Recent Activity</h2>
-              <ul className="activity-list" id="activityList">
-                {activities.length > 0 ? (
-                  activities.map((a, idx) => (
-                    <li key={idx}>
-                      <i className={`fas ${a.icon}`}></i>
-                      <span>{a.text}</span>
-                      <span className="time">{a.timeAgo}</span>
+              <div className="charts">
+                <div className="chart-card">
+                  <h2>Service Distribution</h2>
+                  <div className="chart-wrapper" style={{ height: 300 }}>
+                    <canvas ref={pieRef} id="servicePieChart"></canvas>
+                  </div>
+                </div>
+                <div className="chart-card">
+                  <h2>Monthly Earnings Overview (Weekly Basis)</h2>
+                  <div className="chart-wrapper" style={{ height: 300 }}>
+                    <canvas ref={barRef} id="earningsBarChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div className="recent-activity">
+                <h2>Recent Activity</h2>
+                <ul className="activity-list" id="activityList">
+                  {activities.length > 0 ? (
+                    activities.map((a, idx) => (
+                      <li key={idx}>
+                        <i className={`fas ${a.icon}`}></i>
+                        <span>{a.text}</span>
+                        <span className="time">{a.timeAgo}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li>
+                      <i className="fas fa-info-circle"></i>
+                      <span>No recent activity</span>
                     </li>
-                  ))
-                ) : (
-                  <li>
-                    <i className="fas fa-info-circle"></i>
-                    <span>No recent activity</span>
-                  </li>
-                )}
-              </ul>
-            </div>
-          </>
-        )}
-      </div>
-
-      {error ? (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 12,
-            right: 12,
-            background: "#e74c3c",
-            color: "#fff",
-            padding: "8px 12px",
-            borderRadius: 6,
-          }}
-        >
-          {error}
+                  )}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
-      ) : null}
 
-      {/* Minor visual guardrails to ensure activity text is visible regardless of global theme overrides */}
-      <style>{`
+        {error ? <div className="sp-error-toast">{error}</div> : null}
+
+        {/* Minor visual guardrails to ensure activity text is visible regardless of global theme overrides */}
+        <style>{`
         .activity-list span { color: #0f2944; }
         .activity-list .time { color: #666; }
       `}</style>
-    </>
+      </main>
+      <ServiceFooter />
+    </div>
   );
 }

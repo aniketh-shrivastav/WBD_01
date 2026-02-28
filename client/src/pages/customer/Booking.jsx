@@ -1131,7 +1131,6 @@ export default function CustomerBooking() {
                                     ? String(p.insuranceValidTill).split("T")[0]
                                     : "",
                                 );
-                                if (p.carModel) setCarModel(p.carModel);
                               } else {
                                 setRegistrationNumber("");
                                 setVehicleMake("");

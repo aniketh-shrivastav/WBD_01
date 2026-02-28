@@ -9,7 +9,6 @@ const customerProfileSchema = new mongoose.Schema({
   },
   address: String,
   district: String,
-  carModel: String,
   payments: String,
   profilePicture: String,
 

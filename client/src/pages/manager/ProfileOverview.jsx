@@ -204,11 +204,6 @@ export default function ManagerProfileOverview() {
                     <strong>Owner:</strong> {profile.ownerName}
                   </div>
                 ) : null}
-                {profile.carModel ? (
-                  <div>
-                    <strong>Car Model:</strong> {profile.carModel}
-                  </div>
-                ) : null}
                 {profile.vehicleMake || profile.vehicleModel ? (
                   <div>
                     <strong>Vehicle:</strong>{" "}

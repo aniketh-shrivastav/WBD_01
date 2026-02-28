@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import ServiceNav from "../../components/ServiceNav";
+import ServiceFooter from "../../components/ServiceFooter";
+import "../../Css/service.css";
 
 function useLink(href) {
   useEffect(() => {
@@ -85,24 +88,6 @@ export default function ServiceProfileSettings() {
 
   function removePaintColor(idx) {
     setPaintColors((prev) => (prev || []).filter((_, i) => i !== idx));
-  }
-
-  const backendBase = useMemo(() => {
-    try {
-      const hinted = window.__API_BASE__ || process.env.REACT_APP_API_BASE;
-      if (hinted) return hinted;
-      const { protocol, hostname, port } = window.location;
-      if (port === "5173") return `${protocol}//${hostname}:3000`;
-      return ""; // same-origin
-    } catch {
-      return "";
-    }
-  }, []);
-
-  function handleLogout(e) {
-    e.preventDefault();
-    const next = encodeURIComponent(`${window.location.origin}/`);
-    window.location.href = `${backendBase}/logout?next=${next}`;
   }
 
   useEffect(() => {
@@ -343,469 +328,359 @@ export default function ServiceProfileSettings() {
   }
 
   return (
-    <>
-      <nav className="navbar">
-        <div className="logo-brand">
-          <img src="/images3/logo2.jpg" alt="Logo" className="logo" />
-          <span className="brand">AutoCustomizer</span>
-        </div>
-        <a
-          href="#"
-          className="menu-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById("sidebar")?.classList.toggle("active");
-          }}
-        >
-          ☰
-        </a>
-        <div className="nav-links" id="navLinks">
-          <a href="/service/dashboard">Dashboard</a>
-          <a href="/service/profileSettings" className="active">
-            Profile Settings
-          </a>
-          <a href="/service/bookingManagement">Booking Management</a>
-          <a href="/service/reviews">Reviews & Ratings</a>
-          <a href="/logout" onClick={handleLogout}>
-            Logout
-          </a>
-        </div>
-      </nav>
-
-      <div className="sidebar" id="sidebar">
-        <a
-          className="close-btn"
-          onClick={() =>
-            document.getElementById("sidebar")?.classList.toggle("active")
-          }
-        >
-          Close ×
-        </a>
-        <a href="/service/dashboard">
-          <i className="fas fa-tachometer-alt"></i> Dashboard
-        </a>
-        <a href="/service/profileSettings" className="active">
-          <i className="fas fa-user-cog"></i> Profile Settings
-        </a>
-        <a href="/service/bookingManagement">
-          <i className="fas fa-calendar-alt"></i> Booking Management
-        </a>
-        <a href="/service/reviews">
-          <i className="fas fa-star"></i> Reviews & Ratings
-        </a>
-        <a href="/logout" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt"></i> Logout
-        </a>
-      </div>
-
-      <div className="profile-container">
-        <div className="profile-pic-container">
-          <label className={`profile-pic-label${editing ? " is-editing" : ""}`}>
-            <img
-              src={profilePreview || profilePicture || "/images3/image5.jpg"}
-              alt="Profile"
-              className="profile-pic"
-            />
-            {editing ? (
-              <>
-                <span className="profile-pic-overlay">Change photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setProfileFile(e.target.files?.[0] || null)}
-                />
-              </>
-            ) : null}
-          </label>
-        </div>
-        <h1>Profile Settings</h1>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSave();
-          }}
-        >
-          <label>Name:</label>
-          <input
-            type="text"
-            value={form.name}
-            disabled={!editing}
-            onChange={(e) => setField("name", e.target.value)}
-            className={errors.name ? "error-border" : undefined}
-          />
-          {errors.name ? (
-            <div className="error" style={{ display: "block" }}>
-              {errors.name}
-            </div>
-          ) : (
-            <div className="error" />
-          )}
-
-          <label>Email:</label>
-          <input type="email" value={form.email} disabled readOnly />
-
-          <label>Phone:</label>
-          <input
-            type="tel"
-            value={form.phone}
-            disabled={!editing}
-            onChange={(e) => setField("phone", e.target.value)}
-            className={errors.phone ? "error-border" : undefined}
-          />
-          {errors.phone ? (
-            <div className="error" style={{ display: "block" }}>
-              {errors.phone}
-            </div>
-          ) : (
-            <div className="error" />
-          )}
-
-          <label>District:</label>
-          <input
-            type="text"
-            value={form.district}
-            disabled={!editing}
-            onChange={(e) => setField("district", e.target.value)}
-            className={errors.district ? "error-border" : undefined}
-          />
-          {errors.district ? (
-            <div className="error" style={{ display: "block" }}>
-              {errors.district}
-            </div>
-          ) : (
-            <div className="error" />
-          )}
-
-          <div className="services-container">
-            <h2>Services Offered</h2>
-            <ul className="service-list" id="serviceList">
-              {services.map((s, idx) => (
-                <li className="service-item" key={`${s.name}-${idx}`}>
+    <div className="service-page">
+      <ServiceNav />
+      <main className="service-main">
+        <div className="profile-container">
+          <div className="profile-pic-container">
+            <label
+              className={`profile-pic-label${editing ? " is-editing" : ""}`}
+            >
+              <img
+                src={profilePreview || profilePicture || "/images3/image5.jpg"}
+                alt="Profile"
+                className="profile-pic"
+              />
+              {editing ? (
+                <>
+                  <span className="profile-pic-overlay">Change photo</span>
                   <input
-                    type="text"
-                    className="service-name"
-                    value={s.name}
-                    disabled
-                    readOnly
-                    required
-                  />
-                  <input
-                    type="number"
-                    className="service-cost"
-                    value={s.cost}
-                    disabled={!editing}
+                    type="file"
+                    accept="image/*"
                     onChange={(e) =>
-                      setServices((list) =>
-                        list.map((it, i) =>
-                          i === idx ? { ...it, cost: e.target.value } : it,
-                        ),
-                      )
+                      setProfileFile(e.target.files?.[0] || null)
                     }
-                    required
                   />
-                  {editing ? (
-                    <button
-                      type="button"
-                      className="delete-btn"
-                      onClick={() => removeService(idx)}
-                    >
-                      Delete
-                    </button>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-            {editing ? (
-              <div className="service-input-container">
-                <select
-                  id="newService"
-                  value={newService}
-                  onChange={(e) => {
-                    setNewService(e.target.value);
-                    validateNewServiceInputs(true);
-                  }}
-                  style={{
-                    padding: "8px",
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    minWidth: 180,
-                  }}
-                >
-                  <option value="">-- Select Service Category --</option>
-                  {availableCategories
-                    .filter((cat) => !services.some((s) => s.name === cat.name))
-                    .map((cat) => (
-                      <option key={cat._id} value={cat.name}>
-                        {cat.name}
-                      </option>
-                    ))}
-                </select>
-                {errors.newService ? (
-                  <div className="error" style={{ display: "block" }}>
-                    {errors.newService}
-                  </div>
-                ) : (
-                  <div className="error" id="newServiceErr"></div>
-                )}
-                <input
-                  type="number"
-                  id="newServiceCost"
-                  placeholder="Cost"
-                  inputMode="decimal"
-                  min="0.01"
-                  step="0.01"
-                  value={newCost}
-                  onChange={(e) => {
-                    setNewCost(e.target.value);
-                    validateNewServiceInputs(true);
-                  }}
-                />
-                {errors.newCost ? (
-                  <div className="error" style={{ display: "block" }}>
-                    {errors.newCost}
-                  </div>
-                ) : (
-                  <div className="error" id="newServiceCostErr"></div>
-                )}
-                <button
-                  type="button"
-                  className="btn add-service-btn"
-                  onClick={addService}
-                  disabled={!validateNewServiceInputs(false)}
-                >
-                  Add Service
-                </button>
-                <div
-                  style={{ fontSize: "0.85em", color: "#555", marginTop: 4 }}
-                >
-                  Select a category from the list and set your cost.
-                </div>
-              </div>
-            ) : null}
-            {errors.services ? (
+                </>
+              ) : null}
+            </label>
+          </div>
+          <h1>Profile Settings</h1>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSave();
+            }}
+          >
+            <label>Name:</label>
+            <input
+              type="text"
+              value={form.name}
+              disabled={!editing}
+              onChange={(e) => setField("name", e.target.value)}
+              className={errors.name ? "error-border" : undefined}
+            />
+            {errors.name ? (
               <div className="error" style={{ display: "block" }}>
-                {errors.services}
+                {errors.name}
               </div>
-            ) : null}
-          </div>
+            ) : (
+              <div className="error" />
+            )}
 
-          {/* Pickup / Dropoff Rates */}
-          <div className="services-container" style={{ marginTop: 16 }}>
-            <h2>Pickup &amp; Dropoff Rates</h2>
-            <div style={{ fontSize: "0.9em", color: "#555", marginBottom: 8 }}>
-              Set the rates you charge for vehicle pickup and dropoff. Customers
-              can optionally request these services when booking.
-            </div>
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-              <label
-                style={{ display: "flex", flexDirection: "column", gap: 4 }}
-              >
-                <span>Pickup Rate (₹)</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={pickupRate}
-                  disabled={!editing}
-                  onChange={(e) => setPickupRate(e.target.value)}
-                  style={{
-                    padding: "8px",
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    width: 140,
-                  }}
-                />
-              </label>
-              <label
-                style={{ display: "flex", flexDirection: "column", gap: 4 }}
-              >
-                <span>Dropoff Rate (₹)</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={dropoffRate}
-                  disabled={!editing}
-                  onChange={(e) => setDropoffRate(e.target.value)}
-                  style={{
-                    padding: "8px",
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    width: 140,
-                  }}
-                />
-              </label>
-            </div>
-          </div>
+            <label>Email:</label>
+            <input type="email" value={form.email} disabled readOnly />
 
-          {/* Car Painting color options */}
-          {hasCarPainting && (
-            <div className="services-container" style={{ marginTop: 16 }}>
-              <h2>Car Painting Colors Offered</h2>
-              <div
-                style={{ fontSize: "0.9em", color: "#555", marginBottom: 8 }}
-              >
-                Customers will be able to select one of these colors while
-                booking.
+            <label>Phone:</label>
+            <input
+              type="tel"
+              value={form.phone}
+              disabled={!editing}
+              onChange={(e) => setField("phone", e.target.value)}
+              className={errors.phone ? "error-border" : undefined}
+            />
+            {errors.phone ? (
+              <div className="error" style={{ display: "block" }}>
+                {errors.phone}
               </div>
+            ) : (
+              <div className="error" />
+            )}
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <input
-                  type="color"
-                  value={newPaintColor}
-                  disabled={!editing}
-                  onChange={(e) => setNewPaintColor(e.target.value)}
-                  aria-label="Pick a paint color"
-                  style={{
-                    width: 44,
-                    height: 36,
-                    padding: 0,
-                    border: "1px solid #ccc",
-                    borderRadius: 8,
-                  }}
-                />
-                <input
-                  type="text"
-                  value={newPaintColor}
-                  disabled={!editing}
-                  onChange={(e) => setNewPaintColor(e.target.value)}
-                  placeholder="#rrggbb"
-                  style={{ width: 120 }}
-                />
-                {editing ? (
-                  <button
-                    type="button"
-                    className="btn add-service-btn"
-                    onClick={() => addPaintColor(newPaintColor)}
-                  >
-                    Add Color
-                  </button>
-                ) : null}
-                <div
-                  style={{ marginLeft: "auto", fontSize: 12, color: "#666" }}
-                >
-                  {(paintColors || []).length}/24
-                </div>
+            <label>District:</label>
+            <input
+              type="text"
+              value={form.district}
+              disabled={!editing}
+              onChange={(e) => setField("district", e.target.value)}
+              className={errors.district ? "error-border" : undefined}
+            />
+            {errors.district ? (
+              <div className="error" style={{ display: "block" }}>
+                {errors.district}
               </div>
+            ) : (
+              <div className="error" />
+            )}
 
-              {errors.paintColors ? (
-                <div
-                  className="error"
-                  style={{ display: "block", marginTop: 6 }}
-                >
-                  {errors.paintColors}
-                </div>
-              ) : (
-                <div className="error" />
-              )}
-
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  marginTop: 12,
-                }}
-              >
-                {(paintColors || []).map((c, idx) => (
-                  <div
-                    key={`${c}-${idx}`}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "6px 10px",
-                      background: "#fff",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 6,
-                        background: c,
-                        border: "1px solid #bbb",
-                      }}
+            <div className="services-container">
+              <h2>Services Offered</h2>
+              <ul className="service-list" id="serviceList">
+                {services.map((s, idx) => (
+                  <li className="service-item" key={`${s.name}-${idx}`}>
+                    <input
+                      type="text"
+                      className="service-name"
+                      value={s.name}
+                      disabled
+                      readOnly
+                      required
                     />
-                    <span style={{ fontFamily: "monospace", fontSize: 12 }}>
-                      {c}
-                    </span>
+                    <input
+                      type="number"
+                      className="service-cost"
+                      value={s.cost}
+                      disabled={!editing}
+                      onChange={(e) =>
+                        setServices((list) =>
+                          list.map((it, i) =>
+                            i === idx ? { ...it, cost: e.target.value } : it,
+                          ),
+                        )
+                      }
+                      required
+                    />
                     {editing ? (
                       <button
                         type="button"
                         className="delete-btn"
-                        onClick={() => removePaintColor(idx)}
-                        style={{ padding: "4px 10px" }}
+                        onClick={() => removeService(idx)}
                       >
-                        Remove
+                        Delete
                       </button>
                     ) : null}
-                  </div>
+                  </li>
                 ))}
+              </ul>
+              {editing ? (
+                <div className="service-input-container">
+                  <select
+                    id="newService"
+                    value={newService}
+                    onChange={(e) => {
+                      setNewService(e.target.value);
+                      validateNewServiceInputs(true);
+                    }}
+                    className="sp-select-service"
+                  >
+                    <option value="">-- Select Service Category --</option>
+                    {availableCategories
+                      .filter(
+                        (cat) => !services.some((s) => s.name === cat.name),
+                      )
+                      .map((cat) => (
+                        <option key={cat._id} value={cat.name}>
+                          {cat.name}
+                        </option>
+                      ))}
+                  </select>
+                  {errors.newService ? (
+                    <div className="error" style={{ display: "block" }}>
+                      {errors.newService}
+                    </div>
+                  ) : (
+                    <div className="error" id="newServiceErr"></div>
+                  )}
+                  <input
+                    type="number"
+                    id="newServiceCost"
+                    placeholder="Cost"
+                    inputMode="decimal"
+                    min="0.01"
+                    step="0.01"
+                    value={newCost}
+                    onChange={(e) => {
+                      setNewCost(e.target.value);
+                      validateNewServiceInputs(true);
+                    }}
+                  />
+                  {errors.newCost ? (
+                    <div className="error" style={{ display: "block" }}>
+                      {errors.newCost}
+                    </div>
+                  ) : (
+                    <div className="error" id="newServiceCostErr"></div>
+                  )}
+                  <button
+                    type="button"
+                    className="btn add-service-btn"
+                    onClick={addService}
+                    disabled={!validateNewServiceInputs(false)}
+                  >
+                    Add Service
+                  </button>
+                  <div className="sp-hint">
+                    Select a category from the list and set your cost.
+                  </div>
+                </div>
+              ) : null}
+              {errors.services ? (
+                <div className="error" style={{ display: "block" }}>
+                  {errors.services}
+                </div>
+              ) : null}
+            </div>
+
+            {/* Pickup / Dropoff Rates */}
+            <div className="services-container" style={{ marginTop: 16 }}>
+              <h2>Pickup &amp; Dropoff Rates</h2>
+              <div className="sp-hint">
+                Set the rates you charge for vehicle pickup and dropoff.
+                Customers can optionally request these services when booking.
               </div>
+              <div className="sp-rate-grid">
+                <label className="sp-rate-label">
+                  <span>Pickup Rate (₹)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={pickupRate}
+                    disabled={!editing}
+                    onChange={(e) => setPickupRate(e.target.value)}
+                  />
+                </label>
+                <label className="sp-rate-label">
+                  <span>Dropoff Rate (₹)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={dropoffRate}
+                    disabled={!editing}
+                    onChange={(e) => setDropoffRate(e.target.value)}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Car Painting color options */}
+            {hasCarPainting && (
+              <div className="services-container" style={{ marginTop: 16 }}>
+                <h2>Car Painting Colors Offered</h2>
+                <div className="sp-hint">
+                  Customers will be able to select one of these colors while
+                  booking.
+                </div>
+
+                <div className="sp-paint-row">
+                  <input
+                    type="color"
+                    value={newPaintColor}
+                    disabled={!editing}
+                    onChange={(e) => setNewPaintColor(e.target.value)}
+                    aria-label="Pick a paint color"
+                  />
+                  <input
+                    type="text"
+                    value={newPaintColor}
+                    disabled={!editing}
+                    onChange={(e) => setNewPaintColor(e.target.value)}
+                    placeholder="#rrggbb"
+                  />
+                  {editing ? (
+                    <button
+                      type="button"
+                      className="btn add-service-btn"
+                      onClick={() => addPaintColor(newPaintColor)}
+                    >
+                      Add Color
+                    </button>
+                  ) : null}
+                  <div className="sp-paint-count">
+                    {(paintColors || []).length}/24
+                  </div>
+                </div>
+
+                {errors.paintColors ? (
+                  <div
+                    className="error"
+                    style={{ display: "block", marginTop: 6 }}
+                  >
+                    {errors.paintColors}
+                  </div>
+                ) : (
+                  <div className="error" />
+                )}
+
+                <div className="sp-paint-swatches">
+                  {(paintColors || []).map((c, idx) => (
+                    <div key={`${c}-${idx}`} className="sp-paint-chip">
+                      <span
+                        className="sp-paint-swatch"
+                        style={{ background: c }}
+                      />
+                      <span className="sp-paint-hex">{c}</span>
+                      {editing ? (
+                        <button
+                          type="button"
+                          className="delete-btn"
+                          onClick={() => removePaintColor(idx)}
+                        >
+                          Remove
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="buttons">
+              {!editing ? (
+                <button
+                  type="button"
+                  className="btn edit-btn"
+                  onClick={() => setEditing(true)}
+                >
+                  Edit
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn save-btn"
+                    onClick={onSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="btn cancel-btn"
+                    onClick={onCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+            </div>
+          </form>
+
+          {/* Show Danger Zone only while editing */}
+          {editing && (
+            <div className="delete-account-section">
+              <h3>Danger Zone</h3>
+              <p>
+                Once you delete your account, there is no going back. Please be
+                certain.
+              </p>
+              <button
+                id="delete-account-btn"
+                className="delete-btn"
+                onClick={onDeleteAccount}
+              >
+                Delete My Account
+              </button>
             </div>
           )}
 
-          <div className="buttons">
-            {!editing ? (
-              <button
-                type="button"
-                className="btn edit-btn"
-                onClick={() => setEditing(true)}
-              >
-                Edit
-              </button>
-            ) : (
-              <>
-                <button type="button" className="btn save-btn" onClick={onSave}>
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="btn cancel-btn"
-                  onClick={onCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            )}
+          <div className="sp-status" style={{ color: statusColor }}>
+            {status}
           </div>
-        </form>
-
-        {/* Show Danger Zone only while editing */}
-        {editing && (
-          <div className="delete-account-section">
-            <h3>Danger Zone</h3>
-            <p>
-              Once you delete your account, there is no going back. Please be
-              certain.
-            </p>
-            <button
-              id="delete-account-btn"
-              className="delete-btn"
-              onClick={onDeleteAccount}
-            >
-              Delete My Account
-            </button>
-          </div>
-        )}
-
-        <div style={{ textAlign: "center", marginTop: 8, color: statusColor }}>
-          {status}
         </div>
-      </div>
 
-      <style>{`
+        <style>{`
         .error-border{ border:2px solid red; }
         .error{ color:red; font-size:0.8em; }
         .service-input-container{ display:block !important; }
@@ -834,6 +709,8 @@ export default function ServiceProfileSettings() {
         }
         .profile-pic-label.is-editing:hover .profile-pic-overlay{ opacity:1; }
       `}</style>
-    </>
+      </main>
+      <ServiceFooter />
+    </div>
   );
 }
