@@ -299,6 +299,36 @@ export default function OrderDetails() {
                           {item.itemStatus || order.orderStatus}
                         </span>
                       </div>
+                      {item.deliveryOtp &&
+                        String(item.itemStatus || "").toLowerCase() === "shipped" && (
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              padding: "8px 14px",
+                              background: "#ede9fe",
+                              border: "1px dashed #6d28d9",
+                              borderRadius: "8px",
+                              display: "inline-block",
+                            }}
+                          >
+                            <strong style={{ color: "#6d28d9", fontSize: "13px" }}>
+                              Delivery OTP:
+                            </strong>{" "}
+                            <span
+                              style={{
+                                fontWeight: 700,
+                                fontSize: "18px",
+                                letterSpacing: "3px",
+                                color: "#4c1d95",
+                              }}
+                            >
+                              {item.deliveryOtp}
+                            </span>
+                            <div style={{ fontSize: "11px", color: "#6d28d9", marginTop: "2px" }}>
+                              Share this OTP with the seller to confirm delivery
+                            </div>
+                          </div>
+                        )}
                       <div
                         style={{
                           marginTop: "10px",

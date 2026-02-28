@@ -24,6 +24,8 @@ const OrderItemSchema = new mongoose.Schema(
     deliveryDate: {
       type: Date,
     }, // Expected delivery date set by seller
+    deliveryOtp: { type: String }, // OTP generated when shipped, customer must share with seller to confirm delivery
+    deliveryOtpGeneratedAt: { type: Date },
     itemStatusHistory: [
       {
         from: { type: String },

@@ -21,6 +21,8 @@ export default function SellerOrders() {
   const [pendingStatuses, setPendingStatuses] = useState({});
   // Store delivery dates
   const [deliveryDates, setDeliveryDates] = useState({});
+  // Store delivery OTP inputs
+  const [otpInputs, setOtpInputs] = useState({});
 
   async function loadOrders() {
     setLoading(true);
@@ -89,6 +91,15 @@ export default function SellerOrders() {
       return;
     }
 
+    // Require OTP when marking as delivered
+    if (newStatus === "delivered") {
+      const enteredOtp = (otpInputs[uniqueId] || "").trim();
+      if (!enteredOtp || enteredOtp.length !== 6) {
+        alert("Please enter the 6-digit delivery OTP from the customer.");
+        return;
+      }
+    }
+
     try {
       const deliveryDate = deliveryDates[uniqueId] || null;
 
@@ -101,6 +112,7 @@ export default function SellerOrders() {
           productId: productId || undefined,
           itemIndex: itemIndex !== undefined ? itemIndex : undefined,
           deliveryDate: deliveryDate || undefined,
+          otp: newStatus === "delivered" ? (otpInputs[uniqueId] || "").trim() : undefined,
         }),
       });
 
@@ -134,6 +146,13 @@ export default function SellerOrders() {
 
       // Clear pending status
       setPendingStatuses((prev) => {
+        const updated = { ...prev };
+        delete updated[uniqueId];
+        return updated;
+      });
+
+      // Clear OTP input
+      setOtpInputs((prev) => {
         const updated = { ...prev };
         delete updated[uniqueId];
         return updated;
@@ -316,6 +335,30 @@ export default function SellerOrders() {
                                 </option>
                               ))}
                             </select>
+                            {currentStatus === "delivered" &&
+                              originalStatus === "shipped" && (
+                                <input
+                                  type="text"
+                                  className="seller-input seller-input-compact"
+                                  placeholder="Enter delivery OTP"
+                                  maxLength={6}
+                                  value={otpInputs[uniqueId] || ""}
+                                  onChange={(e) => {
+                                    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                                    setOtpInputs((prev) => ({
+                                      ...prev,
+                                      [uniqueId]: val,
+                                    }));
+                                  }}
+                                  style={{
+                                    width: "130px",
+                                    letterSpacing: "2px",
+                                    fontWeight: 600,
+                                    textAlign: "center",
+                                    marginTop: "4px",
+                                  }}
+                                />
+                              )}
                             <button
                               className="seller-btn seller-btn-primary seller-btn-sm"
                               disabled={disabled || !hasChanged}

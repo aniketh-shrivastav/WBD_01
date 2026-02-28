@@ -601,7 +601,7 @@ exports.deleteProduct = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { newStatus, productId, itemIndex, deliveryDate } = req.body;
+    const { newStatus, productId, itemIndex, deliveryDate, otp } = req.body;
 
     const order = await Order.findById(orderId);
     if (!order) {
@@ -653,6 +653,32 @@ exports.updateOrderStatus = async (req, res) => {
 
       if (deliveryDate) {
         order.items[itemIndex].deliveryDate = new Date(deliveryDate);
+      }
+
+      // OTP: Generate when shipping, verify when delivering
+      if (newStatus === "shipped") {
+        const otpCode = String(Math.floor(100000 + Math.random() * 900000));
+        order.items[itemIndex].deliveryOtp = otpCode;
+        order.items[itemIndex].deliveryOtpGeneratedAt = new Date();
+      }
+
+      if (newStatus === "delivered") {
+        const storedOtp = order.items[itemIndex].deliveryOtp;
+        if (!storedOtp) {
+          return res.status(400).json({
+            success: false,
+            message: "No delivery OTP found. The item must be shipped first.",
+          });
+        }
+        if (!otp || String(otp).trim() !== String(storedOtp).trim()) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid delivery OTP. Please enter the correct OTP from the customer.",
+          });
+        }
+        // Clear OTP after successful verification
+        order.items[itemIndex].deliveryOtp = undefined;
+        order.items[itemIndex].deliveryOtpGeneratedAt = undefined;
       }
 
       const prevItemStatus = order.items[itemIndex].itemStatus || null;
@@ -713,6 +739,20 @@ exports.updateOrderStatus = async (req, res) => {
       changedBy: { id: req.session.user?.id, role: "seller" },
     });
     order.items.forEach((item, idx) => {
+      // OTP handling for bulk status update
+      if (newStatus === "shipped") {
+        const otpCode = String(Math.floor(100000 + Math.random() * 900000));
+        order.items[idx].deliveryOtp = otpCode;
+        order.items[idx].deliveryOtpGeneratedAt = new Date();
+      }
+      if (newStatus === "delivered") {
+        const storedOtp = order.items[idx].deliveryOtp;
+        if (storedOtp) {
+          order.items[idx].deliveryOtp = undefined;
+          order.items[idx].deliveryOtpGeneratedAt = undefined;
+        }
+      }
+
       const prevItemStatus = order.items[idx].itemStatus || null;
       order.items[idx].itemStatus = newStatus;
       order.items[idx].itemStatusHistory =
