@@ -22,6 +22,8 @@ exports.updateProfile = async (req, res) => {
       district,
       servicesOffered = [],
       paintColors = [],
+      pickupRate,
+      dropoffRate,
     } = req.body;
     const userId = req.session.user?.id;
 
@@ -78,6 +80,12 @@ exports.updateProfile = async (req, res) => {
       servicesOffered: servicesArray,
       paintColors: hasCarPainting ? normalizedColors : [],
     };
+
+    // Pickup / drop-off rates (service providers only)
+    if (pickupRate !== undefined)
+      updateData.pickupRate = Math.max(0, Number(pickupRate) || 0);
+    if (dropoffRate !== undefined)
+      updateData.dropoffRate = Math.max(0, Number(dropoffRate) || 0);
 
     if (req.file) {
       try {

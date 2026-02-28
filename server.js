@@ -112,6 +112,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
 
 // Mount routes
 app.use("/", profileSettingsRoutes);
@@ -126,6 +127,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/", chatRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/service-categories", serviceCategoryRoutes);
 
 // 8. REACT APP SERVING (for production)
 

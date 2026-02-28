@@ -39,6 +39,19 @@ const ServiceBookingSchema = new mongoose.Schema({
 
   // For Car Painting bookings: chosen paint color (hex string like #ff0000)
   paintColor: { type: String },
+
+  // Pickup / Drop-off
+  needsPickup: { type: Boolean, default: false },
+  needsDropoff: { type: Boolean, default: false },
+  pickupCost: { type: Number, default: 0 },
+  dropoffCost: { type: Number, default: 0 },
+
+  // Product cost (added by provider after booking)
+  productCost: { type: Number, default: 0 },
+
+  // Service category (from manager-defined categories)
+  serviceCategory: { type: String, default: "" },
+
   totalCost: {
     type: Number,
     required: false, // make optional for backward compatibility

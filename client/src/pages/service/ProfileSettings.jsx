@@ -13,7 +13,7 @@ function useLink(href) {
 export default function ServiceProfileSettings() {
   useLink("/styles/profileSettings.css");
   useLink(
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
   );
 
   const [editing, setEditing] = useState(false);
@@ -31,6 +31,13 @@ export default function ServiceProfileSettings() {
     district: "",
   });
   const [services, setServices] = useState([]); // [{name, cost}]
+
+  // Manager-defined service categories
+  const [availableCategories, setAvailableCategories] = useState([]);
+
+  // Pickup & drop-off rates
+  const [pickupRate, setPickupRate] = useState("");
+  const [dropoffRate, setDropoffRate] = useState("");
 
   // Car Painting color options (hex strings)
   const [paintColors, setPaintColors] = useState([]);
@@ -69,7 +76,7 @@ export default function ServiceProfileSettings() {
         new Set([
           ...(prev || []).map(normalizeHexColor).filter(Boolean),
           normalized,
-        ])
+        ]),
       );
       return next.slice(0, 24);
     });
@@ -101,6 +108,16 @@ export default function ServiceProfileSettings() {
   useEffect(() => {
     (async () => {
       try {
+        // Load available categories from manager
+        const catRes = await fetch("/api/service-categories/active", {
+          headers: { Accept: "application/json" },
+          credentials: "include",
+        });
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          if (catData.success) setAvailableCategories(catData.categories || []);
+        }
+
         const res = await fetch(`/service/api/profile`, {
           headers: { Accept: "application/json" },
         });
@@ -134,13 +151,15 @@ export default function ServiceProfileSettings() {
           (u.servicesOffered || []).map((s) => ({
             name: s.name || "",
             cost: s.cost ?? 0,
-          }))
+          })),
         );
+        setPickupRate(u.pickupRate || "");
+        setDropoffRate(u.dropoffRate || "");
         setPaintColors(
           (u.paintColors || [])
             .map((c) => normalizeHexColor(c))
             .filter(Boolean)
-            .slice(0, 24)
+            .slice(0, 24),
         );
       } catch (e) {
         setStatus(e.message || "Failed to load");
@@ -179,7 +198,7 @@ export default function ServiceProfileSettings() {
       errs.phone = "Phone number should contain 10 digits";
     if (!form.district.trim()) errs.district = "District is required";
     const bad = services.find(
-      (s) => !(s.name || "").trim() || isNaN(parseFloat(s.cost))
+      (s) => !(s.name || "").trim() || isNaN(parseFloat(s.cost)),
     );
     if (bad)
       errs.services = "Please ensure all services have a name and a valid cost";
@@ -197,14 +216,14 @@ export default function ServiceProfileSettings() {
   }
 
   function validateNewServiceInputs(show) {
-    const nameOk = /^[A-Za-z0-9\s.-]{2,}$/.test((newService || "").trim());
+    const nameOk = (newService || "").trim().length > 0;
     const costVal = parseFloat((newCost || "").trim());
     const costOk =
       (newCost || "").trim() !== "" && !isNaN(costVal) && costVal > 0;
     if (show) {
       setErrors((e) => ({
         ...e,
-        newService: nameOk ? undefined : "Enter at least 2 valid characters",
+        newService: nameOk ? undefined : "Please select a service category",
         newCost: costOk ? undefined : "Enter a valid cost greater than 0",
       }));
     }
@@ -238,6 +257,8 @@ export default function ServiceProfileSettings() {
           payload.append("phone", form.phone.trim());
           payload.append("district", form.district.trim());
           payload.append("servicesOffered", JSON.stringify(services));
+          payload.append("pickupRate", pickupRate || 0);
+          payload.append("dropoffRate", dropoffRate || 0);
           payload.append(
             "paintColors",
             JSON.stringify(
@@ -285,13 +306,15 @@ export default function ServiceProfileSettings() {
           (u.servicesOffered || []).map((s) => ({
             name: s.name || "",
             cost: s.cost ?? 0,
-          }))
+          })),
         );
+        setPickupRate(u.pickupRate || "");
+        setDropoffRate(u.dropoffRate || "");
         setPaintColors(
           (u.paintColors || [])
             .map((c) => normalizeHexColor(c))
             .filter(Boolean)
-            .slice(0, 24)
+            .slice(0, 24),
         );
       } catch {}
     })();
@@ -301,7 +324,7 @@ export default function ServiceProfileSettings() {
     if (!userId) return;
     if (
       !window.confirm(
-        "Are you sure you want to permanently delete your account? This action cannot be undone."
+        "Are you sure you want to permanently delete your account? This action cannot be undone.",
       )
     )
       return;
@@ -377,15 +400,9 @@ export default function ServiceProfileSettings() {
 
       <div className="profile-container">
         <div className="profile-pic-container">
-          <label
-            className={`profile-pic-label${editing ? " is-editing" : ""}`}
-          >
+          <label className={`profile-pic-label${editing ? " is-editing" : ""}`}>
             <img
-              src={
-                profilePreview ||
-                profilePicture ||
-                "/images3/image5.jpg"
-              }
+              src={profilePreview || profilePicture || "/images3/image5.jpg"}
               alt="Profile"
               className="profile-pic"
             />
@@ -469,14 +486,8 @@ export default function ServiceProfileSettings() {
                     type="text"
                     className="service-name"
                     value={s.name}
-                    disabled={!editing}
-                    onChange={(e) =>
-                      setServices((list) =>
-                        list.map((it, i) =>
-                          i === idx ? { ...it, name: e.target.value } : it
-                        )
-                      )
-                    }
+                    disabled
+                    readOnly
                     required
                   />
                   <input
@@ -487,8 +498,8 @@ export default function ServiceProfileSettings() {
                     onChange={(e) =>
                       setServices((list) =>
                         list.map((it, i) =>
-                          i === idx ? { ...it, cost: e.target.value } : it
-                        )
+                          i === idx ? { ...it, cost: e.target.value } : it,
+                        ),
                       )
                     }
                     required
@@ -507,16 +518,29 @@ export default function ServiceProfileSettings() {
             </ul>
             {editing ? (
               <div className="service-input-container">
-                <input
-                  type="text"
+                <select
                   id="newService"
-                  placeholder="New Service Name"
                   value={newService}
                   onChange={(e) => {
                     setNewService(e.target.value);
                     validateNewServiceInputs(true);
                   }}
-                />
+                  style={{
+                    padding: "8px",
+                    borderRadius: 4,
+                    border: "1px solid #ccc",
+                    minWidth: 180,
+                  }}
+                >
+                  <option value="">-- Select Service Category --</option>
+                  {availableCategories
+                    .filter((cat) => !services.some((s) => s.name === cat.name))
+                    .map((cat) => (
+                      <option key={cat._id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                </select>
                 {errors.newService ? (
                   <div className="error" style={{ display: "block" }}>
                     {errors.newService}
@@ -555,8 +579,7 @@ export default function ServiceProfileSettings() {
                 <div
                   style={{ fontSize: "0.85em", color: "#555", marginTop: 4 }}
                 >
-                  Name must be 2+ characters; cost must be a number greater than
-                  0.
+                  Select a category from the list and set your cost.
                 </div>
               </div>
             ) : null}
@@ -565,6 +588,55 @@ export default function ServiceProfileSettings() {
                 {errors.services}
               </div>
             ) : null}
+          </div>
+
+          {/* Pickup / Dropoff Rates */}
+          <div className="services-container" style={{ marginTop: 16 }}>
+            <h2>Pickup &amp; Dropoff Rates</h2>
+            <div style={{ fontSize: "0.9em", color: "#555", marginBottom: 8 }}>
+              Set the rates you charge for vehicle pickup and dropoff. Customers
+              can optionally request these services when booking.
+            </div>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+              <label
+                style={{ display: "flex", flexDirection: "column", gap: 4 }}
+              >
+                <span>Pickup Rate (₹)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={pickupRate}
+                  disabled={!editing}
+                  onChange={(e) => setPickupRate(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: 4,
+                    border: "1px solid #ccc",
+                    width: 140,
+                  }}
+                />
+              </label>
+              <label
+                style={{ display: "flex", flexDirection: "column", gap: 4 }}
+              >
+                <span>Dropoff Rate (₹)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={dropoffRate}
+                  disabled={!editing}
+                  onChange={(e) => setDropoffRate(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: 4,
+                    border: "1px solid #ccc",
+                    width: 140,
+                  }}
+                />
+              </label>
+            </div>
           </div>
 
           {/* Car Painting color options */}

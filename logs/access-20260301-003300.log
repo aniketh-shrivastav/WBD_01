@@ -1,0 +1,11 @@
+[2026-02-28T19:03:00.048Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:03:00.087Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:03:00.369Z] GET /api/session - IP: ::1
+[2026-02-28T19:03:00.617Z] GET /api/session - IP: ::1
+[2026-02-28T19:03:00.695Z] GET /chat/customer/67e53cb532c5a757c77e3df8/messages - IP: ::1
+[2026-02-28T19:03:00.796Z] GET /chat/customer/67e53cb532c5a757c77e3df8/messages - IP: ::1
+[2026-02-28T19:03:02.242Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:03:02.283Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:03:02.566Z] GET /styles/styles.css - IP: ::1
+[2026-02-28T19:03:02.568Z] GET /customer/api/profile - IP: ::1
+[2026-02-28T19:03:02.820Z] GET /customer/api/profile - IP: ::1

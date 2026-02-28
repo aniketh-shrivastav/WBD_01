@@ -63,7 +63,7 @@ exports.getBooking = async (req, res) => {
           },
         },
       },
-      "name servicesOffered district paintColors",
+      "name servicesOffered district paintColors pickupRate dropoffRate",
     );
 
     const uniqueServicesSet = new Set();
@@ -137,7 +137,7 @@ exports.getBookingApi = async (req, res) => {
           },
         },
       },
-      "name servicesOffered district paintColors",
+      "name servicesOffered district paintColors pickupRate dropoffRate",
     );
 
     const uniqueServicesSet = new Set();

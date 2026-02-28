@@ -226,6 +226,20 @@ export default function ManagerProfileOverview() {
                     <strong>Reg. No:</strong> {profile.registrationNumber}
                   </div>
                 ) : null}
+                {profile.pickupRate != null &&
+                Number(profile.pickupRate) > 0 ? (
+                  <div>
+                    <strong>Pickup Rate:</strong>{" "}
+                    {formatMoneyINR(profile.pickupRate)}
+                  </div>
+                ) : null}
+                {profile.dropoffRate != null &&
+                Number(profile.dropoffRate) > 0 ? (
+                  <div>
+                    <strong>Dropoff Rate:</strong>{" "}
+                    {formatMoneyINR(profile.dropoffRate)}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -271,6 +285,9 @@ export default function ManagerProfileOverview() {
                         <th>Services</th>
                         <th>Status</th>
                         <th>Cost</th>
+                        <th>Product Cost</th>
+                        <th>Pickup</th>
+                        <th>Dropoff</th>
                         <th>Booked At</th>
                       </tr>
                     </thead>
@@ -287,6 +304,21 @@ export default function ManagerProfileOverview() {
                           <td>{(b.selectedServices || []).join(", ")}</td>
                           <td>{b.status || ""}</td>
                           <td>{formatMoneyINR(b.totalCost || 0)}</td>
+                          <td>
+                            {b.productCost
+                              ? formatMoneyINR(b.productCost)
+                              : "—"}
+                          </td>
+                          <td>
+                            {b.needsPickup
+                              ? `Yes — ${formatMoneyINR(b.pickupCost || 0)}`
+                              : "No"}
+                          </td>
+                          <td>
+                            {b.needsDropoff
+                              ? `Yes — ${formatMoneyINR(b.dropoffCost || 0)}`
+                              : "No"}
+                          </td>
                           <td>{formatDateTime(b.createdAt)}</td>
                         </tr>
                       ))}
@@ -632,6 +664,9 @@ export default function ManagerProfileOverview() {
                         <th>Services</th>
                         <th>Status</th>
                         <th>Cost</th>
+                        <th>Product Cost</th>
+                        <th>Pickup</th>
+                        <th>Dropoff</th>
                         <th>Booked At</th>
                       </tr>
                     </thead>
@@ -648,6 +683,21 @@ export default function ManagerProfileOverview() {
                           <td>{(b.selectedServices || []).join(", ")}</td>
                           <td>{b.status || ""}</td>
                           <td>{formatMoneyINR(b.totalCost || 0)}</td>
+                          <td>
+                            {b.productCost
+                              ? formatMoneyINR(b.productCost)
+                              : "—"}
+                          </td>
+                          <td>
+                            {b.needsPickup
+                              ? `Yes — ${formatMoneyINR(b.pickupCost || 0)}`
+                              : "No"}
+                          </td>
+                          <td>
+                            {b.needsDropoff
+                              ? `Yes — ${formatMoneyINR(b.dropoffCost || 0)}`
+                              : "No"}
+                          </td>
                           <td>{formatDateTime(b.createdAt)}</td>
                         </tr>
                       ))}

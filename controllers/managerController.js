@@ -1612,6 +1612,8 @@ exports.getProfileOverview = async (req, res) => {
           servicesOffered: Array.isArray(serviceProvider.servicesOffered)
             ? serviceProvider.servicesOffered
             : [],
+          pickupRate: serviceProvider.pickupRate || 0,
+          dropoffRate: serviceProvider.dropoffRate || 0,
         },
         totals: {
           totalEarnings: n(earnings?.totalEarnings),

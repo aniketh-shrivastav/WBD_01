@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
   address: String,
   district: String,
   servicesOffered: [ServiceSchema], // array of { name, cost }
+  // Pickup & drop-off rates for service providers
+  pickupRate: { type: Number, default: 0 },
+  dropoffRate: { type: Number, default: 0 },
   // For service providers offering Car Painting: list of available paint colors (hex strings like #ff0000)
   paintColors: { type: [String], default: [] },
   // Password reset flow

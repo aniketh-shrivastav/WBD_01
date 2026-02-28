@@ -15,6 +15,11 @@ exports.createBooking = async (req, res) => {
       description,
       district,
       paintColor,
+      // Pickup / Drop-off
+      needsPickup,
+      needsDropoff,
+      // Service category
+      serviceCategory,
       // Extended vehicle details
       registrationNumber,
       vehicleMake,
@@ -98,6 +103,18 @@ exports.createBooking = async (req, res) => {
       }
     });
 
+    // Pickup / Drop-off costs
+    let pickupCost = 0;
+    let dropoffCost = 0;
+    if (needsPickup) {
+      pickupCost = Number(provider.pickupRate) || 0;
+      totalCost += pickupCost;
+    }
+    if (needsDropoff) {
+      dropoffCost = Number(provider.dropoffRate) || 0;
+      totalCost += dropoffCost;
+    }
+
     const booking = new ServiceBooking({
       customerId,
       providerId,
@@ -112,6 +129,11 @@ exports.createBooking = async (req, res) => {
       district,
       paintColor: normalizedPaintColor,
       totalCost,
+      needsPickup: !!needsPickup,
+      needsDropoff: !!needsDropoff,
+      pickupCost,
+      dropoffCost,
+      serviceCategory: serviceCategory || "",
       // Extended vehicle details
       registrationNumber: registrationNumber || "",
       vehicleMake: vehicleMake || "",

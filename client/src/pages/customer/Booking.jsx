@@ -67,6 +67,10 @@ export default function CustomerBooking() {
   // Car Painting selection
   const [paintColor, setPaintColor] = useState("");
 
+  // Pickup / Dropoff
+  const [needsPickup, setNeedsPickup] = useState(false);
+  const [needsDropoff, setNeedsDropoff] = useState(false);
+
   // Validation errors
   const [errors, setErrors] = useState({});
 
@@ -394,9 +398,23 @@ export default function CustomerBooking() {
     }
   }, [showSummary]);
 
+  const pickupCost = useMemo(() => {
+    if (!needsPickup || !provider) return 0;
+    return Number(provider.pickupRate) || 0;
+  }, [needsPickup, provider]);
+
+  const dropoffCost = useMemo(() => {
+    if (!needsDropoff || !provider) return 0;
+    return Number(provider.dropoffRate) || 0;
+  }, [needsDropoff, provider]);
+
   const estimatedTotal = useMemo(() => {
-    return services.reduce((sum, s) => sum + (serviceCostMap[s] || 0), 0);
-  }, [services, serviceCostMap]);
+    const serviceCost = services.reduce(
+      (sum, s) => sum + (serviceCostMap[s] || 0),
+      0,
+    );
+    return serviceCost + pickupCost + dropoffCost;
+  }, [services, serviceCostMap, pickupCost, dropoffCost]);
 
   async function confirmBooking() {
     try {
@@ -416,6 +434,10 @@ export default function CustomerBooking() {
           address: address.trim(),
           description: description.trim(),
           district,
+          needsPickup,
+          needsDropoff,
+          serviceCategory:
+            services.length === 1 ? services[0] : services.join(", "),
           paintColor: paintColor
             ? String(paintColor).trim().toLowerCase()
             : undefined,
@@ -477,6 +499,8 @@ export default function CustomerBooking() {
     // Changing provider clears selected services
     setServices([]);
     setPaintColor("");
+    setNeedsPickup(false);
+    setNeedsDropoff(false);
     setFieldError("services", "");
     setFieldError("paintColor", "");
   }, [providerId]);
@@ -848,6 +872,84 @@ export default function CustomerBooking() {
                     </div>
                   )}
 
+                  {/* Pickup / Dropoff Options */}
+                  {provider &&
+                    (Number(provider.pickupRate) > 0 ||
+                      Number(provider.dropoffRate) > 0) && (
+                      <div
+                        className="booking-form-group"
+                        style={{
+                          marginTop: 16,
+                          padding: "16px",
+                          background: "#f8f9fa",
+                          borderRadius: 8,
+                        }}
+                      >
+                        <label className="booking-label">
+                          🚚 Pickup &amp; Dropoff Services
+                        </label>
+                        <p
+                          style={{
+                            fontSize: "0.85em",
+                            color: "#666",
+                            marginBottom: 8,
+                          }}
+                        >
+                          This provider offers vehicle pickup and dropoff.
+                          Select if you need these services.
+                        </p>
+                        {Number(provider.pickupRate) > 0 && (
+                          <label
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              marginBottom: 8,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={needsPickup}
+                              onChange={(e) => setNeedsPickup(e.target.checked)}
+                              style={{ width: 18, height: 18 }}
+                            />
+                            <span>
+                              Vehicle Pickup —{" "}
+                              <strong>
+                                ₹{Number(provider.pickupRate).toLocaleString()}
+                              </strong>
+                            </span>
+                          </label>
+                        )}
+                        {Number(provider.dropoffRate) > 0 && (
+                          <label
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={needsDropoff}
+                              onChange={(e) =>
+                                setNeedsDropoff(e.target.checked)
+                              }
+                              style={{ width: 18, height: 18 }}
+                            />
+                            <span>
+                              Vehicle Dropoff —{" "}
+                              <strong>
+                                ₹{Number(provider.dropoffRate).toLocaleString()}
+                              </strong>
+                            </span>
+                          </label>
+                        )}
+                      </div>
+                    )}
+
                   {/* Cost Display */}
                   {services.length > 0 && (
                     <div className="booking-cost-display">
@@ -859,6 +961,22 @@ export default function CustomerBooking() {
                           ₹{estimatedTotal.toLocaleString()}
                         </div>
                       </div>
+                      {(pickupCost > 0 || dropoffCost > 0) && (
+                        <div
+                          style={{
+                            fontSize: "0.85em",
+                            color: "#555",
+                            marginTop: 4,
+                          }}
+                        >
+                          Includes:{" "}
+                          {pickupCost > 0 &&
+                            `Pickup ₹${pickupCost.toLocaleString()}`}
+                          {pickupCost > 0 && dropoffCost > 0 && " + "}
+                          {dropoffCost > 0 &&
+                            `Dropoff ₹${dropoffCost.toLocaleString()}`}
+                        </div>
+                      )}
                       <div className="booking-cost-note">
                         * Final cost may vary based on service requirements
                       </div>
@@ -1544,6 +1662,35 @@ export default function CustomerBooking() {
                         </div>
                       )}
                     </div>
+
+                    {/* Pickup/Dropoff in summary */}
+                    {(needsPickup || needsDropoff) && (
+                      <div
+                        className="booking-summary-grid"
+                        style={{ marginTop: 8 }}
+                      >
+                        {needsPickup && (
+                          <div className="booking-summary-item">
+                            <div className="booking-summary-label">
+                              🚚 Pickup
+                            </div>
+                            <div className="booking-summary-value">
+                              ₹{pickupCost.toLocaleString()}
+                            </div>
+                          </div>
+                        )}
+                        {needsDropoff && (
+                          <div className="booking-summary-item">
+                            <div className="booking-summary-label">
+                              🚚 Dropoff
+                            </div>
+                            <div className="booking-summary-value">
+                              ₹{dropoffCost.toLocaleString()}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <div className="booking-summary-total">
                       <div className="booking-summary-total-label">

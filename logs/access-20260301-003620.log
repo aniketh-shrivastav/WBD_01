@@ -1,0 +1,14 @@
+[2026-02-28T19:06:21.967Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-02-28T19:06:27.797Z] POST /login - IP: ::1
+[2026-02-28T19:06:28.053Z] GET /api/session - IP: ::1
+[2026-02-28T19:06:28.066Z] GET /api/session - IP: ::1
+[2026-02-28T19:06:28.158Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:06:28.246Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:06:28.470Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T19:06:28.471Z] GET /images3/logo2.jpg - IP: ::1
+[2026-02-28T19:06:28.736Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T19:06:29.463Z] GET /manager/api/dashboard - IP: ::1
+[2026-02-28T19:06:32.633Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:06:32.680Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:06:32.950Z] GET /api/service-categories - IP: ::1
+[2026-02-28T19:06:33.212Z] GET /api/service-categories - IP: ::1

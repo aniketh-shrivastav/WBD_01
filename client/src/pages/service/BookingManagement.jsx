@@ -453,8 +453,25 @@ export default function BookingManagement() {
                       ).toLocaleDateString()
                     : "",
                 ],
+                ["Service Category", viewDetail.serviceCategory],
                 ["Services", (viewDetail.selectedServices || []).join(", ")],
                 ["Description", viewDetail.description],
+                [
+                  "Pickup",
+                  viewDetail.needsPickup
+                    ? `Yes — ₹${viewDetail.pickupCost || 0}`
+                    : "No",
+                ],
+                [
+                  "Dropoff",
+                  viewDetail.needsDropoff
+                    ? `Yes — ₹${viewDetail.dropoffCost || 0}`
+                    : "No",
+                ],
+                [
+                  "Product Cost",
+                  viewDetail.productCost ? `₹${viewDetail.productCost}` : "—",
+                ],
                 ["Status", viewDetail.status],
                 [
                   "Total Cost",
@@ -478,6 +495,45 @@ export default function BookingManagement() {
                   </div>
                 ))}
             </div>
+
+            {/* Document Links */}
+            {/* Product Cost Editor */}
+            {viewDetail.status !== "Declined" && (
+              <div
+                style={{
+                  marginTop: 16,
+                  padding: "12px 16px",
+                  background: "#f0f7ff",
+                  borderRadius: 8,
+                }}
+              >
+                <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>
+                  Add / Update Product Cost
+                </div>
+                <p style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
+                  Add the cost of products/parts used for this booking. This
+                  will be added to the total cost.
+                </p>
+                <ProductCostEditor
+                  bookingId={viewDetail._id || viewDetail.id}
+                  currentCost={viewDetail.productCost || 0}
+                  onSaved={(newCost, newTotal) => {
+                    setViewDetail((prev) =>
+                      prev
+                        ? { ...prev, productCost: newCost, totalCost: newTotal }
+                        : prev,
+                    );
+                    setBookings((list) =>
+                      list.map((b) =>
+                        (b._id || b.id) === (viewDetail._id || viewDetail.id)
+                          ? { ...b, productCost: newCost, totalCost: newTotal }
+                          : b,
+                      ),
+                    );
+                  }}
+                />
+              </div>
+            )}
 
             {/* Document Links */}
             {(viewDetail.rcBook || viewDetail.insuranceCopy) && (
@@ -633,6 +689,70 @@ function CostEditor({ value, onSave }) {
         style={{ padding: "2px 5px", marginLeft: 4 }}
       >
         💾
+      </button>
+    </form>
+  );
+}
+
+function ProductCostEditor({ bookingId, currentCost, onSaved }) {
+  const [val, setVal] = useState(currentCost || 0);
+  const [saving, setSaving] = useState(false);
+  return (
+    <form
+      style={{ display: "flex", alignItems: "center", gap: 8 }}
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        try {
+          const res = await fetch("/service/api/update-product-cost", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ bookingId, productCost: Number(val) }),
+          });
+          const j = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            alert("Error: " + (j.error || "Failed to update product cost"));
+            return;
+          }
+          alert("Product cost updated successfully.");
+          if (onSaved) onSaved(Number(val), j.totalCost);
+        } catch {
+          alert("Failed to update product cost.");
+        } finally {
+          setSaving(false);
+        }
+      }}
+    >
+      <span>₹</span>
+      <input
+        type="number"
+        min={0}
+        step="0.01"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        style={{
+          width: 100,
+          padding: "6px 8px",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+        }}
+      />
+      <button
+        type="submit"
+        disabled={saving}
+        style={{
+          padding: "6px 12px",
+          borderRadius: 4,
+          background: "#27ae60",
+          color: "#fff",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        {saving ? "Saving..." : "Save"}
       </button>
     </form>
   );

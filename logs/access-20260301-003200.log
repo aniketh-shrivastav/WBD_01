@@ -1,0 +1,6 @@
+[2026-02-28T19:02:00.621Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:02:00.657Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:02:00.931Z] GET /styles/styles.css - IP: ::1
+[2026-02-28T19:02:00.932Z] GET /customer/api/booking - IP: ::1
+[2026-02-28T19:02:01.191Z] GET /customer/api/booking - IP: ::1
+[2026-02-28T19:02:07.843Z] GET /customer/api/provider/67e53d2732c5a757c77e3dfe/reviews - IP: ::1

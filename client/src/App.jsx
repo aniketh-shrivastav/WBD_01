@@ -15,6 +15,7 @@ import ManagerOrders from "./pages/manager/Orders";
 import Payments from "./pages/manager/Payments";
 import Support from "./pages/manager/Support";
 import ManagerChat from "./pages/manager/Chat";
+import ServiceCategories from "./pages/manager/ServiceCategories";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 
@@ -313,6 +314,14 @@ export default function App() {
         element={
           <RequireRole role="manager">
             <ManagerOrders />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/manager/service-categories"
+        element={
+          <RequireRole role="manager">
+            <ServiceCategories />
           </RequireRole>
         }
       />

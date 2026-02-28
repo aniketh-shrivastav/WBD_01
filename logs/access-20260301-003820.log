@@ -1,0 +1,5 @@
+[2026-02-28T19:08:34.403Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:08:36.553Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:08:36.557Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1
+[2026-02-28T19:08:36.591Z] GET /chat/unread-count - IP: ::1
+[2026-02-28T19:08:37.054Z] GET /manager/api/profile-overview/67ec262bbce77b21794e1f3a - IP: ::1

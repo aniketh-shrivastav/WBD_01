@@ -523,6 +523,8 @@ exports.getProfile = async (req, res) => {
       servicesOffered = [],
       paintColors = [],
       profilePicture = "",
+      pickupRate = 0,
+      dropoffRate = 0,
     } = user;
     res.json({
       success: true,
@@ -535,6 +537,8 @@ exports.getProfile = async (req, res) => {
         servicesOffered,
         paintColors,
         profilePicture,
+        pickupRate,
+        dropoffRate,
       },
     });
   } catch (err) {
@@ -648,6 +652,13 @@ exports.getBookings = async (req, res) => {
       status: b.status,
       createdAt: b.createdAt,
       totalCost: b.totalCost || 0,
+      // Pickup / Drop-off
+      needsPickup: b.needsPickup || false,
+      needsDropoff: b.needsDropoff || false,
+      pickupCost: b.pickupCost || 0,
+      dropoffCost: b.dropoffCost || 0,
+      productCost: b.productCost || 0,
+      serviceCategory: b.serviceCategory || "",
       // Extended vehicle details
       registrationNumber: b.registrationNumber || "",
       vehicleMake: b.vehicleMake || "",
@@ -672,6 +683,49 @@ exports.getBookings = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Failed to load bookings" });
+  }
+};
+
+// Update product cost for a booking
+exports.updateProductCost = async (req, res) => {
+  try {
+    const providerId = req.user.id;
+    const { bookingId, productCost } = req.body;
+    if (!bookingId)
+      return res
+        .status(400)
+        .json({ success: false, message: "Booking ID required" });
+    const cost = Math.max(0, Number(productCost) || 0);
+    const booking = await ServiceBooking.findOne({
+      _id: bookingId,
+      providerId,
+    });
+    if (!booking)
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+
+    const oldTotal = booking.totalCost || 0;
+    const oldProductCost = booking.productCost || 0;
+    booking.productCost = cost;
+    booking.totalCost = oldTotal - oldProductCost + cost;
+
+    booking.costHistory.push({
+      from: oldTotal,
+      to: booking.totalCost,
+      changedAt: new Date(),
+      changedBy: { id: providerId, role: "service-provider" },
+    });
+
+    await booking.save();
+    res.json({
+      success: true,
+      totalCost: booking.totalCost,
+      productCost: cost,
+    });
+  } catch (err) {
+    console.error("Error updating product cost:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
