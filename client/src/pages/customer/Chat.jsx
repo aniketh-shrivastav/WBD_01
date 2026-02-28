@@ -26,6 +26,7 @@ export default function CustomerChat() {
   const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chatError, setChatError] = useState("");
   const [themeMode, setThemeMode] = useState(
     () => document.documentElement.getAttribute("data-theme") || "light",
   );
@@ -137,7 +138,35 @@ export default function CustomerChat() {
     if (!user || uploading) return;
     const text = input.trim();
     const hasFile = Boolean(pendingFile);
-    if (!text && !hasFile) return;
+    if (!text && !hasFile) {
+      setChatError("Please type a message or attach a file.");
+      return;
+    }
+    if (text && text.length < 1) {
+      setChatError("Message is too short.");
+      return;
+    }
+    if (hasFile) {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+      if (!allowedTypes.includes(pendingFile.type)) {
+        setChatError("File type not allowed. Use images, PDF or Word docs.");
+        return;
+      }
+      if (pendingFile.size > 10 * 1024 * 1024) {
+        setChatError("File size must be under 10MB.");
+        return;
+      }
+    }
+    setChatError("");
 
     try {
       setUploading(hasFile);
@@ -184,6 +213,29 @@ export default function CustomerChat() {
       setPendingFile(null);
       return;
     }
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      setChatError("File type not allowed. Use images, PDF or Word docs.");
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setChatError("File size must be under 10MB.");
+      setPendingFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setChatError("");
     setPendingFile(file);
   }
 
@@ -387,7 +439,10 @@ export default function CustomerChat() {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setChatError("");
+            }}
             placeholder="Type a message..."
             style={{
               flex: 1,
@@ -444,6 +499,18 @@ export default function CustomerChat() {
           {uploading && (
             <span style={{ marginLeft: 8, fontSize: 12, color: "#6b7280" }}>
               Uploading...
+            </span>
+          )}
+          {chatError && (
+            <span
+              style={{
+                marginLeft: 8,
+                fontSize: 12,
+                color: "#ef4444",
+                fontWeight: 500,
+              }}
+            >
+              {chatError}
             </span>
           )}
 

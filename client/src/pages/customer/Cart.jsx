@@ -30,6 +30,7 @@ export default function CustomerCart() {
   const [addressMode, setAddressMode] = useState("profile"); // "profile" or "custom"
   const [customAddress, setCustomAddress] = useState("");
   const [customDistrict, setCustomDistrict] = useState("");
+  const [cartErrors, setCartErrors] = useState({});
 
   function backendBase() {
     const { protocol, hostname, port } = window.location;
@@ -167,6 +168,19 @@ export default function CustomerCart() {
     }
   }
 
+  function validateCustomAddress() {
+    if (addressMode !== "custom") return true;
+    const errs = {};
+    if (!customAddress.trim() || customAddress.trim().length < 5) {
+      errs.customAddress = "Delivery address is required (min 5 characters).";
+    }
+    if (!customDistrict.trim() || customDistrict.trim().length < 2) {
+      errs.customDistrict = "District is required (min 2 characters).";
+    }
+    setCartErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
   async function placeOrder() {
     if (paymentMethod === "card") {
       await handleStripeCheckout();
@@ -174,16 +188,7 @@ export default function CustomerCart() {
     }
 
     // Validate custom address if selected
-    if (addressMode === "custom") {
-      if (!customAddress.trim() || customAddress.trim().length < 5) {
-        alert("Please enter a valid delivery address (min 5 characters).");
-        return;
-      }
-      if (!customDistrict.trim() || customDistrict.trim().length < 2) {
-        alert("Please enter a valid district.");
-        return;
-      }
-    }
+    if (!validateCustomAddress()) return;
 
     try {
       const orderBody = { paymentMethod };
@@ -477,12 +482,23 @@ export default function CustomerCart() {
                     </label>
                     <input
                       type="text"
-                      className="customer-input"
+                      className={`customer-input ${cartErrors.customAddress ? "customer-input-error" : ""}`}
                       placeholder="Enter full delivery address"
                       value={customAddress}
-                      onChange={(e) => setCustomAddress(e.target.value)}
+                      onChange={(e) => {
+                        setCustomAddress(e.target.value);
+                        setCartErrors((p) => ({
+                          ...p,
+                          customAddress: undefined,
+                        }));
+                      }}
                       style={{ width: "100%" }}
                     />
+                    {cartErrors.customAddress && (
+                      <div className="customer-error-text">
+                        {cartErrors.customAddress}
+                      </div>
+                    )}
                   </div>
                   <div style={{ flex: "1 1 140px" }}>
                     <label
@@ -498,12 +514,23 @@ export default function CustomerCart() {
                     </label>
                     <input
                       type="text"
-                      className="customer-input"
+                      className={`customer-input ${cartErrors.customDistrict ? "customer-input-error" : ""}`}
                       placeholder="District"
                       value={customDistrict}
-                      onChange={(e) => setCustomDistrict(e.target.value)}
+                      onChange={(e) => {
+                        setCustomDistrict(e.target.value);
+                        setCartErrors((p) => ({
+                          ...p,
+                          customDistrict: undefined,
+                        }));
+                      }}
                       style={{ width: "100%" }}
                     />
+                    {cartErrors.customDistrict && (
+                      <div className="customer-error-text">
+                        {cartErrors.customDistrict}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -601,6 +628,14 @@ export default function CustomerCart() {
                   </div>
                 </div>
               </div>
+              {cartErrors.payment && (
+                <div
+                  className="customer-error-text"
+                  style={{ padding: "0 20px" }}
+                >
+                  {cartErrors.payment}
+                </div>
+              )}
               <div className="customer-modal-footer">
                 <button
                   className="customer-btn customer-btn-secondary"
@@ -612,7 +647,10 @@ export default function CustomerCart() {
                   className="customer-btn customer-btn-success"
                   onClick={() => {
                     if (!paymentMethod) {
-                      alert("Please select a payment method.");
+                      setCartErrors((p) => ({
+                        ...p,
+                        payment: "Please select a payment method.",
+                      }));
                       return;
                     }
                     if (paymentMethod === "card") {

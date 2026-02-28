@@ -195,6 +195,7 @@ export default function CustomerHistory() {
   const [ratingBookingId, setRatingBookingId] = useState("");
   const [ratingValue, setRatingValue] = useState("");
   const [ratingReview, setRatingReview] = useState("");
+  const [ratingErrors, setRatingErrors] = useState({});
 
   // Highlighting state for newly added/updated orders/services
   const [highlightedIds, setHighlightedIds] = useState(() => ({
@@ -417,15 +418,20 @@ export default function CustomerHistory() {
 
   async function submitRating(e) {
     e.preventDefault();
+    const errs = {};
     const numericRating = Number(ratingValue);
     if (
       !Number.isFinite(numericRating) ||
       numericRating < 1 ||
       numericRating > 5
     ) {
-      alert("Please enter a rating between 1 and 5.");
-      return;
+      errs.rating = "Please enter a rating between 1 and 5.";
     }
+    if (ratingReview.trim() && ratingReview.trim().length < 5) {
+      errs.review = "Review must be at least 5 characters if provided.";
+    }
+    setRatingErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     try {
       const res = await fetch(`/customer/rate-service/${ratingBookingId}`, {
         method: "POST",
@@ -1107,10 +1113,18 @@ export default function CustomerHistory() {
                     max={5}
                     required
                     value={ratingValue}
-                    onChange={(e) => setRatingValue(e.target.value)}
-                    className="customer-input"
+                    onChange={(e) => {
+                      setRatingValue(e.target.value);
+                      setRatingErrors((p) => ({ ...p, rating: undefined }));
+                    }}
+                    className={`customer-input ${ratingErrors.rating ? "customer-input-error" : ""}`}
                     style={{ maxWidth: "120px" }}
                   />
+                  {ratingErrors.rating && (
+                    <div className="customer-error-text">
+                      {ratingErrors.rating}
+                    </div>
+                  )}
                 </div>
                 <div className="customer-form-group">
                   <label className="customer-label" htmlFor="review">
@@ -1121,10 +1135,18 @@ export default function CustomerHistory() {
                     id="review"
                     rows={4}
                     value={ratingReview}
-                    onChange={(e) => setRatingReview(e.target.value)}
-                    className="customer-input"
+                    onChange={(e) => {
+                      setRatingReview(e.target.value);
+                      setRatingErrors((p) => ({ ...p, review: undefined }));
+                    }}
+                    className={`customer-input ${ratingErrors.review ? "customer-input-error" : ""}`}
                     placeholder="Share your experience..."
                   />
+                  {ratingErrors.review && (
+                    <div className="customer-error-text">
+                      {ratingErrors.review}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="customer-modal-footer">

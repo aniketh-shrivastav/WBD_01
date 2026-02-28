@@ -21,6 +21,10 @@ export default function ProductManagement() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  const [stockProductId, setStockProductId] = useState(null);
+  const [stockAmount, setStockAmount] = useState("");
+  const [stockError, setStockError] = useState("");
+  const [stockLoading, setStockLoading] = useState(false);
 
   const imageInputRef = useRef(null);
 
@@ -172,7 +176,6 @@ export default function ProductManagement() {
         credentials: "include",
         headers: { Accept: "application/json" },
       });
-      // Server currently redirects after delete; handle both JSON and redirect/HTML responses
       const ct = res.headers.get("content-type") || "";
       if (ct.includes("application/json")) {
         const data = await res.json();
@@ -184,6 +187,43 @@ export default function ProductManagement() {
     } catch (err) {
       console.error(err);
       alert(err?.message || "Failed to delete product.");
+    }
+  }
+
+  // Add Stock
+  function openStockModal(id) {
+    setStockProductId(id);
+    setStockAmount("");
+    setStockError("");
+  }
+
+  async function handleAddStock() {
+    const qty = Number(stockAmount);
+    if (!Number.isInteger(qty) || qty < 1) {
+      setStockError("Enter a positive whole number");
+      return;
+    }
+    setStockLoading(true);
+    try {
+      const res = await fetch(`/seller/update-stock/${stockProductId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ quantity: qty }),
+      });
+      const data = await res.json();
+      if (!data.success)
+        throw new Error(data.message || "Failed to update stock");
+      setStockProductId(null);
+      await loadProducts();
+    } catch (err) {
+      console.error(err);
+      setStockError(err?.message || "Failed to update stock");
+    } finally {
+      setStockLoading(false);
     }
   }
 
@@ -393,12 +433,26 @@ export default function ProductManagement() {
                       </p>
                     </div>
 
-                    <div style={{ padding: "0 20px 20px" }}>
+                    <div
+                      style={{
+                        padding: "0 20px 20px",
+                        display: "flex",
+                        gap: "8px",
+                      }}
+                    >
                       <button
-                        className="seller-btn seller-btn-danger seller-w-full"
+                        className="seller-btn seller-btn-primary"
+                        style={{ flex: 1 }}
+                        onClick={() => openStockModal(p._id)}
+                      >
+                        Add Stock
+                      </button>
+                      <button
+                        className="seller-btn seller-btn-danger"
+                        style={{ flex: 1 }}
                         onClick={() => handleDelete(p._id)}
                       >
-                        Delete Product
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -407,6 +461,59 @@ export default function ProductManagement() {
             )}
           </div>
         </div>
+
+        {/* Add Stock Modal */}
+        {stockProductId && (
+          <div
+            className="seller-modal-overlay"
+            onClick={() => setStockProductId(null)}
+          >
+            <div
+              className="seller-card"
+              style={{ maxWidth: 400, width: "90%", margin: "auto" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="seller-card-header">
+                <h2 className="seller-card-title">📦 Add Stock</h2>
+              </div>
+              <div className="seller-card-body">
+                <div className="seller-form-group">
+                  <label className="seller-label">Quantity to Add</label>
+                  <input
+                    className="seller-input"
+                    type="number"
+                    min="1"
+                    value={stockAmount}
+                    onChange={(e) => {
+                      setStockAmount(e.target.value);
+                      setStockError("");
+                    }}
+                    autoFocus
+                    onKeyDown={(e) => e.key === "Enter" && handleAddStock()}
+                  />
+                  {stockError && (
+                    <small className="seller-error-text">{stockError}</small>
+                  )}
+                </div>
+                <div className="seller-flex seller-gap-2 seller-mt-2">
+                  <button
+                    className="seller-btn seller-btn-primary"
+                    onClick={handleAddStock}
+                    disabled={stockLoading}
+                  >
+                    {stockLoading ? "Updating..." : "Confirm"}
+                  </button>
+                  <button
+                    className="seller-btn seller-btn-secondary"
+                    onClick={() => setStockProductId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <SellerFooter />

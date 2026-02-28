@@ -357,6 +357,83 @@ export default function CustomerBooking() {
     setFieldError("description", "");
     return true;
   }
+  function validateRegistrationNumber() {
+    const val = registrationNumber.trim();
+    if (!val)
+      return (
+        setFieldError("registrationNumber", "Registration number is required"),
+        false
+      );
+    if (!/^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/i.test(val))
+      return (setFieldError("registrationNumber", "Format: KA01AB1234"), false);
+    setFieldError("registrationNumber", "");
+    return true;
+  }
+  function validateVehicleMake() {
+    const val = vehicleMake.trim();
+    if (!val)
+      return (setFieldError("vehicleMake", "Vehicle make is required"), false);
+    if (val.length < 2)
+      return (setFieldError("vehicleMake", "Too short (min 2 chars)"), false);
+    setFieldError("vehicleMake", "");
+    return true;
+  }
+  function validateVehicleModel() {
+    const val = vehicleModel.trim();
+    if (!val)
+      return (
+        setFieldError("vehicleModel", "Vehicle model is required"),
+        false
+      );
+    if (val.length < 2)
+      return (setFieldError("vehicleModel", "Too short (min 2 chars)"), false);
+    setFieldError("vehicleModel", "");
+    return true;
+  }
+  function validateFuelType() {
+    if (!fuelType)
+      return (setFieldError("fuelType", "Please select fuel type"), false);
+    setFieldError("fuelType", "");
+    return true;
+  }
+  function validateTransmission() {
+    if (!transmission)
+      return (
+        setFieldError("transmission", "Please select transmission"),
+        false
+      );
+    setFieldError("transmission", "");
+    return true;
+  }
+  function validateYearOfManufacture() {
+    const val = String(yearOfManufacture).trim();
+    if (!val)
+      return (
+        setFieldError("yearOfManufacture", "Year of manufacture is required"),
+        false
+      );
+    const yr = Number(val);
+    const curr = new Date().getFullYear();
+    if (!/^\d{4}$/.test(val) || yr < 1980 || yr > curr)
+      return (
+        setFieldError("yearOfManufacture", `Must be between 1980 and ${curr}`),
+        false
+      );
+    setFieldError("yearOfManufacture", "");
+    return true;
+  }
+  function validateCurrentMileage() {
+    const val = String(currentMileage).trim();
+    if (!val)
+      return (
+        setFieldError("currentMileage", "Current mileage is required"),
+        false
+      );
+    if (isNaN(val) || Number(val) < 0)
+      return (setFieldError("currentMileage", "Must be 0 or more"), false);
+    setFieldError("currentMileage", "");
+    return true;
+  }
 
   function validateAll() {
     const validations = [
@@ -370,6 +447,13 @@ export default function CustomerBooking() {
       { ok: validateCarModel(), elementId: "car-model" },
       { ok: validateAddress(), elementId: "address" },
       { ok: validateDescription(), elementId: "description" },
+      { ok: validateRegistrationNumber(), elementId: "reg-number" },
+      { ok: validateVehicleMake(), elementId: "v-make" },
+      { ok: validateVehicleModel(), elementId: "v-model" },
+      { ok: validateFuelType(), elementId: "v-fuel" },
+      { ok: validateTransmission(), elementId: "v-trans" },
+      { ok: validateYearOfManufacture(), elementId: "v-yom" },
+      { ok: validateCurrentMileage(), elementId: "v-mileage" },
     ];
     const firstBad = validations.find((v) => !v.ok);
     if (firstBad?.elementId) {
@@ -1195,8 +1279,14 @@ export default function CustomerBooking() {
                           onChange={(e) =>
                             setRegistrationNumber(e.target.value)
                           }
-                          className="booking-form-input"
+                          onBlur={validateRegistrationNumber}
+                          className={`booking-form-input ${errors.registrationNumber ? "invalid" : ""}`}
                         />
+                        {errors.registrationNumber && (
+                          <span className="booking-error-msg">
+                            {errors.registrationNumber}
+                          </span>
+                        )}
                       </div>
                       <div className="booking-form-group">
                         <label className="booking-form-label" htmlFor="v-make">
@@ -1209,8 +1299,14 @@ export default function CustomerBooking() {
                           placeholder="e.g., Hyundai, Honda, BMW"
                           value={vehicleMake}
                           onChange={(e) => setVehicleMake(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateVehicleMake}
+                          className={`booking-form-input ${errors.vehicleMake ? "invalid" : ""}`}
                         />
+                        {errors.vehicleMake && (
+                          <span className="booking-error-msg">
+                            {errors.vehicleMake}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -1226,8 +1322,14 @@ export default function CustomerBooking() {
                           placeholder="e.g., i20, City, X5"
                           value={vehicleModel}
                           onChange={(e) => setVehicleModel(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateVehicleModel}
+                          className={`booking-form-input ${errors.vehicleModel ? "invalid" : ""}`}
                         />
+                        {errors.vehicleModel && (
+                          <span className="booking-error-msg">
+                            {errors.vehicleModel}
+                          </span>
+                        )}
                       </div>
                       <div className="booking-form-group">
                         <label
@@ -1258,7 +1360,8 @@ export default function CustomerBooking() {
                           id="v-fuel"
                           value={fuelType}
                           onChange={(e) => setFuelType(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateFuelType}
+                          className={`booking-form-input ${errors.fuelType ? "invalid" : ""}`}
                         >
                           <option value="">Select</option>
                           <option value="Petrol">Petrol</option>
@@ -1267,6 +1370,11 @@ export default function CustomerBooking() {
                           <option value="Hybrid">Hybrid</option>
                           <option value="CNG">CNG</option>
                         </select>
+                        {errors.fuelType && (
+                          <span className="booking-error-msg">
+                            {errors.fuelType}
+                          </span>
+                        )}
                       </div>
                       <div className="booking-form-group">
                         <label className="booking-form-label" htmlFor="v-trans">
@@ -1277,12 +1385,18 @@ export default function CustomerBooking() {
                           id="v-trans"
                           value={transmission}
                           onChange={(e) => setTransmission(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateTransmission}
+                          className={`booking-form-input ${errors.transmission ? "invalid" : ""}`}
                         >
                           <option value="">Select</option>
                           <option value="Manual">Manual</option>
                           <option value="Automatic">Automatic</option>
                         </select>
+                        {errors.transmission && (
+                          <span className="booking-error-msg">
+                            {errors.transmission}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -1300,8 +1414,14 @@ export default function CustomerBooking() {
                           max={new Date().getFullYear()}
                           value={yearOfManufacture}
                           onChange={(e) => setYearOfManufacture(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateYearOfManufacture}
+                          className={`booking-form-input ${errors.yearOfManufacture ? "invalid" : ""}`}
                         />
+                        {errors.yearOfManufacture && (
+                          <span className="booking-error-msg">
+                            {errors.yearOfManufacture}
+                          </span>
+                        )}
                       </div>
                       <div className="booking-form-group">
                         <label className="booking-form-label" htmlFor="v-vin">
@@ -1335,8 +1455,14 @@ export default function CustomerBooking() {
                           min="0"
                           value={currentMileage}
                           onChange={(e) => setCurrentMileage(e.target.value)}
-                          className="booking-form-input"
+                          onBlur={validateCurrentMileage}
+                          className={`booking-form-input ${errors.currentMileage ? "invalid" : ""}`}
                         />
+                        {errors.currentMileage && (
+                          <span className="booking-error-msg">
+                            {errors.currentMileage}
+                          </span>
+                        )}
                       </div>
                       <div className="booking-form-group">
                         <label

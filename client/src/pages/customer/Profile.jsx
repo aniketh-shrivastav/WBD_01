@@ -214,6 +214,82 @@ export default function CustomerProfile() {
     }
     return true;
   }
+  function validateRegistrationNumber() {
+    const v = (form.registrationNumber || "").trim();
+    if (!v) {
+      showError("registrationNumber", "Registration number is required.");
+      return false;
+    }
+    if (!/^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/i.test(v)) {
+      showError("registrationNumber", "Format: KA01AB1234");
+      return false;
+    }
+    return true;
+  }
+  function validateVehicleMake() {
+    const v = (form.vehicleMake || "").trim();
+    if (!v) {
+      showError("vehicleMake", "Vehicle make is required.");
+      return false;
+    }
+    if (v.length < 2) {
+      showError("vehicleMake", "Too short (min 2 chars).");
+      return false;
+    }
+    return true;
+  }
+  function validateVehicleModel() {
+    const v = (form.vehicleModel || "").trim();
+    if (!v) {
+      showError("vehicleModel", "Vehicle model is required.");
+      return false;
+    }
+    if (v.length < 2) {
+      showError("vehicleModel", "Too short (min 2 chars).");
+      return false;
+    }
+    return true;
+  }
+  function validateFuelType() {
+    if (!form.fuelType) {
+      showError("fuelType", "Please select fuel type.");
+      return false;
+    }
+    return true;
+  }
+  function validateTransmission() {
+    if (!form.transmission) {
+      showError("transmission", "Please select transmission.");
+      return false;
+    }
+    return true;
+  }
+  function validateYearOfManufacture() {
+    const v = String(form.yearOfManufacture || "").trim();
+    if (!v) {
+      showError("yearOfManufacture", "Year of manufacture is required.");
+      return false;
+    }
+    const yr = Number(v);
+    const curr = new Date().getFullYear();
+    if (!/^\d{4}$/.test(v) || yr < 1980 || yr > curr) {
+      showError("yearOfManufacture", `Must be between 1980 and ${curr}.`);
+      return false;
+    }
+    return true;
+  }
+  function validateCurrentMileage() {
+    const v = String(form.currentMileage || "").trim();
+    if (!v) {
+      showError("currentMileage", "Current mileage is required.");
+      return false;
+    }
+    if (isNaN(v) || Number(v) < 0) {
+      showError("currentMileage", "Must be 0 or more.");
+      return false;
+    }
+    return true;
+  }
 
   function validateAll() {
     setErrors({});
@@ -223,6 +299,13 @@ export default function CustomerProfile() {
       validateAddress(),
       validateDistrict(),
       validatePayments(),
+      validateRegistrationNumber(),
+      validateVehicleMake(),
+      validateVehicleModel(),
+      validateFuelType(),
+      validateTransmission(),
+      validateYearOfManufacture(),
+      validateCurrentMileage(),
     ].every(Boolean);
     return ok;
   }
@@ -524,8 +607,14 @@ export default function CustomerProfile() {
                       onChange={(e) =>
                         setField("registrationNumber", e.target.value)
                       }
-                      className="customer-input"
+                      onBlur={validateRegistrationNumber}
+                      className={`customer-input ${errors.registrationNumber ? "customer-input-error" : ""}`}
                     />
+                    {errors.registrationNumber && (
+                      <div className="customer-error-text">
+                        {errors.registrationNumber}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="vehicleMake">
@@ -537,8 +626,14 @@ export default function CustomerProfile() {
                       placeholder="e.g., Hyundai, Honda, BMW"
                       value={form.vehicleMake || ""}
                       onChange={(e) => setField("vehicleMake", e.target.value)}
-                      className="customer-input"
+                      onBlur={validateVehicleMake}
+                      className={`customer-input ${errors.vehicleMake ? "customer-input-error" : ""}`}
                     />
+                    {errors.vehicleMake && (
+                      <div className="customer-error-text">
+                        {errors.vehicleMake}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="vehicleModel">
@@ -550,8 +645,14 @@ export default function CustomerProfile() {
                       placeholder="e.g., i20, City, X5"
                       value={form.vehicleModel || ""}
                       onChange={(e) => setField("vehicleModel", e.target.value)}
-                      className="customer-input"
+                      onBlur={validateVehicleModel}
+                      className={`customer-input ${errors.vehicleModel ? "customer-input-error" : ""}`}
                     />
+                    {errors.vehicleModel && (
+                      <div className="customer-error-text">
+                        {errors.vehicleModel}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="vehicleVariant">
@@ -577,7 +678,8 @@ export default function CustomerProfile() {
                       name="fuelType"
                       value={form.fuelType || ""}
                       onChange={(e) => setField("fuelType", e.target.value)}
-                      className="customer-input"
+                      onBlur={validateFuelType}
+                      className={`customer-input ${errors.fuelType ? "customer-input-error" : ""}`}
                     >
                       <option value="">Select Fuel Type</option>
                       <option value="Petrol">Petrol</option>
@@ -586,6 +688,11 @@ export default function CustomerProfile() {
                       <option value="Hybrid">Hybrid</option>
                       <option value="CNG">CNG</option>
                     </select>
+                    {errors.fuelType && (
+                      <div className="customer-error-text">
+                        {errors.fuelType}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="transmission">
@@ -596,12 +703,18 @@ export default function CustomerProfile() {
                       name="transmission"
                       value={form.transmission || ""}
                       onChange={(e) => setField("transmission", e.target.value)}
-                      className="customer-input"
+                      onBlur={validateTransmission}
+                      className={`customer-input ${errors.transmission ? "customer-input-error" : ""}`}
                     >
                       <option value="">Select Transmission</option>
                       <option value="Manual">Manual</option>
                       <option value="Automatic">Automatic</option>
                     </select>
+                    {errors.transmission && (
+                      <div className="customer-error-text">
+                        {errors.transmission}
+                      </div>
+                    )}
                   </div>
                   \n{" "}
                 </div>
@@ -632,8 +745,14 @@ export default function CustomerProfile() {
                       onChange={(e) =>
                         setField("yearOfManufacture", e.target.value)
                       }
-                      className="customer-input"
+                      onBlur={validateYearOfManufacture}
+                      className={`customer-input ${errors.yearOfManufacture ? "customer-input-error" : ""}`}
                     />
+                    {errors.yearOfManufacture && (
+                      <div className="customer-error-text">
+                        {errors.yearOfManufacture}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label className="customer-label" htmlFor="vin">
@@ -662,8 +781,14 @@ export default function CustomerProfile() {
                       onChange={(e) =>
                         setField("currentMileage", e.target.value)
                       }
-                      className="customer-input"
+                      onBlur={validateCurrentMileage}
+                      className={`customer-input ${errors.currentMileage ? "customer-input-error" : ""}`}
                     />
+                    {errors.currentMileage && (
+                      <div className="customer-error-text">
+                        {errors.currentMileage}
+                      </div>
+                    )}
                   </div>
                   <div className="customer-form-group">
                     <label

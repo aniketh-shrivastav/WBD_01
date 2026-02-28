@@ -68,6 +68,7 @@ export default function ProductDetails() {
   const [userReview, setUserReview] = useState(null);
   const [reviewForm, setReviewForm] = useState({ rating: 5, review: "" });
   const [reviewStatus, setReviewStatus] = useState("");
+  const [reviewErrors, setReviewErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -140,6 +141,16 @@ export default function ProductDetails() {
   const submitReview = async (e) => {
     e.preventDefault();
     setReviewStatus("");
+    // Validate review form
+    const errs = {};
+    if (!reviewForm.rating || reviewForm.rating < 1 || reviewForm.rating > 5) {
+      errs.rating = "Please select a rating between 1 and 5.";
+    }
+    if (!reviewForm.review.trim() || reviewForm.review.trim().length < 10) {
+      errs.review = "Review must be at least 10 characters.";
+    }
+    setReviewErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     try {
       const res = await fetch(`/customer/product/${id}/review`, {
         method: "POST",
@@ -394,28 +405,46 @@ export default function ProductDetails() {
                         <label className="pd-form-label">Your Rating</label>
                         <StarRatingInput
                           rating={reviewForm.rating}
-                          onChange={(value) =>
+                          onChange={(value) => {
                             setReviewForm((prev) => ({
                               ...prev,
                               rating: value,
-                            }))
-                          }
+                            }));
+                            setReviewErrors((p) => ({
+                              ...p,
+                              rating: undefined,
+                            }));
+                          }}
                         />
+                        {reviewErrors.rating && (
+                          <div className="customer-error-text">
+                            {reviewErrors.rating}
+                          </div>
+                        )}
                       </div>
                       <div className="pd-form-group">
                         <label className="pd-form-label">Your Review</label>
                         <textarea
-                          className="pd-form-textarea"
+                          className={`pd-form-textarea ${reviewErrors.review ? "customer-input-error" : ""}`}
                           rows={3}
-                          placeholder="Share your experience with this product..."
+                          placeholder="Share your experience with this product (min 10 characters)..."
                           value={reviewForm.review}
-                          onChange={(e) =>
+                          onChange={(e) => {
                             setReviewForm((prev) => ({
                               ...prev,
                               review: e.target.value,
-                            }))
-                          }
+                            }));
+                            setReviewErrors((p) => ({
+                              ...p,
+                              review: undefined,
+                            }));
+                          }}
                         />
+                        {reviewErrors.review && (
+                          <div className="customer-error-text">
+                            {reviewErrors.review}
+                          </div>
+                        )}
                       </div>
                       <button type="submit" className="pd-submit-btn">
                         {userReview ? "Update Review" : "Submit Review"}
