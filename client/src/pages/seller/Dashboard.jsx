@@ -1,20 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
-import "../../Css/sellerDashboard.css";
+import SellerNav from "../../components/SellerNav";
+import SellerFooter from "../../components/SellerFooter";
+import "../../Css/seller.css";
 import { fetchSellerDashboard } from "../../store/sellerSlice";
 
 const STALE_AFTER_MS = 1000 * 60 * 5;
 
 export default function SellerDashboard() {
-  // Add class to <body> for dashboard-specific CSS
-  useEffect(() => {
-    document.body.classList.add("seller-page");
-    return () => {
-      document.body.classList.remove("seller-page");
-    };
-  }, []);
-
   const dispatch = useDispatch();
   const { dashboard, status, error, lastFetched, hydratedFromStorage } =
     useSelector((state) => state.seller);
@@ -57,7 +51,6 @@ export default function SellerDashboard() {
     }
   }, [dispatch, status, lastFetched]);
 
-  // Pie chart setup
   useEffect(() => {
     if (!pieRef.current) return;
     if (pieInst.current) {
@@ -78,11 +71,11 @@ export default function SellerDashboard() {
             {
               data: values,
               backgroundColor: [
-                "#6a11cb",
-                "#2575fc",
-                "#ff6f61",
-                "#2ecc71",
-                "#f1c40f",
+                "#4f46e5",
+                "#6366f1",
+                "#ef4444",
+                "#10b981",
+                "#f59e0b",
               ],
             },
           ],
@@ -108,174 +101,129 @@ export default function SellerDashboard() {
   };
 
   return (
-    <div>
-      {/* NAVBAR */}
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/images3/logo2.jpg"
-            alt="AutoCustomizer"
-            style={{ height: "40px", objectFit: "contain" }}
-          />
-        </div>
-        <ul>
-          <li>
-            <a href="/seller/dashboard" className="active">
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a href="/seller/profileSettings">Profile Settings</a>
-          </li>
-          <li>
-            <a href="/seller/productmanagement">Products</a>
-          </li>
-          <li>
-            <a href="/seller/orders">Orders</a>
-          </li>
-          <li>
-            <a href="/seller/reviews">Reviews</a>
-          </li>
-          <li>
-            <a href="/logout">Logout</a>
-          </li>
-        </ul>
-      </nav>
+    <div className="seller-page">
+      <SellerNav />
 
-      {/* HEADER */}
-      <header>
-        <h1>AutoCustomizer Seller Dashboard</h1>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-            alignItems: "center",
-            marginTop: 8,
-          }}
-        >
-          <span style={{ color: "#6b7280", fontSize: 14 }}>
-            {lastUpdatedText}
-          </span>
+      <main className="seller-main">
+        <div className="seller-flex seller-items-center seller-justify-between seller-flex-wrap seller-gap-2 seller-mb-3">
+          <div>
+            <h1 className="seller-title">Seller Dashboard</h1>
+            <p className="seller-subtitle">{lastUpdatedText}</p>
+          </div>
           <button
-            type="button"
+            className="seller-btn seller-btn-primary seller-btn-sm"
             onClick={handleRefresh}
             disabled={status === "loading"}
-            style={{
-              padding: "6px 14px",
-              borderRadius: 6,
-              border: "1px solid #cbd5f5",
-              background: status === "loading" ? "#e5e7eb" : "#111827",
-              color: status === "loading" ? "#6b7280" : "#fff",
-              cursor: status === "loading" ? "not-allowed" : "pointer",
-              fontSize: 14,
-              fontWeight: 600,
-            }}
           >
-            {status === "loading" ? "Refreshing" : "Refresh Data"}
+            {status === "loading" ? "Refreshing..." : "↻ Refresh Data"}
           </button>
         </div>
-      </header>
 
-      {/* MAIN CONTENT */}
-      <main className="seller-main">
-        {loading ? (
-          <p className="loading" style={{ textAlign: "center" }}>
-            Loading dashboard...
-          </p>
-        ) : null}
-        {error && hasData ? (
-          <p style={{ color: "red", textAlign: "center" }}>{error}</p>
-        ) : null}
+        {loading && (
+          <div className="seller-loading">
+            <div className="seller-spinner" />
+            <span className="seller-loading-text">Loading dashboard...</span>
+          </div>
+        )}
+
+        {error && hasData && (
+          <div className="seller-alert seller-alert-error">{error}</div>
+        )}
+        {error && !hasData && (
+          <div className="seller-alert seller-alert-error">
+            Failed to load dashboard: {error}
+          </div>
+        )}
+
         {/* Stat Cards */}
-        <section className="stats">
-          <div className="card">
-            <h2>Total Sales</h2>
-            <p>{stats.totalSales}</p>
+        <div className="seller-stats-grid">
+          <div className="seller-stat-card">
+            <div className="seller-stat-icon">📦</div>
+            <span className="seller-stat-label">Total Sales</span>
+            <span className="seller-stat-value">{stats.totalSales}</span>
           </div>
-          <div className="card">
-            <h2>Total Earnings</h2>
-            <p>₹{stats.totalEarnings}</p>
+          <div className="seller-stat-card">
+            <div className="seller-stat-icon">💰</div>
+            <span className="seller-stat-label">Total Earnings</span>
+            <span className="seller-stat-value">₹{stats.totalEarnings}</span>
           </div>
-          <div className="card">
-            <h2>Total Orders</h2>
-            <p>{stats.totalOrders}</p>
+          <div className="seller-stat-card">
+            <div className="seller-stat-icon">🛒</div>
+            <span className="seller-stat-label">Total Orders</span>
+            <span className="seller-stat-value">{stats.totalOrders}</span>
           </div>
-        </section>
+        </div>
 
         {/* Stock Alerts */}
-        <section className="alerts" style={{ marginTop: 30 }}>
-          <h2>Stock Alerts</h2>
-          <div>
-            {stockAlerts.length ? (
-              <ul>
-                {stockAlerts.map((a, i) => (
-                  <li key={i}>
-                    <strong>{a.product}</strong> — Only {a.stock} left!
-                  </li>
-                ))}
-              </ul>
+        <div className="seller-alerts-card">
+          <h3 className="seller-table-title seller-mt-0 seller-mb-2">
+            ⚠ Stock Alerts
+          </h3>
+          {stockAlerts.length ? (
+            stockAlerts.map((a, i) => (
+              <div className="seller-alert-item" key={i}>
+                <strong>{a.product}</strong> — Only {a.stock} left!
+              </div>
+            ))
+          ) : (
+            <p className="seller-text-muted seller-mb-0">
+              All products are well-stocked.
+            </p>
+          )}
+        </div>
+
+        {/* Orders + Chart Grid */}
+        <div className="seller-dashboard-grid">
+          <div className="seller-chart-card">
+            <h3>Recent Orders</h3>
+            {recentOrders.length ? (
+              <div className="seller-table-wrap">
+                <table className="seller-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentOrders.map((o, i) => (
+                      <tr key={i}>
+                        <td style={{ fontWeight: 600 }}>{o.orderId}</td>
+                        <td>{o.customer}</td>
+                        <td>
+                          <span
+                            className={`seller-status-badge seller-status-${String(o.status).toLowerCase()}`}
+                          >
+                            {o.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
-              <p>All products are well-stocked.</p>
+              <p className="seller-text-muted">No recent orders.</p>
             )}
           </div>
-        </section>
 
-        {/* Orders + Chart */}
-        <div className="orders-and-chart">
-          {/* Orders Table */}
-          <section className="orders">
-            <h2>Recent Orders</h2>
-            {recentOrders.length ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((o, i) => (
-                    <tr key={i}>
-                      <td>{o.orderId}</td>
-                      <td>{o.customer}</td>
-                      <td>{o.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No recent orders.</p>
-            )}
-          </section>
-
-          {/* Pie Chart */}
-          <section className="pie-chart">
-            <h2>Order Status Distribution</h2>
+          <div className="seller-chart-card">
+            <h3>Order Status Distribution</h3>
             <div style={{ position: "relative", height: 300 }}>
               {Object.keys(statusDistribution).length ? (
                 <canvas ref={pieRef} />
               ) : (
-                <p style={{ textAlign: "center" }}>
+                <p className="seller-text-center seller-text-muted">
                   No order distribution data yet.
                 </p>
               )}
             </div>
-          </section>
+          </div>
         </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className="seller-footer">
-        <p>© 2025 AutoCustomizer | All Rights Reserved</p>
-      </footer>
-
-      {error && !hasData && (
-        <p style={{ color: "red", textAlign: "center" }}>
-          Failed to load dashboard: {error}
-        </p>
-      )}
+      <SellerFooter />
     </div>
   );
 }

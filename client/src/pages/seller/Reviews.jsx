@@ -1,21 +1,9 @@
 import React, { useEffect, useState } from "react";
-
-function useLink(href) {
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, [href]);
-}
+import SellerNav from "../../components/SellerNav";
+import SellerFooter from "../../components/SellerFooter";
+import "../../Css/seller.css";
 
 export default function SellerReviews() {
-  useLink("/Css/CStyle.css");
-  useLink("/newstyle.css");
-  useLink("/Css/sellerBase.css");
-  useLink("/styles/reviews.css");
-
   const [reviews, setReviews] = useState([]);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,92 +38,71 @@ export default function SellerReviews() {
     };
   }, []);
 
+  function renderStars(rating) {
+    return (
+      <span className="seller-stars">
+        {Array.from({ length: 5 }, (_, i) => (
+          <svg
+            key={i}
+            className="seller-star-icon"
+            viewBox="0 0 20 20"
+            fill={i < Math.round(rating) ? "var(--seller-primary)" : "#e2e8f0"}
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.065 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.284-3.957z" />
+          </svg>
+        ))}
+      </span>
+    );
+  }
+
   return (
     <div className="seller-page">
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/images3/logo2.jpg"
-            alt="AutoCustomizer"
-            style={{ height: "40px", objectFit: "contain" }}
-          />
-        </div>
-        <ul>
-          <li>
-            <a href="/seller/dashboard">Dashboard</a>
-          </li>
-          <li>
-            <a href="/seller/profileSettings">Profile Settings</a>
-          </li>
-          <li>
-            <a href="/seller/productmanagement">Products</a>
-          </li>
-          <li>
-            <a href="/seller/orders">Orders</a>
-          </li>
-          <li>
-            <a href="/seller/reviews" className="active">
-              Reviews
-            </a>
-          </li>
-          <li>
-            <a href="/logout">Logout</a>
-          </li>
-        </ul>
-      </nav>
+      <SellerNav />
 
-      <header>
-        <h1>Product Reviews</h1>
-      </header>
+      <main className="seller-main">
+        <h1 className="seller-title">Product Reviews</h1>
+        <p className="seller-subtitle">
+          See what customers say about your products
+        </p>
 
-      <div className="container" style={{ paddingBottom: 32 }}>
-        {loading && <p>Loading reviews...</p>}
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
+        {loading && (
+          <div className="seller-loading">
+            <div className="seller-spinner" />
+          </div>
+        )}
+        {error && (
+          <div className="seller-alert seller-alert-error">{error}</div>
+        )}
 
         {!loading && !error && summaries.length === 0 && (
-          <p className="no-products">No reviews yet.</p>
+          <div className="seller-empty">
+            <p>No reviews yet.</p>
+          </div>
         )}
 
         {!loading && !error && summaries.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <h2>Summary by Product</h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: 16,
-              }}
-            >
+          <div className="seller-mb-3">
+            <h2 className="seller-section-title">Summary by Product</h2>
+            <div className="seller-summary-grid">
               {summaries.map((s) => (
-                <div
-                  key={s.productId}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: 12,
-                    background: "#fff",
-                    boxShadow: "0 6px 18px rgba(15, 23, 42, 0.08)",
-                  }}
-                >
-                  {s.productImage ? (
+                <div className="seller-summary-card" key={s.productId}>
+                  {s.productImage && (
                     <img
                       src={s.productImage}
                       alt={s.productName}
-                      style={{
-                        width: "100%",
-                        height: 140,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        marginBottom: 10,
-                      }}
+                      className="seller-summary-image"
                     />
-                  ) : null}
-                  <strong>{s.productName}</strong>
-                  <div style={{ marginTop: 6, fontSize: 14 }}>
-                    ⭐ {s.avgRating} / 5
-                  </div>
-                  <div style={{ color: "#6b7280", fontSize: 13 }}>
-                    {s.totalReviews} review(s)
+                  )}
+                  <div className="seller-summary-content">
+                    <h3 className="seller-summary-name">{s.productName}</h3>
+                    <div className="seller-review-rating">
+                      {renderStars(s.avgRating)}
+                      <span className="seller-rating-value">{s.avgRating}</span>
+                      <span className="seller-rating-max">/ 5</span>
+                    </div>
+                    <div className="seller-review-count">
+                      {s.totalReviews} review(s)
+                    </div>
                   </div>
                 </div>
               ))}
@@ -145,40 +112,31 @@ export default function SellerReviews() {
 
         {!loading && !error && reviews.length > 0 && (
           <div>
-            <h2>All Reviews</h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 16,
-              }}
-            >
+            <h2 className="seller-section-title">All Reviews</h2>
+            <div className="seller-review-grid">
               {reviews.map((r) => (
-                <div
-                  key={r._id}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: 14,
-                    background: "#fff",
-                    boxShadow: "0 6px 18px rgba(15, 23, 42, 0.08)",
-                  }}
-                >
-                  <div style={{ fontWeight: 600 }}>
-                    {r.productId?.name || "Product"}
+                <div className="seller-review-card" key={r._id}>
+                  <div className="seller-review-header">
+                    <div>
+                      <div className="seller-review-product">
+                        {r.productId?.name || "Product"}
+                      </div>
+                      <div className="seller-review-author">
+                        by {r.userId?.name || "Customer"}
+                      </div>
+                    </div>
+                    <div className="seller-review-rating">
+                      {renderStars(r.rating)}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 13, color: "#6b7280" }}>
-                    by {r.userId?.name || "Customer"}
+                  <div className="seller-review-body">
+                    {r.review ? (
+                      <p>{r.review}</p>
+                    ) : (
+                      <p className="seller-review-empty">No review text.</p>
+                    )}
                   </div>
-                  <div style={{ marginTop: 8 }}>⭐ {r.rating} / 5</div>
-                  {r.review ? (
-                    <p style={{ marginTop: 8 }}>{r.review}</p>
-                  ) : (
-                    <p style={{ marginTop: 8, color: "#6b7280" }}>
-                      No review text.
-                    </p>
-                  )}
-                  <div style={{ fontSize: 12, color: "#9ca3af" }}>
+                  <div className="seller-review-footer">
                     {r.createdAt
                       ? new Date(r.createdAt).toLocaleDateString()
                       : ""}
@@ -188,11 +146,9 @@ export default function SellerReviews() {
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      <footer className="seller-footer">
-        <p>© 2025 AutoCustomizer | All Rights Reserved</p>
-      </footer>
+      <SellerFooter />
     </div>
   );
 }

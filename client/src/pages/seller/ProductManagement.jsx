@@ -1,23 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import "../../Css/productManagement.css";
-
-// Utility hook to dynamically link CSS files (for compatibility with old CSS)
-function useLink(href) {
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, [href]);
-}
+import SellerNav from "../../components/SellerNav";
+import SellerFooter from "../../components/SellerFooter";
+import "../../Css/seller.css";
 
 export default function ProductManagement() {
-  // Load external CSS
-  useLink("/Css/CStyle.css");
-  useLink("/newstyle.css");
-  useLink("/Css/sellerBase.css");
-
   // Local states
   const [form, setForm] = useState({
     name: "",
@@ -203,271 +189,227 @@ export default function ProductManagement() {
 
   return (
     <div className="seller-page">
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/images3/logo2.jpg"
-            alt="AutoCustomizer"
-            style={{ height: "40px", objectFit: "contain" }}
-          />
-        </div>
-        <ul>
-          <li>
-            <a href="/seller/dashboard">Dashboard</a>
-          </li>
-          <li>
-            <a href="/seller/profileSettings">Profile Settings</a>
-          </li>
-          <li>
-            <a href="/seller/productmanagement" className="active">
-              Products
-            </a>
-          </li>
-          <li>
-            <a href="/seller/orders">Orders</a>
-          </li>
-          <li>
-            <a href="/seller/reviews">Reviews</a>
-          </li>
-          <li>
-            <a href="/logout">Logout</a>
-          </li>
-        </ul>
-      </nav>
+      <SellerNav />
 
-      <header>
-        <h1>Product Management</h1>
-      </header>
+      <main className="seller-main">
+        <h1 className="seller-title">Product Management</h1>
+        <p className="seller-subtitle">Add, manage, and track your products</p>
 
-      <div className="container">
         <a
           href="/Seller/bulk-upload"
-          className="btn-add"
-          style={{ marginBottom: 20 }}
+          className="seller-btn seller-btn-secondary seller-mb-3"
+          style={{ display: "inline-block" }}
         >
           Bulk Upload Products
         </a>
 
         {/* Product Form */}
-        <form
-          className="product-form"
-          onSubmit={handleSubmit}
-          encType="multipart/form-data"
-        >
-          {[
-            { label: "Product Name", key: "name", type: "text" },
-            {
-              label: "Product Price (₹)",
-              key: "price",
-              type: "number",
-              step: "0.01",
-            },
-            {
-              label: "Product Description",
-              key: "description",
-              type: "textarea",
-            },
-            { label: "Product Category", key: "category", type: "text" },
-            { label: "Product Brand", key: "brand", type: "text" },
-            { label: "Product Quantity", key: "quantity", type: "number" },
-            { label: "Product SKU", key: "sku", type: "text", maxLength: 6 },
-            { label: "Compatibility", key: "compatibility", type: "text" },
-          ].map((f) => (
-            <div className="form-group" key={f.key}>
-              <label htmlFor={f.key}>{f.label}</label>
-              {f.type === "textarea" ? (
-                <textarea
-                  id={f.key}
-                  rows={3}
-                  value={form[f.key]}
-                  onChange={(e) => setField(f.key, e.target.value)}
-                />
-              ) : (
-                <input
-                  id={f.key}
-                  type={f.type}
-                  step={f.step}
-                  maxLength={f.maxLength}
-                  value={form[f.key]}
-                  onChange={(e) => setField(f.key, e.target.value)}
-                />
-              )}
-              {errors[f.key] && (
-                <small style={{ color: "crimson" }}>{errors[f.key]}</small>
+        <div className="seller-card seller-mb-3">
+          <div className="seller-card-header">
+            <h2 className="seller-card-title">📦 Add New Product</h2>
+          </div>
+          <form
+            onSubmit={handleSubmit}
+            encType="multipart/form-data"
+            className="seller-card-body"
+          >
+            <div className="seller-form-grid">
+              {[
+                { label: "Product Name", key: "name", type: "text" },
+                {
+                  label: "Product Price (₹)",
+                  key: "price",
+                  type: "number",
+                  step: "0.01",
+                },
+                { label: "Product Category", key: "category", type: "text" },
+                { label: "Product Brand", key: "brand", type: "text" },
+                { label: "Product Quantity", key: "quantity", type: "number" },
+                {
+                  label: "Product SKU",
+                  key: "sku",
+                  type: "text",
+                  maxLength: 6,
+                },
+                { label: "Compatibility", key: "compatibility", type: "text" },
+              ].map((f) => (
+                <div className="seller-form-group" key={f.key}>
+                  <label className="seller-label" htmlFor={f.key}>
+                    {f.label}
+                  </label>
+                  <input
+                    className="seller-input"
+                    id={f.key}
+                    type={f.type}
+                    step={f.step}
+                    maxLength={f.maxLength}
+                    value={form[f.key]}
+                    onChange={(e) => setField(f.key, e.target.value)}
+                  />
+                  {errors[f.key] && (
+                    <small className="seller-error-text">{errors[f.key]}</small>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="seller-form-group seller-mt-2">
+              <label className="seller-label" htmlFor="description">
+                Product Description
+              </label>
+              <textarea
+                className="seller-input"
+                id="description"
+                rows={3}
+                value={form.description}
+                onChange={(e) => setField("description", e.target.value)}
+                style={{ resize: "vertical" }}
+              />
+              {errors.description && (
+                <small className="seller-error-text">
+                  {errors.description}
+                </small>
               )}
             </div>
-          ))}
 
-          <div className="form-group">
-            <label htmlFor="productImage">Product Images (up to 5):</label>
-            <input
-              id="productImage"
-              type="file"
-              accept="image/*"
-              multiple
-              ref={imageInputRef}
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []).slice(0, 5);
-                setField("images", files);
-              }}
-            />
-            {form.images && form.images.length > 0 && (
-              <div style={{ marginTop: 8, fontSize: 13, color: "#6b7280" }}>
-                {form.images.length} image(s) selected
-              </div>
-            )}
-            {errors.images && (
-              <small style={{ color: "crimson" }}>{errors.images}</small>
-            )}
-          </div>
+            <div className="seller-form-group seller-mt-2">
+              <label className="seller-label" htmlFor="productImage">
+                Product Images (up to 5)
+              </label>
+              <input
+                className="seller-input"
+                id="productImage"
+                type="file"
+                accept="image/*"
+                multiple
+                ref={imageInputRef}
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []).slice(0, 5);
+                  setField("images", files);
+                }}
+                style={{ padding: 10 }}
+              />
+              {form.images && form.images.length > 0 && (
+                <div className="seller-text-sm seller-text-muted seller-mt-1">
+                  {form.images.length} image(s) selected
+                </div>
+              )}
+              {errors.images && (
+                <small className="seller-error-text">{errors.images}</small>
+              )}
+            </div>
 
-          <button type="submit" className="btn-add">
-            Add Product
-          </button>
-          {status && (
-            <p style={{ color: "#6a11cb", marginTop: 10 }}>{status}</p>
-          )}
-        </form>
+            <div className="seller-flex seller-items-center seller-gap-2 seller-mt-2">
+              <button type="submit" className="seller-btn seller-btn-primary">
+                Add Product
+              </button>
+              {status && (
+                <span
+                  style={{ color: "var(--seller-primary)", fontWeight: 500 }}
+                >
+                  {status}
+                </span>
+              )}
+            </div>
+          </form>
+        </div>
 
         {/* Product List */}
-        <div className="product-list">
-          <h2>Product List</h2>
-
-          {/* Status Tabs */}
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              marginBottom: "20px",
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { key: "all", label: "All Products" },
-              { key: "pending", label: "On Hold" },
-              { key: "approved", label: "Accepted" },
-              { key: "rejected", label: "Rejected" },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  padding: "10px 20px",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: activeTab === tab.key ? "600" : "400",
-                  background:
-                    activeTab === tab.key
-                      ? tab.key === "approved"
-                        ? "#10b981"
-                        : tab.key === "rejected"
-                          ? "#ef4444"
-                          : tab.key === "pending"
-                            ? "#f59e0b"
-                            : "#6a11cb"
-                      : "#e5e7eb",
-                  color: activeTab === tab.key ? "#fff" : "#374151",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                {tab.label} ({statusCounts[tab.key]})
-              </button>
-            ))}
+        <div className="seller-card">
+          <div className="seller-card-header">
+            <h2 className="seller-card-title">📊 Product List</h2>
           </div>
-
-          {loading ? (
-            <p>Loading products...</p>
-          ) : filteredProducts.length === 0 ? (
-            <p className="no-products">
-              {activeTab === "all"
-                ? "No products found."
-                : `No ${activeTab === "pending" ? "on hold" : activeTab} products.`}
-            </p>
-          ) : (
-            <div className="product-grid">
-              {filteredProducts.map((p) => (
-                <div
-                  className="product-card"
-                  key={p._id}
-                  style={{ position: "relative" }}
+          <div className="seller-card-body">
+            {/* Status Tabs */}
+            <div className="seller-tabs seller-mb-3">
+              {[
+                { key: "all", label: "All Products" },
+                { key: "pending", label: "On Hold" },
+                { key: "approved", label: "Accepted" },
+                { key: "rejected", label: "Rejected" },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`seller-tab${activeTab === tab.key ? " active" : ""}`}
+                  onClick={() => setActiveTab(tab.key)}
                 >
-                  {/* Status Badge */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      padding: "4px 12px",
-                      borderRadius: "20px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      textTransform: "uppercase",
-                      background:
-                        p.status === "approved"
-                          ? "#10b981"
-                          : p.status === "rejected"
-                            ? "#ef4444"
-                            : "#f59e0b",
-                      color: "#fff",
-                    }}
-                  >
-                    {p.status === "pending"
-                      ? "On Hold"
-                      : p.status === "approved"
-                        ? "Accepted"
-                        : "Rejected"}
-                  </div>
-                  <div className="product-details">
-                    <h3>{p.name}</h3>
-                    <p>
-                      <strong>Price:</strong> ₹{p.price}
-                    </p>
-                    <p>
-                      <strong>Description:</strong> {p.description}
-                    </p>
-                    <p>
-                      <strong>Category:</strong> {p.category}
-                    </p>
-                    <p>
-                      <strong>Brand:</strong> {p.brand}
-                    </p>
-                    <p>
-                      <strong>Quantity:</strong> {p.quantity}
-                    </p>
-                    <p>
-                      <strong>SKU:</strong> {p.sku}
-                    </p>
+                  {tab.label} ({statusCounts[tab.key]})
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="seller-loading">
+                <div className="seller-spinner" />
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="seller-empty">
+                <p>
+                  {activeTab === "all"
+                    ? "No products found."
+                    : `No ${activeTab === "pending" ? "on hold" : activeTab} products.`}
+                </p>
+              </div>
+            ) : (
+              <div className="seller-product-grid">
+                {filteredProducts.map((p) => (
+                  <div className="seller-product-card" key={p._id}>
+                    {/* Status Badge */}
+                    <span
+                      className={`seller-product-badge seller-product-badge-${p.status === "approved" ? "accepted" : p.status === "rejected" ? "rejected" : "pending"}`}
+                    >
+                      {p.status === "pending"
+                        ? "On Hold"
+                        : p.status === "approved"
+                          ? "Accepted"
+                          : "Rejected"}
+                    </span>
+
                     {p.image && (
                       <img
                         src={p.image}
                         alt={p.name}
-                        style={{
-                          width: "100%",
-                          height: 200,
-                          objectFit: "cover",
-                          borderRadius: 8,
-                          marginBottom: 12,
-                        }}
+                        className="seller-product-image"
                       />
                     )}
-                  </div>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(p._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
-      <footer className="seller-footer">
-        <p>© 2025 AutoCustomizer | All Rights Reserved</p>
-      </footer>
+                    <div className="seller-product-info">
+                      <h3 className="seller-product-name">{p.name}</h3>
+                      <p className="seller-product-price">₹{p.price}</p>
+                      <p className="seller-product-meta">
+                        <strong>Category:</strong> {p.category}
+                      </p>
+                      <p className="seller-product-meta">
+                        <strong>Brand:</strong> {p.brand}
+                      </p>
+                      <p className="seller-product-meta">
+                        <strong>Quantity:</strong> {p.quantity}
+                      </p>
+                      <p className="seller-product-meta">
+                        <strong>SKU:</strong> {p.sku}
+                      </p>
+                      <p className="seller-product-meta seller-text-sm seller-text-muted">
+                        {p.description}
+                      </p>
+                    </div>
+
+                    <div style={{ padding: "0 20px 20px" }}>
+                      <button
+                        className="seller-btn seller-btn-danger seller-w-full"
+                        onClick={() => handleDelete(p._id)}
+                      >
+                        Delete Product
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <SellerFooter />
     </div>
   );
 }

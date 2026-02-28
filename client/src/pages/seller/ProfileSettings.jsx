@@ -1,19 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-
-function useLink(href) {
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, [href]);
-}
+import SellerNav from "../../components/SellerNav";
+import SellerFooter from "../../components/SellerFooter";
+import "../../Css/seller.css";
 
 export default function SellerProfileSettings() {
-  useLink("/Css/CStyle.css");
-  useLink("/Css/sellerBase.css");
-
   const MAX_LEN = 15;
   const [form, setForm] = useState({
     storeName: "",
@@ -155,206 +145,150 @@ export default function SellerProfileSettings() {
 
   return (
     <div className="seller-page">
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/images3/logo2.jpg"
-            alt="AutoCustomizer"
-            style={{ height: "40px", objectFit: "contain" }}
-          />
-        </div>
-        <ul>
-          <li>
-            <a href="/seller/dashboard">Dashboard</a>
-          </li>
-          <li>
-            <a href="/seller/profileSettings" className="active">
-              Profile Settings
-            </a>
-          </li>
-          <li>
-            <a href="/seller/productmanagement">Products</a>
-          </li>
-          <li>
-            <a href="/seller/orders">Orders</a>
-          </li>
-          <li>
-            <a href="/seller/reviews">Reviews</a>
-          </li>
-          <li>
-            <a href="/logout">Logout</a>
-          </li>
-        </ul>
-      </nav>
-      <header>
-        <h1>{headerTitle}</h1>
-      </header>
+      <SellerNav />
+
       <main className="seller-main">
-        <section className="profile-section">
-          <div className="profile-pic-container" style={{ marginBottom: 16 }}>
-            <label className="profile-pic-label">
+        <h1 className="seller-title">{headerTitle}</h1>
+        <p className="seller-subtitle">
+          Manage your store profile and settings
+        </p>
+
+        <div className="seller-profile-container">
+          {/* Profile Picture */}
+          <div className="seller-profile-header">
+            <div className="seller-profile-avatar-wrap">
               <img
-                src={
-                  profilePreview ||
-                  profilePicture ||
-                  "/images3/image5.jpg"
-                }
+                src={profilePreview || profilePicture || "/images3/image5.jpg"}
                 alt="Profile"
-                className="profile-pic"
-                style={{ width: 96, height: 96, borderRadius: "50%" }}
+                className="seller-profile-avatar"
               />
-              <span className="profile-pic-overlay">Change photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setProfileFile(e.target.files?.[0] || null)}
-              />
-            </label>
+              <label className="seller-profile-avatar-overlay">
+                Change photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => setProfileFile(e.target.files?.[0] || null)}
+                />
+              </label>
+            </div>
+            <h2 className="seller-profile-name">
+              {form.storeName || "Your Store"}
+            </h2>
+            <p className="seller-text-muted seller-mb-0">
+              {form.contactEmail || "seller@store.com"}
+            </p>
           </div>
-          <form className="profile-form" onSubmit={onSubmit} noValidate>
-            <div className="form-group">
-              <label htmlFor="storeName">Store Name:</label>
-              <input
-                id="storeName"
-                type="text"
-                maxLength={MAX_LEN}
-                value={form.storeName}
-                onChange={(e) => setField("storeName", e.target.value)}
-              />
-              {errors.storeName ? (
-                <small
-                  className="input-error"
-                  style={{ color: "crimson", display: "block", marginTop: 6 }}
-                >
-                  {errors.storeName}
-                </small>
-              ) : null}
+
+          {/* Profile Form */}
+          <form className="seller-profile-form" onSubmit={onSubmit} noValidate>
+            <div className="seller-form-grid">
+              <div className="seller-form-group">
+                <label className="seller-label" htmlFor="storeName">
+                  Store Name
+                </label>
+                <input
+                  className="seller-input"
+                  id="storeName"
+                  type="text"
+                  maxLength={MAX_LEN}
+                  value={form.storeName}
+                  onChange={(e) => setField("storeName", e.target.value)}
+                />
+                {errors.storeName && (
+                  <small className="seller-error-text">
+                    {errors.storeName}
+                  </small>
+                )}
+              </div>
+              <div className="seller-form-group">
+                <label className="seller-label" htmlFor="ownerName">
+                  Owner Name
+                </label>
+                <input
+                  className="seller-input"
+                  id="ownerName"
+                  type="text"
+                  maxLength={MAX_LEN}
+                  value={form.ownerName}
+                  onChange={(e) => setField("ownerName", e.target.value)}
+                />
+                {errors.ownerName && (
+                  <small className="seller-error-text">
+                    {errors.ownerName}
+                  </small>
+                )}
+              </div>
+              <div className="seller-form-group">
+                <label className="seller-label" htmlFor="contactEmail">
+                  Contact Email
+                </label>
+                <input
+                  className="seller-input"
+                  id="contactEmail"
+                  type="email"
+                  value={form.contactEmail}
+                  onChange={(e) => setField("contactEmail", e.target.value)}
+                />
+                {errors.contactEmail && (
+                  <small className="seller-error-text">
+                    {errors.contactEmail}
+                  </small>
+                )}
+              </div>
+              <div className="seller-form-group">
+                <label className="seller-label" htmlFor="phone">
+                  Phone Number
+                </label>
+                <input
+                  className="seller-input"
+                  id="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setField("phone", e.target.value)}
+                />
+                {errors.phone && (
+                  <small className="seller-error-text">{errors.phone}</small>
+                )}
+              </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="ownerName">Owner Name:</label>
-              <input
-                id="ownerName"
-                type="text"
-                maxLength={MAX_LEN}
-                value={form.ownerName}
-                onChange={(e) => setField("ownerName", e.target.value)}
-              />
-              {errors.ownerName ? (
-                <small
-                  className="input-error"
-                  style={{ color: "crimson", display: "block", marginTop: 6 }}
-                >
-                  {errors.ownerName}
-                </small>
-              ) : null}
-            </div>
-            <div className="form-group">
-              <label htmlFor="contactEmail">Contact Email:</label>
-              <input
-                id="contactEmail"
-                type="email"
-                value={form.contactEmail}
-                onChange={(e) => setField("contactEmail", e.target.value)}
-              />
-              {errors.contactEmail ? (
-                <small
-                  className="input-error"
-                  style={{ color: "crimson", display: "block", marginTop: 6 }}
-                >
-                  {errors.contactEmail}
-                </small>
-              ) : null}
-            </div>
-            <div className="form-group">
-              <label htmlFor="phone">Phone Number:</label>
-              <input
-                id="phone"
-                type="tel"
-                value={form.phone}
-                onChange={(e) => setField("phone", e.target.value)}
-              />
-              {errors.phone ? (
-                <small
-                  className="input-error"
-                  style={{ color: "crimson", display: "block", marginTop: 6 }}
-                >
-                  {errors.phone}
-                </small>
-              ) : null}
-            </div>
-            <div className="form-group">
-              <label htmlFor="address">Store Address:</label>
+
+            <div className="seller-form-group seller-mt-2">
+              <label className="seller-label" htmlFor="address">
+                Store Address
+              </label>
               <textarea
+                className="seller-input"
                 id="address"
                 rows={3}
                 value={form.address}
                 onChange={(e) => setField("address", e.target.value)}
+                style={{ resize: "vertical" }}
               />
-              {errors.address ? (
-                <small
-                  className="input-error"
-                  style={{ color: "crimson", display: "block", marginTop: 6 }}
-                >
-                  {errors.address}
-                </small>
-              ) : null}
+              {errors.address && (
+                <small className="seller-error-text">{errors.address}</small>
+              )}
             </div>
-            <button type="submit">Update Profile</button>
-          </form>
-          <p
-            id="statusMsg"
-            style={{ textAlign: "center", marginTop: 15, fontWeight: 600 }}
-          >
-            {status}
-          </p>
-        </section>
-      </main>
-      <footer className="seller-footer">
-        <p>© 2025 AutoCustomizer | All Rights Reserved</p>
-      </footer>
 
-      {/* Local CSS overrides to exactly match legacy profileSettings.html visual design */}
-      <style>{`
-        /* Ensure seller pages don't inherit any fixed nav from other sections */
-        .seller-page .navbar { position: static !important; }
-        /* Background like legacy (light gradient) */
-        .seller-page { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); min-height: 100vh; }
-        /* Header gradient bar */
-        .seller-page header { background: linear-gradient(135deg, #6a11cb, #2575fc); color:#fff; padding:30px 20px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-        .seller-page header h1 { margin:0; font-size:2.5em; font-weight:600; }
-        /* Main container width uses sellerBase's .seller-main; add safety padding */
-        .seller-page .seller-main { padding:20px; margin:0 auto; }
-        /* White card with hover lift, same as legacy */
-        .seller-page .profile-section { background:#fff; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1); padding:25px; max-width:800px; margin:30px auto; transition:.3s; }
-        .seller-page .profile-section:hover { transform: translateY(-5px); box-shadow:0 8px 16px rgba(0,0,0,0.2); }
-        .seller-page .profile-form .form-group { margin-bottom:20px; }
-        .seller-page .profile-form label { display:block; font-weight:600; margin-bottom:8px; color:#6a11cb; }
-        .seller-page .profile-form input, .seller-page .profile-form textarea { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:1em; transition:border .3s, box-shadow .3s; background:#fff; color:#000; }
-        .seller-page .profile-form input:focus, .seller-page .profile-form textarea:focus { outline:none; border-color:#6a11cb; box-shadow:0 0 0 2px rgba(106,17,203,.2); }
-        .seller-page .profile-form textarea { resize:vertical; min-height:80px; }
-        .seller-page .profile-form button { background: linear-gradient(135deg, #6a11cb, #2575fc); color:#fff; border:none; padding:15px; width:100%; border-radius:8px; cursor:pointer; font-weight:600; font-size:1em; transition:.3s; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-        .seller-page .profile-form button:hover { background: linear-gradient(135deg, #5c0fb3, #2169e8); transform: translateY(-2px); box-shadow:0 6px 8px rgba(0,0,0,0.15); }
-        .seller-page .seller-footer { background: linear-gradient(135deg, #6a11cb, #2575fc); color:#fff; text-align:center; padding:15px; box-shadow:0 -4px 6px rgba(0,0,0,0.1); }
-        .seller-page .input-error { color:crimson; }
-        .seller-page .profile-pic-label{ position:relative; display:inline-block; cursor:pointer; }
-        .seller-page .profile-pic-label input{ display:none; }
-        .seller-page .profile-pic-overlay{
-          position:absolute;
-          inset:0;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          background:rgba(0,0,0,0.45);
-          color:#fff;
-          font-size:0.75rem;
-          font-weight:600;
-          opacity:0;
-          transition:opacity 0.2s ease;
-          border-radius:50%;
-        }
-        .seller-page .profile-pic-label:hover .profile-pic-overlay{ opacity:1; }
-        @media (max-width: 768px) { .seller-page .profile-section { margin:20px 15px; } .seller-page header h1 { font-size:2em; } }
-      `}</style>
+            <button
+              type="submit"
+              className="seller-btn seller-btn-primary seller-btn-block seller-mt-3"
+            >
+              Update Profile
+            </button>
+          </form>
+
+          {status && (
+            <div
+              className={`seller-alert seller-mt-2 ${status.includes("success") ? "seller-alert-success" : status.includes("Fix") || status.includes("failed") || status.includes("Failed") ? "seller-alert-error" : "seller-alert-info"}`}
+            >
+              {status}
+            </div>
+          )}
+        </div>
+      </main>
+
+      <SellerFooter />
     </div>
   );
 }

@@ -1668,9 +1668,9 @@ exports.getSupportHtml = (req, res) => {
 exports.verifyProvider = async (req, res) => {
   try {
     const { id } = req.params;
-    const { action, note } = req.body; // action: "verify" or "reject"
+    const { action, note } = req.body; // action: "verify", "reject", or "unverify"
 
-    if (!["verify", "reject"].includes(action)) {
+    if (!["verify", "reject", "unverify"].includes(action)) {
       return res.status(400).json({ error: "Invalid action" });
     }
 
@@ -1684,6 +1684,11 @@ exports.verifyProvider = async (req, res) => {
       provider.verifiedAt = new Date();
       provider.verifiedBy = req.session.user.id;
       provider.verificationNote = note || "";
+    } else if (action === "unverify") {
+      provider.verificationStatus = "unverified";
+      provider.verificationNote = note || "Verification revoked by manager";
+      provider.verifiedAt = undefined;
+      provider.verifiedBy = undefined;
     } else {
       provider.verificationStatus = "rejected";
       provider.verificationNote = note || "Documents rejected by manager";
@@ -1693,12 +1698,15 @@ exports.verifyProvider = async (req, res) => {
 
     await provider.save();
 
+    const messages = {
+      verify: "Provider verified successfully",
+      reject: "Provider verification rejected",
+      unverify: "Provider verification revoked",
+    };
+
     res.json({
       success: true,
-      message:
-        action === "verify"
-          ? "Provider verified successfully"
-          : "Provider verification rejected",
+      message: messages[action],
       verificationStatus: provider.verificationStatus,
     });
   } catch (err) {

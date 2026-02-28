@@ -1,52 +1,17 @@
 import React, { useEffect, useState } from "react";
-
-function useLink(href) {
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, [href]);
-}
+import SellerNav from "../../components/SellerNav";
+import SellerFooter from "../../components/SellerFooter";
+import "../../Css/seller.css";
 
 function StatusBadge({ status }) {
   const s = String(status || "").toLowerCase();
-  const color =
-    s === "pending"
-      ? "#FFC107"
-      : s === "confirmed"
-        ? "#7e57c2"
-        : s === "shipped"
-          ? "#2196F3"
-          : s === "delivered"
-            ? "#4CAF50"
-            : s === "cancelled"
-              ? "#e53935"
-              : "#546e7a";
   const label = s.charAt(0).toUpperCase() + s.slice(1);
   return (
-    <span
-      className={`status ${s}`}
-      style={{
-        padding: "6px 12px",
-        borderRadius: 16,
-        color: "#fff",
-        display: "inline-block",
-        background: color,
-        fontSize: ".85rem",
-      }}
-    >
-      {label}
-    </span>
+    <span className={`seller-status-badge seller-status-${s}`}>{label}</span>
   );
 }
 
 export default function SellerOrders() {
-  useLink("/Css/CStyle.css");
-  useLink("/newstyle.css");
-  useLink("/Css/sellerBase.css");
-
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -233,110 +198,54 @@ export default function SellerOrders() {
 
   return (
     <div className="seller-page">
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/images3/logo2.jpg"
-            alt="AutoCustomizer"
-            style={{ height: "40px", objectFit: "contain" }}
-          />
-        </div>
-        <ul>
-          <li>
-            <a href="/seller/dashboard">Dashboard</a>
-          </li>
-          <li>
-            <a href="/seller/profileSettings">Profile Settings</a>
-          </li>
-          <li>
-            <a href="/seller/productmanagement">Products</a>
-          </li>
-          <li>
-            <a href="/seller/orders" className="active">
-              Orders
-            </a>
-          </li>
-          <li>
-            <a href="/seller/reviews">Reviews</a>
-          </li>
-          <li>
-            <a href="/logout">Logout</a>
-          </li>
-        </ul>
-      </nav>
-
-      <header>
-        <h1>Order Management</h1>
-      </header>
+      <SellerNav />
 
       <main className="seller-main">
-        <div
-          className="container"
-          style={{
-            background: "#fff",
-            borderRadius: 12,
-            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-            padding: 20,
-          }}
-        >
-          <h2 style={{ marginTop: 0, color: "#6a11cb" }}>Orders</h2>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <h1 className="seller-title">Order Management</h1>
+        <p className="seller-subtitle">Track and manage all your orders</p>
+
+        <div className="seller-table-container">
+          <div className="seller-table-header">
+            <span className="seller-table-title">
+              Orders
+              {orders.length > 0 && (
+                <span className="seller-table-count">{orders.length}</span>
+              )}
+            </span>
+          </div>
+          <div className="seller-table-wrap">
+            <table className="seller-table">
               <thead>
                 <tr>
-                  {[
-                    "Order ID",
-                    "Customer",
-                    "Product",
-                    "Qty",
-                    "Delivery Address",
-                    "Delivery Date",
-                    "Status",
-                    "Action",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      style={{
-                        padding: 10,
-                        background: "#6a11cb",
-                        color: "#fff",
-                        textAlign: "left",
-                      }}
-                    >
-                      {h}
-                    </th>
-                  ))}
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Delivery Address</th>
+                  <th>Delivery Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      style={{ textAlign: "center", padding: 20 }}
-                    >
-                      Loading...
+                    <td colSpan={8} className="seller-td-empty">
+                      <div
+                        className="seller-spinner"
+                        style={{ margin: "0 auto" }}
+                      />
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      style={{ textAlign: "center", padding: 20, color: "red" }}
-                    >
+                    <td colSpan={8} className="seller-td-error">
                       {error}
                     </td>
                   </tr>
                 ) : orders.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      style={{
-                        textAlign: "center",
-                        padding: 25,
-                        color: "#888",
-                      }}
-                    >
+                    <td colSpan={8} className="seller-td-empty">
                       No orders available.
                     </td>
                   </tr>
@@ -355,44 +264,21 @@ export default function SellerOrders() {
                     const currentStatus = pendingStatuses[uniqueId] || o.status;
                     const originalStatus = baseOriginal;
                     const hasChanged = currentStatus !== originalStatus;
-                    // Disable if original status is final (prevent changing FROM final state)
-                    // Allow changing TO delivered/cancelled from other states
                     const disabled = ["delivered", "cancelled"].includes(
                       String(originalStatus).toLowerCase(),
                     );
 
                     return (
                       <tr key={uniqueId}>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          {o.orderId}
-                        </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          {o.customerName}
-                        </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          {o.productName}
-                        </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          {o.quantity}
-                        </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          {o.deliveryAddress}
-                        </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
+                        <td className="seller-td-bold">{o.orderId}</td>
+                        <td>{o.customerName}</td>
+                        <td>{o.productName}</td>
+                        <td>{o.quantity}</td>
+                        <td>{o.deliveryAddress}</td>
+                        <td>
                           <input
                             type="date"
+                            className="seller-input seller-input-compact"
                             value={deliveryDates[uniqueId] || ""}
                             onChange={(e) =>
                               setDeliveryDates((prev) => ({
@@ -402,54 +288,27 @@ export default function SellerOrders() {
                             }
                             disabled={disabled}
                             min={new Date().toISOString().split("T")[0]}
-                            style={{
-                              padding: "4px 8px",
-                              borderRadius: 6,
-                              border: "1px solid #ccc",
-                              fontSize: 13,
-                            }}
                           />
                           {deliveryDates[uniqueId] && (
-                            <div
-                              style={{
-                                fontSize: 11,
-                                color: "#6b7280",
-                                marginTop: 2,
-                              }}
-                            >
+                            <div className="seller-date-label">
                               {new Date(
                                 deliveryDates[uniqueId],
                               ).toLocaleDateString()}
                             </div>
                           )}
                         </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
+                        <td>
                           <StatusBadge status={currentStatus} />
                         </td>
-                        <td
-                          style={{ padding: 8, borderBottom: "1px solid #ddd" }}
-                        >
-                          <div
-                            className="form-inline"
-                            style={{
-                              background: "transparent",
-                              padding: 0,
-                              margin: 0,
-                            }}
-                          >
+                        <td>
+                          <div className="seller-order-action">
                             <select
+                              className={`seller-select seller-select-compact${hasChanged ? " seller-select-changed" : ""}`}
                               value={String(currentStatus).toLowerCase()}
                               disabled={disabled}
                               onChange={(e) =>
                                 handleStatusChange(uniqueId, e.target.value)
                               }
-                              style={{
-                                padding: 6,
-                                borderRadius: 6,
-                                borderColor: hasChanged ? "#ffc107" : "",
-                              }}
                             >
                               {allStatuses.map((s) => (
                                 <option key={s} value={s}>
@@ -458,16 +317,8 @@ export default function SellerOrders() {
                               ))}
                             </select>
                             <button
-                              className="btn"
+                              className="seller-btn seller-btn-primary seller-btn-sm"
                               disabled={disabled || !hasChanged}
-                              style={{
-                                marginLeft: 8,
-                                opacity: disabled || !hasChanged ? 0.5 : 1,
-                                cursor:
-                                  disabled || !hasChanged
-                                    ? "not-allowed"
-                                    : "pointer",
-                              }}
                               onClick={(e) => {
                                 e.preventDefault();
                                 updateStatus(
@@ -492,42 +343,7 @@ export default function SellerOrders() {
         </div>
       </main>
 
-      <footer className="seller-footer">
-        <p>© 2025 AutoCustomizer | All Rights Reserved</p>
-      </footer>
-
-      {/* Scoped CSS guardrails */}
-      <style>{`
-        .seller-page { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); min-height: 100vh; }
-        .seller-page .navbar { position: static !important; }
-        .seller-page header { background: linear-gradient(135deg, #6a11cb, #2575fc); color:#fff; padding:30px 20px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-        .seller-page header h1 { margin:0; font-weight:600; }
-
-        /* Make the Update button look enabled unless actually disabled */
-        .seller-page .form-inline .btn {
-          background: linear-gradient(135deg, #6a11cb, #2575fc) !important;
-          color: #fff !important;
-          border: none !important;
-          padding: 8px 14px !important;
-          border-radius: 8px !important;
-          cursor: pointer !important;
-          opacity: 1 !important;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-          transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
-        }
-        .seller-page .form-inline .btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.18);
-        }
-        .seller-page .form-inline .btn:disabled {
-          background: #d5d7de !important;
-          color: #888 !important;
-          cursor: not-allowed !important;
-          opacity: .75 !important;
-          box-shadow: none !important;
-          transform: none !important;
-        }
-      `}</style>
+      <SellerFooter />
     </div>
   );
 }

@@ -117,8 +117,12 @@ export default function ManagerProfileOverview() {
       const note =
         action === "reject"
           ? window.prompt("Reason for rejection (optional):") || ""
-          : "";
-      if (action === "reject" && note === null) return; // cancelled prompt
+          : action === "unverify"
+            ? window.prompt("Reason for revoking verification (optional):") ||
+              ""
+            : "";
+      if ((action === "reject" || action === "unverify") && note === null)
+        return; // cancelled prompt
       setVerifyLoading(true);
       setVerifyMsg("");
       try {
@@ -136,7 +140,9 @@ export default function ManagerProfileOverview() {
           j.message ||
             (action === "verify"
               ? "Provider verified!"
-              : "Verification rejected"),
+              : action === "unverify"
+                ? "Verification revoked"
+                : "Verification rejected"),
         );
         // Refresh data
         const refreshResp = await fetch(`/manager/api/profile-overview/${id}`, {
@@ -410,7 +416,7 @@ export default function ManagerProfileOverview() {
                 </div>
               )}
 
-              {/* Verify / Reject buttons */}
+              {/* Verify / Reject / Unverify buttons */}
               {(data?.verification?.documents || []).length > 0 &&
                 data?.verification?.status !== "verified" && (
                   <div
@@ -457,6 +463,36 @@ export default function ManagerProfileOverview() {
                     </button>
                   </div>
                 )}
+
+              {/* Unverify button – only when currently verified */}
+              {data?.verification?.status === "verified" && (
+                <div
+                  style={{
+                    marginTop: 14,
+                    display: "flex",
+                    gap: 10,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    onClick={() => handleVerification("unverify")}
+                    disabled={verifyLoading}
+                    style={{
+                      padding: "8px 20px",
+                      borderRadius: 8,
+                      border: "none",
+                      background: "linear-gradient(135deg,#d97706,#f59e0b)",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      cursor: verifyLoading ? "not-allowed" : "pointer",
+                      opacity: verifyLoading ? 0.6 : 1,
+                    }}
+                  >
+                    ⊘ Unverify Provider
+                  </button>
+                </div>
+              )}
 
               {verifyMsg && (
                 <div
