@@ -36,6 +36,8 @@ const UserSchema = new mongoose.Schema({
   signupOtp: { type: String },
   signupOtpExpires: { type: Date },
   signupOtpAttempts: { type: Number, default: 0 },
+  // Firebase UID for Google Sign-In users
+  firebaseUid: { type: String },
 });
 
 const User = mongoose.model("User", UserSchema);
