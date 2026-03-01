@@ -11,6 +11,7 @@ import ManagerDashboard from "./pages/manager/Dashboard";
 import ManagerUsers from "./pages/manager/Users";
 import Profiles from "./pages/manager/Profiles";
 import ManagerProfileOverview from "./pages/manager/ProfileOverview";
+import UserAnalytics from "./pages/manager/UserAnalytics";
 import ManagerOrders from "./pages/manager/Orders";
 import Payments from "./pages/manager/Payments";
 import Support from "./pages/manager/Support";
@@ -316,6 +317,14 @@ export default function App() {
         element={
           <RequireRole role="manager">
             <ManagerProfileOverview />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/manager/profiles/:id/analytics"
+        element={
+          <RequireRole role="manager">
+            <UserAnalytics />
           </RequireRole>
         }
       />

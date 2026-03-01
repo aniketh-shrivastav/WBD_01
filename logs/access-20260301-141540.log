@@ -1,5 +1,0 @@
-[2026-03-01T08:45:42.436Z] GET /service/api/bookings - IP: ::1
-[2026-03-01T08:45:42.744Z] GET /service/api/bookings - IP: ::1
-[2026-03-01T08:45:44.946Z] GET /api/product-categories/active - IP: ::1
-[2026-03-01T08:45:45.333Z] GET /api/product-categories/active - IP: ::1
-[2026-03-01T08:45:54.254Z] GET /api/parts/search?category=Audio+%26+Infotainment - IP: ::1

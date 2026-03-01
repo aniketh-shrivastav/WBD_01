@@ -111,6 +111,12 @@ router.get(
   isManager,
   managerController.getProfileOverview,
 );
+router.get(
+  "/api/user-analytics/:id",
+  isAuthenticated,
+  isManager,
+  managerController.getUserAnalytics,
+);
 
 // User management routes
 router.post(

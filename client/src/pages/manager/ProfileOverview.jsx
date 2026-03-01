@@ -91,22 +91,38 @@ export default function ManagerProfileOverview() {
 
   const headerRight = useMemo(
     () => (
-      <Link
-        to="/manager/profiles"
-        style={{
-          textDecoration: "none",
-          padding: "8px 12px",
-          borderRadius: 8,
-          background: "#111827",
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 13,
-        }}
-      >
-        Back to Profiles
-      </Link>
+      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <Link
+          to={`/manager/profiles/${id}/analytics`}
+          style={{
+            textDecoration: "none",
+            padding: "8px 12px",
+            borderRadius: 8,
+            background: "linear-gradient(135deg,#4299e1,#667eea)",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 13,
+          }}
+        >
+          View Analytics
+        </Link>
+        <Link
+          to="/manager/profiles"
+          style={{
+            textDecoration: "none",
+            padding: "8px 12px",
+            borderRadius: 8,
+            background: "#111827",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 13,
+          }}
+        >
+          Back to Profiles
+        </Link>
+      </div>
     ),
-    [],
+    [id],
   );
 
   const [verifyLoading, setVerifyLoading] = useState(false);

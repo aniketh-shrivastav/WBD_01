@@ -1,8 +1,0 @@
-[2026-03-01T08:47:01.188Z] GET /chat/unread-count - IP: ::1
-[2026-03-01T08:47:03.694Z] PUT /manager/products/681b0f87d078cdfb42c206f6/edit - IP: ::1
-[2026-03-01T08:47:03.943Z] GET /manager/api/dashboard - IP: ::1
-[2026-03-01T08:47:10.630Z] GET /chat/unread-count - IP: ::1
-[2026-03-01T08:47:10.638Z] GET /api/product-categories - IP: ::1
-[2026-03-01T08:47:10.665Z] GET /chat/unread-count - IP: ::1
-[2026-03-01T08:47:11.014Z] GET /api/product-categories - IP: ::1
-[2026-03-01T08:47:15.489Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

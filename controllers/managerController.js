@@ -1643,6 +1643,475 @@ exports.getProfileOverview = async (req, res) => {
   }
 };
 
+/* ──────────────────────────────────────────────────────────────────
+   USER ANALYTICS — comprehensive stats per customer / seller / provider
+   GET /manager/api/user-analytics/:id
+   ────────────────────────────────────────────────────────────────── */
+exports.getUserAnalytics = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const n = (v) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+    const COMMISSION_RATE = 0.2;
+    const MONTHS = 12;
+    const { buckets, startDate } = buildMonthBuckets(MONTHS);
+    const mk = (y, m) => `${y}-${m}`;
+
+    /* ---------- Try CUSTOMER (CustomerProfile._id) ---------- */
+    const customerProfile = await CustomerProfile.findById(id).populate(
+      "userId",
+      "name email createdAt",
+    );
+    if (customerProfile && customerProfile.userId) {
+      const userId = customerProfile.userId._id;
+      const createdAt = customerProfile.userId.createdAt;
+
+      const [orders, bookings] = await Promise.all([
+        Order.find({ userId }).lean(),
+        ServiceBooking.find({ customerId: userId }).lean(),
+      ]);
+
+      // ---- totals ----
+      const totalOrderSpend = orders.reduce((s, o) => s + n(o.totalAmount), 0);
+      const totalServiceSpend = bookings.reduce(
+        (s, b) => s + n(b.totalCost),
+        0,
+      );
+      const totalSpent = totalOrderSpend + totalServiceSpend;
+
+      // ---- order status distribution ----
+      const orderStatusDist = {};
+      orders.forEach((o) => {
+        orderStatusDist[o.orderStatus || "unknown"] =
+          (orderStatusDist[o.orderStatus || "unknown"] || 0) + 1;
+      });
+
+      // ---- booking status distribution ----
+      const bookingStatusDist = {};
+      bookings.forEach((b) => {
+        bookingStatusDist[b.status || "unknown"] =
+          (bookingStatusDist[b.status || "unknown"] || 0) + 1;
+      });
+
+      // ---- monthly spending ----
+      const monthlyOrders = {};
+      const monthlyServices = {};
+      buckets.forEach((b) => {
+        const k = mk(b.year, b.month);
+        monthlyOrders[k] = 0;
+        monthlyServices[k] = 0;
+      });
+      orders.forEach((o) => {
+        const d = new Date(o.placedAt);
+        if (d >= startDate) {
+          const k = mk(d.getFullYear(), d.getMonth() + 1);
+          if (monthlyOrders[k] !== undefined)
+            monthlyOrders[k] += n(o.totalAmount);
+        }
+      });
+      bookings.forEach((b) => {
+        const d = new Date(b.createdAt);
+        if (d >= startDate) {
+          const k = mk(d.getFullYear(), d.getMonth() + 1);
+          if (monthlyServices[k] !== undefined)
+            monthlyServices[k] += n(b.totalCost);
+        }
+      });
+      const monthlySpending = buckets.map((b) => {
+        const k = mk(b.year, b.month);
+        return {
+          label: b.label,
+          orders: monthlyOrders[k],
+          services: monthlyServices[k],
+          total: monthlyOrders[k] + monthlyServices[k],
+        };
+      });
+
+      // ---- top service providers by spend ----
+      const providerSpend = {};
+      bookings.forEach((b) => {
+        const pid = String(b.providerId);
+        providerSpend[pid] = (providerSpend[pid] || 0) + n(b.totalCost);
+      });
+      const topProviderIds = Object.entries(providerSpend)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      const providerUsers = topProviderIds.length
+        ? await User.find(
+            { _id: { $in: topProviderIds.map((p) => p[0]) } },
+            "name email workshopName",
+          ).lean()
+        : [];
+      const providerMap = new Map(providerUsers.map((u) => [String(u._id), u]));
+      const topProviders = topProviderIds.map(([pid, total]) => {
+        const u = providerMap.get(pid);
+        return {
+          name: u?.workshopName || u?.name || pid,
+          email: u?.email || "",
+          totalSpent: total,
+        };
+      });
+
+      // ---- top sellers by spend ----
+      const sellerSpend = {};
+      orders.forEach((o) => {
+        (o.items || []).forEach((it) => {
+          if (it.itemStatus === "delivered") {
+            const sid = String(it.seller);
+            sellerSpend[sid] =
+              (sellerSpend[sid] || 0) + n(it.price) * n(it.quantity);
+          }
+        });
+      });
+      const topSellerIds = Object.entries(sellerSpend)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      const sellerUsers = topSellerIds.length
+        ? await User.find(
+            { _id: { $in: topSellerIds.map((s) => s[0]) } },
+            "name email",
+          ).lean()
+        : [];
+      const sellerMap = new Map(sellerUsers.map((u) => [String(u._id), u]));
+      const topSellers = topSellerIds.map(([sid, total]) => {
+        const u = sellerMap.get(sid);
+        return {
+          name: u?.name || sid,
+          email: u?.email || "",
+          totalSpent: total,
+        };
+      });
+
+      // ---- activity dates ----
+      const allDates = [
+        ...orders.map((o) => o.placedAt),
+        ...bookings.map((b) => b.createdAt),
+      ]
+        .filter(Boolean)
+        .sort((a, b) => new Date(a) - new Date(b));
+
+      return res.json({
+        role: "Customer",
+        userName: customerProfile.userId.name,
+        memberSince: createdAt,
+        firstActivity: allDates[0] || null,
+        lastActivity: allDates[allDates.length - 1] || null,
+        summary: {
+          totalOrders: orders.length,
+          totalBookings: bookings.length,
+          totalOrderSpend,
+          totalServiceSpend,
+          totalSpent,
+        },
+        orderStatusDist,
+        bookingStatusDist,
+        monthlySpending,
+        topProviders,
+        topSellers,
+      });
+    }
+
+    /* ---------- Try SELLER (SellerProfile._id) ---------- */
+    const sellerProfile = await SellerProfile.findById(id).populate(
+      "sellerId",
+      "name email createdAt",
+    );
+    if (sellerProfile && sellerProfile.sellerId) {
+      const sellerId = sellerProfile.sellerId._id;
+      const createdAt = sellerProfile.sellerId.createdAt;
+
+      const [ordersRaw, products] = await Promise.all([
+        Order.find({ "items.seller": sellerId }).lean(),
+        Product.find({ seller: sellerId }).lean(),
+      ]);
+
+      // flatten to seller items only
+      const sellerItems = [];
+      ordersRaw.forEach((o) => {
+        (o.items || []).forEach((it) => {
+          if (String(it.seller) === String(sellerId)) {
+            sellerItems.push({ ...it, placedAt: o.placedAt, orderId: o._id });
+          }
+        });
+      });
+
+      const deliveredItems = sellerItems.filter(
+        (it) => it.itemStatus === "delivered",
+      );
+      const totalRevenue = deliveredItems.reduce(
+        (s, it) => s + n(it.price) * n(it.quantity),
+        0,
+      );
+      const totalCommission = totalRevenue * COMMISSION_RATE;
+      const totalAfterCommission = totalRevenue - totalCommission;
+
+      // ---- item status distribution ----
+      const itemStatusDist = {};
+      sellerItems.forEach((it) => {
+        itemStatusDist[it.itemStatus || "unknown"] =
+          (itemStatusDist[it.itemStatus || "unknown"] || 0) + 1;
+      });
+
+      // ---- category distribution ----
+      const categoryDist = {};
+      products.forEach((p) => {
+        categoryDist[p.category || "Other"] =
+          (categoryDist[p.category || "Other"] || 0) + 1;
+      });
+
+      // ---- top categories by revenue ----
+      const catRevenue = {};
+      deliveredItems.forEach((it) => {
+        const prod = products.find(
+          (p) => String(p._id) === String(it.productId),
+        );
+        const cat = prod?.category || "Other";
+        catRevenue[cat] = (catRevenue[cat] || 0) + n(it.price) * n(it.quantity);
+      });
+      const topCategories = Object.entries(catRevenue)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 7)
+        .map(([cat, rev]) => ({ category: cat, revenue: rev }));
+
+      // ---- top products by units sold ----
+      const prodSold = {};
+      deliveredItems.forEach((it) => {
+        const key = it.name || String(it.productId);
+        prodSold[key] = (prodSold[key] || 0) + n(it.quantity);
+      });
+      const topProducts = Object.entries(prodSold)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, qty]) => ({ name, unitsSold: qty }));
+
+      // ---- monthly revenue + commission ----
+      const monthlyRev = {};
+      buckets.forEach((b) => {
+        monthlyRev[mk(b.year, b.month)] = 0;
+      });
+      deliveredItems.forEach((it) => {
+        const d = new Date(it.placedAt);
+        if (d >= startDate) {
+          const k = mk(d.getFullYear(), d.getMonth() + 1);
+          if (monthlyRev[k] !== undefined)
+            monthlyRev[k] += n(it.price) * n(it.quantity);
+        }
+      });
+      const monthlyBreakdown = buckets.map((b) => {
+        const k = mk(b.year, b.month);
+        const rev = monthlyRev[k];
+        return {
+          label: b.label,
+          revenue: rev,
+          commission: Math.round(rev * COMMISSION_RATE),
+          afterCommission: Math.round(rev * (1 - COMMISSION_RATE)),
+        };
+      });
+
+      // ---- top customers ----
+      const custSpend = {};
+      ordersRaw.forEach((o) => {
+        const amt = (o.items || [])
+          .filter(
+            (it) =>
+              String(it.seller) === String(sellerId) &&
+              it.itemStatus === "delivered",
+          )
+          .reduce((s, it) => s + n(it.price) * n(it.quantity), 0);
+        if (amt > 0)
+          custSpend[String(o.userId)] =
+            (custSpend[String(o.userId)] || 0) + amt;
+      });
+      const topCustIds = Object.entries(custSpend)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      const custUsers = topCustIds.length
+        ? await User.find(
+            { _id: { $in: topCustIds.map((c) => c[0]) } },
+            "name email",
+          ).lean()
+        : [];
+      const custMap = new Map(custUsers.map((u) => [String(u._id), u]));
+      const topCustomers = topCustIds.map(([cid, total]) => {
+        const u = custMap.get(cid);
+        return {
+          name: u?.name || cid,
+          email: u?.email || "",
+          totalSpent: total,
+        };
+      });
+
+      // ---- activity dates ----
+      const allDates = sellerItems
+        .map((it) => it.placedAt)
+        .filter(Boolean)
+        .sort((a, b) => new Date(a) - new Date(b));
+
+      return res.json({
+        role: "Seller",
+        userName: sellerProfile.sellerId.name,
+        memberSince: createdAt,
+        firstActivity: allDates[0] || null,
+        lastActivity: allDates[allDates.length - 1] || null,
+        summary: {
+          totalOrders: ordersRaw.length,
+          totalItemsSold: sellerItems.length,
+          deliveredCount: deliveredItems.length,
+          totalProducts: products.length,
+          totalRevenue,
+          totalCommission,
+          totalAfterCommission,
+        },
+        itemStatusDist,
+        categoryDist,
+        topCategories,
+        topProducts,
+        topCustomers,
+        monthlyBreakdown,
+      });
+    }
+
+    /* ---------- Try SERVICE PROVIDER (User._id) ---------- */
+    const serviceProvider = await User.findById(id).lean();
+    if (serviceProvider && serviceProvider.role === "service-provider") {
+      const providerId = serviceProvider._id;
+      const createdAt = serviceProvider.createdAt;
+
+      const bookings = await ServiceBooking.find({ providerId }).lean();
+      const completedStatuses = ["Ready", "Completed"];
+      const completed = bookings.filter((b) =>
+        completedStatuses.includes(b.status),
+      );
+
+      const totalEarnings = completed.reduce((s, b) => s + n(b.totalCost), 0);
+      const totalCommission = totalEarnings * COMMISSION_RATE;
+      const totalAfterCommission = totalEarnings - totalCommission;
+
+      // ---- booking status distribution ----
+      const statusDist = {};
+      bookings.forEach((b) => {
+        statusDist[b.status || "unknown"] =
+          (statusDist[b.status || "unknown"] || 0) + 1;
+      });
+
+      // ---- service distribution ----
+      const serviceDist = {};
+      bookings.forEach((b) => {
+        (b.selectedServices || []).forEach((svc) => {
+          serviceDist[svc] = (serviceDist[svc] || 0) + 1;
+        });
+      });
+      const topServices = Object.entries(serviceDist)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 7)
+        .map(([name, count]) => ({ name, count }));
+
+      // ---- service revenue ----
+      const svcRevenue = {};
+      completed.forEach((b) => {
+        const share =
+          n(b.totalCost) / Math.max((b.selectedServices || []).length, 1);
+        (b.selectedServices || []).forEach((svc) => {
+          svcRevenue[svc] = (svcRevenue[svc] || 0) + share;
+        });
+      });
+      const topServicesByRevenue = Object.entries(svcRevenue)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 7)
+        .map(([name, revenue]) => ({ name, revenue: Math.round(revenue) }));
+
+      // ---- top customer relationships ----
+      const custRels = {};
+      bookings.forEach((b) => {
+        const cid = String(b.customerId);
+        if (!custRels[cid]) custRels[cid] = { count: 0, spent: 0 };
+        custRels[cid].count += 1;
+        custRels[cid].spent += n(b.totalCost);
+      });
+      const topCustRelIds = Object.entries(custRels)
+        .sort((a, b) => b[1].spent - a[1].spent)
+        .slice(0, 5);
+      const relUsers = topCustRelIds.length
+        ? await User.find(
+            { _id: { $in: topCustRelIds.map((c) => c[0]) } },
+            "name email",
+          ).lean()
+        : [];
+      const relMap = new Map(relUsers.map((u) => [String(u._id), u]));
+      const topCustomerRelationships = topCustRelIds.map(([cid, data]) => {
+        const u = relMap.get(cid);
+        return {
+          name: u?.name || cid,
+          email: u?.email || "",
+          bookings: data.count,
+          totalSpent: data.spent,
+        };
+      });
+
+      // ---- monthly earnings + commission ----
+      const monthlyEarn = {};
+      buckets.forEach((b) => {
+        monthlyEarn[mk(b.year, b.month)] = 0;
+      });
+      completed.forEach((b) => {
+        const d = new Date(b.createdAt);
+        if (d >= startDate) {
+          const k = mk(d.getFullYear(), d.getMonth() + 1);
+          if (monthlyEarn[k] !== undefined) monthlyEarn[k] += n(b.totalCost);
+        }
+      });
+      const monthlyBreakdown = buckets.map((b) => {
+        const k = mk(b.year, b.month);
+        const earn = monthlyEarn[k];
+        return {
+          label: b.label,
+          earnings: earn,
+          commission: Math.round(earn * COMMISSION_RATE),
+          afterCommission: Math.round(earn * (1 - COMMISSION_RATE)),
+        };
+      });
+
+      // ---- average rating ----
+      const rated = bookings.filter((b) => b.rating >= 1);
+      const avgRating = rated.length
+        ? (rated.reduce((s, b) => s + b.rating, 0) / rated.length).toFixed(1)
+        : null;
+
+      // ---- activity dates ----
+      const allDates = bookings
+        .map((b) => b.createdAt)
+        .filter(Boolean)
+        .sort((a, b) => new Date(a) - new Date(b));
+
+      return res.json({
+        role: "Service Provider",
+        userName: serviceProvider.workshopName || serviceProvider.name,
+        memberSince: createdAt,
+        firstActivity: allDates[0] || null,
+        lastActivity: allDates[allDates.length - 1] || null,
+        summary: {
+          totalBookings: bookings.length,
+          completedBookings: completed.length,
+          totalEarnings,
+          totalCommission,
+          totalAfterCommission,
+          avgRating: avgRating ? Number(avgRating) : null,
+          totalReviews: rated.length,
+        },
+        statusDist,
+        topServices,
+        topServicesByRevenue,
+        topCustomerRelationships,
+        monthlyBreakdown,
+      });
+    }
+
+    return res.status(404).json({ error: "User not found" });
+  } catch (err) {
+    console.error("getUserAnalytics error:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // Static HTML page handlers
 exports.getDashboardHtml = (req, res) => {
   res.sendFile(
