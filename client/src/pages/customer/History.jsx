@@ -905,7 +905,12 @@ export default function CustomerHistory() {
                           <strong>Booked on:</strong> {formatDate(s.createdAt)}
                         </p>
                         <p>
-                          <strong>Car Model:</strong> {s.carModel || ""}
+                          <strong>Vehicle:</strong>{" "}
+                          {[s.vehicleMake, s.vehicleModel, s.vehicleVariant]
+                            .filter(Boolean)
+                            .join(" ") ||
+                            s.carModel ||
+                            "\u2014"}
                         </p>
                         <p>
                           <strong>Description:</strong> {s.description || ""}
@@ -1020,7 +1025,12 @@ export default function CustomerHistory() {
                             {formatDate(s.createdAt)}
                           </p>
                           <p>
-                            <strong>Car Model:</strong> {s.carModel || ""}
+                            <strong>Vehicle:</strong>{" "}
+                            {[s.vehicleMake, s.vehicleModel, s.vehicleVariant]
+                              .filter(Boolean)
+                              .join(" ") ||
+                              s.carModel ||
+                              "\u2014"}
                           </p>
                           <p>
                             <strong>Description:</strong> {s.description || ""}

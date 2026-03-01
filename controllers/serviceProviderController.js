@@ -780,6 +780,9 @@ exports.getBookings = async (req, res) => {
       insuranceCopy: b.insuranceCopy || "",
       vehiclePhotos: b.vehiclePhotos || [],
       carYear: b.carYear || null,
+      // Linked parts / products
+      linkedProducts: b.linkedProducts || [],
+      priceApprovalStatus: b.priceApprovalStatus || "none",
     }));
 
     res.json({ success: true, bookings: shaped });

@@ -203,7 +203,7 @@ export default function BookingManagement() {
                 <th>Service ID</th>
                 <th>Service</th>
                 <th>Description</th>
-                <th>Car Model</th>
+                <th>Vehicle</th>
                 <th>Customer Name</th>
                 <th>Customer email</th>
                 <th>Phone Number</th>
@@ -233,7 +233,13 @@ export default function BookingManagement() {
                     <td>{id}</td>
                     <td>{(o.selectedServices || []).join(", ")}</td>
                     <td>{o.description}</td>
-                    <td>{o.carModel}</td>
+                    <td>
+                      {[o.vehicleMake, o.vehicleModel]
+                        .filter(Boolean)
+                        .join(" ") ||
+                        o.carModel ||
+                        "—"}
+                    </td>
                     <td>{o.customerName}</td>
                     <td>{o.customerEmail}</td>
                     <td>{o.phone}</td>
@@ -326,7 +332,18 @@ export default function BookingManagement() {
                     ["Phone", viewDetail.phone],
                     ["Address", viewDetail.address],
                     ["District", viewDetail.district],
-                    ["Car Model", viewDetail.carModel],
+                    [
+                      "Vehicle",
+                      [
+                        viewDetail.vehicleMake,
+                        viewDetail.vehicleModel,
+                        viewDetail.vehicleVariant,
+                      ]
+                        .filter(Boolean)
+                        .join(" ") ||
+                        viewDetail.carModel ||
+                        "—",
+                    ],
                     ["Reg. Number", viewDetail.registrationNumber],
                     ["Make", viewDetail.vehicleMake],
                     ["Model", viewDetail.vehicleModel],
@@ -427,6 +444,33 @@ export default function BookingManagement() {
                         }}
                       />
                     </div>
+
+                    {/* Parts Resolution — Link platform products to booking */}
+                    <hr className="sp-section-divider" />
+                    <PartsResolver
+                      bookingId={viewDetail._id || viewDetail.id}
+                      linkedProducts={viewDetail.linkedProducts || []}
+                      onUpdate={(linkedProducts, totalCost, productCost) => {
+                        setViewDetail((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                linkedProducts,
+                                totalCost,
+                                productCost,
+                              }
+                            : prev,
+                        );
+                        setBookings((list) =>
+                          list.map((b) =>
+                            (b._id || b.id) ===
+                            (viewDetail._id || viewDetail.id)
+                              ? { ...b, linkedProducts, totalCost, productCost }
+                              : b,
+                          ),
+                        );
+                      }}
+                    />
                   </>
                 )}
 
@@ -579,5 +623,477 @@ function ProductCostEditor({ bookingId, currentCost, onSaved }) {
         {saving ? "Saving..." : "Save"}
       </button>
     </form>
+  );
+}
+
+/* ─────────────────── Parts Resolver Component ─────────────────── */
+
+function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
+  const [searchQ, setSearchQ] = useState("");
+  const [searchCat, setSearchCat] = useState("");
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [linking, setLinking] = useState(null); // productId being linked
+  const [quantities, setQuantities] = useState({}); // productId -> qty
+  const [categories, setCategories] = useState([]);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
+
+  // Fetch product categories for filter
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/product-categories/active", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        const j = await res.json();
+        if (j.success) setCategories(j.categories || []);
+      } catch {}
+    })();
+  }, []);
+
+  async function search() {
+    try {
+      setSearching(true);
+      const params = new URLSearchParams();
+      if (searchQ.trim()) params.set("q", searchQ.trim());
+      if (searchCat) params.set("category", searchCat);
+      const res = await fetch(`/api/parts/search?${params}`, {
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+      const j = await res.json();
+      if (j.success) setResults(j.products || []);
+      else alert(j.message || "Search failed");
+    } catch (e) {
+      alert("Search failed");
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  async function linkProduct(productId) {
+    try {
+      setLinking(productId);
+      const qty = quantities[productId] || 1;
+      const res = await fetch("/api/parts/link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          bookingId,
+          productId,
+          quantity: qty,
+          installationRequired: true,
+        }),
+      });
+      const j = await res.json();
+      if (!j.success) return alert(j.message || "Failed to link product");
+      if (onUpdate) onUpdate(j.linkedProducts, j.totalCost, j.productCost);
+      alert("Product linked successfully!");
+    } catch {
+      alert("Failed to link product");
+    } finally {
+      setLinking(null);
+    }
+  }
+
+  async function unlinkProduct(productId) {
+    if (!window.confirm("Remove this part from the booking?")) return;
+    try {
+      const res = await fetch("/api/parts/unlink", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ bookingId, productId }),
+      });
+      const j = await res.json();
+      if (!j.success) return alert(j.message || "Failed to unlink");
+      if (onUpdate) onUpdate(j.linkedProducts, j.totalCost, j.productCost);
+    } catch {
+      alert("Failed to unlink product");
+    }
+  }
+
+  async function changeAllocationStatus(productId, status) {
+    try {
+      setUpdatingStatus(productId);
+      const res = await fetch("/api/parts/allocation-status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ bookingId, productId, status }),
+      });
+      const j = await res.json();
+      if (!j.success) return alert(j.message || "Failed to update status");
+      if (onUpdate) {
+        // Refresh from server response
+        const refetch = await fetch(`/api/parts/booking/${bookingId}`, {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        const rj = await refetch.json();
+        if (rj.success)
+          onUpdate(rj.linkedProducts, rj.totalCost, rj.productCost);
+      }
+    } catch {
+      alert("Failed to update allocation status");
+    } finally {
+      setUpdatingStatus(null);
+    }
+  }
+
+  const statusColors = {
+    reserved: { bg: "#fffbeb", color: "#b45309", label: "Reserved" },
+    allocated: { bg: "#eff6ff", color: "#2563eb", label: "Allocated" },
+    installed: { bg: "#ecfdf5", color: "#059669", label: "Installed" },
+    returned: { bg: "#fef2f2", color: "#dc2626", label: "Returned" },
+  };
+
+  const nextActions = {
+    reserved: [
+      { label: "Mark Allocated", status: "allocated", color: "#2563eb" },
+      { label: "Return", status: "returned", color: "#dc2626" },
+    ],
+    allocated: [
+      { label: "Mark Installed", status: "installed", color: "#059669" },
+      { label: "Return", status: "returned", color: "#dc2626" },
+    ],
+    installed: [],
+    returned: [],
+  };
+
+  return (
+    <div className="sp-product-cost-box">
+      <h4>🔧 Parts Resolution — Link Platform Products</h4>
+      <p style={{ fontSize: 13, color: "#6b7280", margin: "4px 0 12px" }}>
+        Search the product catalog, link parts to this booking, and manage
+        allocation. Linked parts auto-reserve stock (no shipping triggered).
+      </p>
+
+      {/* Currently linked parts */}
+      {linkedProducts.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <strong style={{ fontSize: 13 }}>
+            Linked Parts ({linkedProducts.length})
+          </strong>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              marginTop: 8,
+            }}
+          >
+            {linkedProducts.map((lp, i) => {
+              const pid = lp.productId?._id || lp.productId;
+              const pName = lp.productId?.name || lp.productName || "Product";
+              const sc =
+                statusColors[lp.allocationStatus] || statusColors.reserved;
+              const actions = nextActions[lp.allocationStatus] || [];
+              return (
+                <div
+                  key={i}
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                    background: "#fafafa",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    flexWrap: "wrap",
+                    fontSize: 13,
+                  }}
+                >
+                  <span style={{ fontWeight: 600, flex: "1 1 auto" }}>
+                    {pName}
+                  </span>
+                  <span>×{lp.quantity}</span>
+                  <span style={{ fontWeight: 600 }}>₹{lp.totalPrice || 0}</span>
+                  <span
+                    style={{
+                      padding: "2px 10px",
+                      borderRadius: 12,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      background: sc.bg,
+                      color: sc.color,
+                    }}
+                  >
+                    {sc.label}
+                  </span>
+                  {lp.installationRequired && (
+                    <span style={{ fontSize: 11, color: "#6b7280" }}>
+                      🔩 Installation
+                    </span>
+                  )}
+                  {actions.map((a) => (
+                    <button
+                      key={a.status}
+                      disabled={updatingStatus === pid}
+                      onClick={() => changeAllocationStatus(pid, a.status)}
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 6,
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#fff",
+                        background: a.color,
+                        opacity: updatingStatus === pid ? 0.5 : 1,
+                      }}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                  {(lp.allocationStatus === "reserved" ||
+                    lp.allocationStatus === "allocated") && (
+                    <button
+                      onClick={() => unlinkProduct(pid)}
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 6,
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#fff",
+                        background: "#6b7280",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Search bar */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          marginBottom: 12,
+          alignItems: "flex-end",
+        }}
+      >
+        <input
+          type="text"
+          value={searchQ}
+          onChange={(e) => setSearchQ(e.target.value)}
+          placeholder="Search parts (name, brand, SKU)..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              search();
+            }
+          }}
+          style={{
+            flex: "1 1 200px",
+            padding: "8px 12px",
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            fontSize: 13,
+          }}
+        />
+        <select
+          value={searchCat}
+          onChange={(e) => setSearchCat(e.target.value)}
+          style={{
+            padding: "8px 12px",
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            fontSize: 13,
+          }}
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={search}
+          disabled={searching}
+          style={{
+            padding: "8px 18px",
+            borderRadius: 6,
+            border: "none",
+            background: "#111827",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            opacity: searching ? 0.5 : 1,
+          }}
+        >
+          {searching ? "Searching..." : "🔍 Search"}
+        </button>
+      </div>
+
+      {/* Search Results */}
+      {results.length > 0 && (
+        <div
+          style={{
+            maxHeight: 300,
+            overflowY: "auto",
+            border: "1px solid #e5e7eb",
+            borderRadius: 8,
+          }}
+        >
+          <table
+            style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}
+          >
+            <thead>
+              <tr style={{ background: "#f9fafb", position: "sticky", top: 0 }}>
+                <th style={{ padding: "8px 10px", textAlign: "left" }}>
+                  Product
+                </th>
+                <th style={{ padding: "8px 10px", textAlign: "left" }}>
+                  Category
+                </th>
+                <th style={{ padding: "8px 10px", textAlign: "right" }}>
+                  Price
+                </th>
+                <th style={{ padding: "8px 10px", textAlign: "right" }}>
+                  In Stock
+                </th>
+                <th style={{ padding: "8px 10px", textAlign: "center" }}>
+                  Qty
+                </th>
+                <th style={{ padding: "8px 10px", textAlign: "center" }}>
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((p) => {
+                const isLinked = linkedProducts.some(
+                  (lp) =>
+                    String(lp.productId?._id || lp.productId) === String(p._id),
+                );
+                return (
+                  <tr key={p._id} style={{ borderTop: "1px solid #f3f4f6" }}>
+                    <td style={{ padding: "8px 10px" }}>
+                      <div style={{ fontWeight: 600 }}>{p.name}</div>
+                      <div style={{ color: "#6b7280", fontSize: 11 }}>
+                        {p.brand} &middot; {p.sku}
+                      </div>
+                      {p.compatibility && (
+                        <div style={{ color: "#9ca3af", fontSize: 11 }}>
+                          Fits: {p.compatibility}
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      style={{
+                        padding: "8px 10px",
+                        fontSize: 11,
+                        color: "#6b7280",
+                      }}
+                    >
+                      {p.category}
+                      {p.subcategory ? ` > ${p.subcategory}` : ""}
+                    </td>
+                    <td
+                      style={{
+                        padding: "8px 10px",
+                        textAlign: "right",
+                        fontWeight: 600,
+                      }}
+                    >
+                      ₹{p.price}
+                    </td>
+                    <td style={{ padding: "8px 10px", textAlign: "right" }}>
+                      <span
+                        style={{
+                          color: p.availableStock > 0 ? "#059669" : "#dc2626",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {p.availableStock}
+                      </span>
+                    </td>
+                    <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                      <input
+                        type="number"
+                        min={1}
+                        max={p.availableStock}
+                        value={quantities[p._id] || 1}
+                        onChange={(e) =>
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [p._id]: parseInt(e.target.value, 10) || 1,
+                          }))
+                        }
+                        style={{
+                          width: 50,
+                          padding: "4px 6px",
+                          borderRadius: 4,
+                          border: "1px solid #d1d5db",
+                          textAlign: "center",
+                          fontSize: 12,
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                      {isLinked ? (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: "#059669",
+                            fontWeight: 600,
+                          }}
+                        >
+                          ✓ Linked
+                        </span>
+                      ) : p.availableStock <= 0 ? (
+                        <span style={{ fontSize: 11, color: "#dc2626" }}>
+                          Out of stock
+                        </span>
+                      ) : (
+                        <button
+                          disabled={linking === p._id}
+                          onClick={() => linkProduct(p._id)}
+                          style={{
+                            padding: "4px 12px",
+                            borderRadius: 6,
+                            border: "none",
+                            background: "#4f46e5",
+                            color: "#fff",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            opacity: linking === p._id ? 0.5 : 1,
+                          }}
+                        >
+                          {linking === p._id ? "Linking..." : "+ Link"}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }

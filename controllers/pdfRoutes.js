@@ -147,7 +147,14 @@ exports.getServiceReceipt = async (req, res) => {
           "Provider",
           `${service.providerId.name} | ${service.providerId.phone}`,
         ],
-        ["Car Model", service.carModel],
+        [
+          "Vehicle",
+          [service.vehicleMake, service.vehicleModel, service.vehicleVariant]
+            .filter(Boolean)
+            .join(" ") ||
+            service.carModel ||
+            "N/A",
+        ],
         ["Description", service.description],
         ["Total Cost", `₹${service.totalCost}`],
       ],

@@ -579,8 +579,18 @@ export default function Orders() {
               <span>{booking.description || "N/A"}</span>
             </div>
             <div className="detail-item">
-              <label>Car Model</label>
-              <span>{booking.carModel || "N/A"}</span>
+              <label>Vehicle</label>
+              <span>
+                {[
+                  booking.vehicleMake,
+                  booking.vehicleModel,
+                  booking.vehicleVariant,
+                ]
+                  .filter(Boolean)
+                  .join(" ") ||
+                  booking.carModel ||
+                  "N/A"}
+              </span>
             </div>
             <div className="detail-item">
               <label>Car Year</label>

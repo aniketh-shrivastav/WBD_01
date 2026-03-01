@@ -115,6 +115,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const productCategoryRoutes = require("./routes/productCategoryRoutes");
+const partsRoutes = require("./routes/partsRoutes");
 
 // Mount routes
 app.use("/", profileSettingsRoutes);
@@ -131,6 +132,7 @@ app.use("/", chatRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/service-categories", serviceCategoryRoutes);
 app.use("/api/product-categories", productCategoryRoutes);
+app.use("/api/parts", partsRoutes);
 app.use("/customer", notificationRoutes);
 
 // 8. REACT APP SERVING (for production)

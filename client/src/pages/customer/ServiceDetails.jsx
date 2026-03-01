@@ -287,9 +287,19 @@ export default function ServiceDetails() {
                         color: "var(--customer-text-secondary)",
                       }}
                     >
-                      Car Model
+                      Vehicle
                     </span>
-                    <div style={{ fontWeight: "500" }}>{booking.carModel}</div>
+                    <div style={{ fontWeight: "500" }}>
+                      {[
+                        booking.vehicleMake,
+                        booking.vehicleModel,
+                        booking.vehicleVariant,
+                      ]
+                        .filter(Boolean)
+                        .join(" ") ||
+                        booking.carModel ||
+                        "\u2014"}
+                    </div>
                   </div>
                   <div>
                     <span

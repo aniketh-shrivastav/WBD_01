@@ -74,6 +74,12 @@ const ProductSchema = new mongoose.Schema({
     enum: ["pending", "approved", "rejected"],
     default: "pending",
   },
+  // Stock reservation tracking — quantity allocated to active bookings
+  reservedQuantity: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

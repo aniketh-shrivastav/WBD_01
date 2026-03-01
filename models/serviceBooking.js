@@ -15,7 +15,7 @@ const ServiceBookingSchema = new mongoose.Schema({
   selectedServices: [{ type: String, required: true }], // names of selected services
   date: { type: Date, required: true },
   phone: { type: String, required: true },
-  carModel: { type: String, required: true },
+  carModel: { type: String, default: "" },
   address: { type: String, required: true },
   description: { type: String, required: true },
   district: { type: String, required: true },
@@ -48,6 +48,30 @@ const ServiceBookingSchema = new mongoose.Schema({
 
   // Product cost (added by provider after booking)
   productCost: { type: Number, default: 0 },
+
+  // Linked Products — parts sourced from platform marketplace for this booking
+  linkedProducts: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      productName: { type: String, default: "" },
+      quantity: { type: Number, default: 1, min: 1 },
+      unitPrice: { type: Number, default: 0 },
+      totalPrice: { type: Number, default: 0 },
+      installationRequired: { type: Boolean, default: true },
+      allocationStatus: {
+        type: String,
+        enum: ["reserved", "allocated", "installed", "returned"],
+        default: "reserved",
+      },
+      reservedAt: { type: Date, default: Date.now },
+      allocatedAt: { type: Date },
+      installedAt: { type: Date },
+    },
+  ],
 
   // Price approval workflow (customer must agree to finalized price)
   priceApproved: { type: Boolean, default: false },

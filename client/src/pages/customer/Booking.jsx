@@ -43,7 +43,6 @@ export default function CustomerBooking() {
   const [providerId, setProviderId] = useState("");
   const [services, setServices] = useState([]); // selected
   const [date, setDate] = useState("");
-  const [carModel, setCarModel] = useState("");
   const [phone, setPhone] = useState("");
   const [carYear, setCarYear] = useState("");
   const [address, setAddress] = useState("");
@@ -319,15 +318,6 @@ export default function CustomerBooking() {
     setFieldError("carYear", "");
     return true;
   }
-  function validateCarModel() {
-    const val = carModel.trim();
-    if (!val)
-      return (setFieldError("carModel", "Car Model is required"), false);
-    if (val.length < 2)
-      return (setFieldError("carModel", "Car Model seems too short"), false);
-    setFieldError("carModel", "");
-    return true;
-  }
   function validateAddress() {
     const val = address.trim();
     if (!val) return (setFieldError("address", "Address is required"), false);
@@ -444,7 +434,6 @@ export default function CustomerBooking() {
       { ok: validateDate(), elementId: "date" },
       { ok: validatePhone(), elementId: "phone" },
       { ok: validateCarYear(), elementId: "car-year" },
-      { ok: validateCarModel(), elementId: "car-model" },
       { ok: validateAddress(), elementId: "address" },
       { ok: validateDescription(), elementId: "description" },
       { ok: validateRegistrationNumber(), elementId: "reg-number" },
@@ -513,7 +502,6 @@ export default function CustomerBooking() {
           selectedServices: services,
           date,
           phone: phone.trim(),
-          carModel: carModel.trim(),
           carYear: Number(carYear),
           address: address.trim(),
           description: description.trim(),
@@ -1101,31 +1089,6 @@ export default function CustomerBooking() {
                         <span className="booking-error-msg">{errors.date}</span>
                       )}
                     </div>
-
-                    <div className="booking-form-group">
-                      <label className="booking-form-label" htmlFor="car-model">
-                        <span className="booking-form-label-icon">🚗</span>
-                        Car Model
-                        <span className="booking-form-hint">
-                          (Company & Model)
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        id="car-model"
-                        required
-                        placeholder="e.g., Maruti Swift, Honda City"
-                        value={carModel}
-                        onChange={(e) => setCarModel(e.target.value)}
-                        onBlur={validateCarModel}
-                        className={`booking-form-input ${errors.carModel ? "invalid" : ""}`}
-                      />
-                      {errors.carModel && (
-                        <span className="booking-error-msg">
-                          {errors.carModel}
-                        </span>
-                      )}
-                    </div>
                   </div>
 
                   {/* Form Row - Year & Phone */}
@@ -1609,11 +1572,11 @@ export default function CustomerBooking() {
 
                     <div className="booking-summary-grid">
                       <div className="booking-summary-item">
-                        <div className="booking-summary-label">
-                          🚗 Car Model
-                        </div>
+                        <div className="booking-summary-label">🚗 Vehicle</div>
                         <div className="booking-summary-value">
-                          {carModel.trim()}
+                          {[vehicleMake, vehicleModel, vehicleVariant]
+                            .filter(Boolean)
+                            .join(" ") || "—"}
                         </div>
                       </div>
 
