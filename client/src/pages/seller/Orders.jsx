@@ -112,7 +112,10 @@ export default function SellerOrders() {
           productId: productId || undefined,
           itemIndex: itemIndex !== undefined ? itemIndex : undefined,
           deliveryDate: deliveryDate || undefined,
-          otp: newStatus === "delivered" ? (otpInputs[uniqueId] || "").trim() : undefined,
+          otp:
+            newStatus === "delivered"
+              ? (otpInputs[uniqueId] || "").trim()
+              : undefined,
         }),
       });
 
@@ -344,7 +347,9 @@ export default function SellerOrders() {
                                   maxLength={6}
                                   value={otpInputs[uniqueId] || ""}
                                   onChange={(e) => {
-                                    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                                    const val = e.target.value
+                                      .replace(/\D/g, "")
+                                      .slice(0, 6);
                                     setOtpInputs((prev) => ({
                                       ...prev,
                                       [uniqueId]: val,

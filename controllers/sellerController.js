@@ -673,7 +673,8 @@ exports.updateOrderStatus = async (req, res) => {
         if (!otp || String(otp).trim() !== String(storedOtp).trim()) {
           return res.status(400).json({
             success: false,
-            message: "Invalid delivery OTP. Please enter the correct OTP from the customer.",
+            message:
+              "Invalid delivery OTP. Please enter the correct OTP from the customer.",
           });
         }
         // Clear OTP after successful verification

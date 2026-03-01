@@ -300,7 +300,8 @@ export default function OrderDetails() {
                         </span>
                       </div>
                       {item.deliveryOtp &&
-                        String(item.itemStatus || "").toLowerCase() === "shipped" && (
+                        String(item.itemStatus || "").toLowerCase() ===
+                          "shipped" && (
                           <div
                             style={{
                               marginTop: "10px",
@@ -311,7 +312,9 @@ export default function OrderDetails() {
                               display: "inline-block",
                             }}
                           >
-                            <strong style={{ color: "#6d28d9", fontSize: "13px" }}>
+                            <strong
+                              style={{ color: "#6d28d9", fontSize: "13px" }}
+                            >
                               Delivery OTP:
                             </strong>{" "}
                             <span
@@ -324,7 +327,13 @@ export default function OrderDetails() {
                             >
                               {item.deliveryOtp}
                             </span>
-                            <div style={{ fontSize: "11px", color: "#6d28d9", marginTop: "2px" }}>
+                            <div
+                              style={{
+                                fontSize: "11px",
+                                color: "#6d28d9",
+                                marginTop: "2px",
+                              }}
+                            >
                               Share this OTP with the seller to confirm delivery
                             </div>
                           </div>

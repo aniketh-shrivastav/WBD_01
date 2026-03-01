@@ -621,13 +621,20 @@ export default function CustomerHistory() {
                         </p>
                         <ul>
                           {(o.items || []).map((i, idx) => (
-                            <li key={idx} style={{ marginBottom: i.deliveryOtp ? "8px" : "0" }}>
+                            <li
+                              key={idx}
+                              style={{
+                                marginBottom: i.deliveryOtp ? "8px" : "0",
+                              }}
+                            >
                               {i.name} x {i.quantity} (₹{i.price})
-                              {i.itemStatus && i.itemStatus !== o.orderStatus && (
-                                <> — {statusSpan(i.itemStatus)}</>
-                              )}
+                              {i.itemStatus &&
+                                i.itemStatus !== o.orderStatus && (
+                                  <> — {statusSpan(i.itemStatus)}</>
+                                )}
                               {i.deliveryOtp &&
-                                String(i.itemStatus || "").toLowerCase() === "shipped" && (
+                                String(i.itemStatus || "").toLowerCase() ===
+                                  "shipped" && (
                                   <div
                                     style={{
                                       marginTop: "4px",
@@ -638,7 +645,12 @@ export default function CustomerHistory() {
                                       display: "inline-block",
                                     }}
                                   >
-                                    <strong style={{ color: "#6d28d9", fontSize: "13px" }}>
+                                    <strong
+                                      style={{
+                                        color: "#6d28d9",
+                                        fontSize: "13px",
+                                      }}
+                                    >
                                       Delivery OTP:
                                     </strong>{" "}
                                     <span
@@ -651,8 +663,15 @@ export default function CustomerHistory() {
                                     >
                                       {i.deliveryOtp}
                                     </span>
-                                    <div style={{ fontSize: "11px", color: "#6d28d9", marginTop: "2px" }}>
-                                      Share this OTP with the seller to confirm delivery
+                                    <div
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "#6d28d9",
+                                        marginTop: "2px",
+                                      }}
+                                    >
+                                      Share this OTP with the seller to confirm
+                                      delivery
                                     </div>
                                   </div>
                                 )}
@@ -769,9 +788,10 @@ export default function CustomerHistory() {
                           {(o.items || []).map((i, idx) => (
                             <li key={idx}>
                               {i.name} x {i.quantity} (₹{i.price})
-                              {i.itemStatus && i.itemStatus !== o.orderStatus && (
-                                <> — {statusSpan(i.itemStatus)}</>
-                              )}
+                              {i.itemStatus &&
+                                i.itemStatus !== o.orderStatus && (
+                                  <> — {statusSpan(i.itemStatus)}</>
+                                )}
                             </li>
                           ))}
                         </ul>
