@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const ServiceBooking = require("../models/serviceBooking");
+const { createNotification } = require("./notificationController");
 
 function getMonthName(monthIndex) {
   const months = [
@@ -130,6 +131,28 @@ exports.updateBookingStatus = async (req, res) => {
         message: `Invalid status transition from ${booking.status} to ${newStatus}`,
       });
     }
+
+    // Block confirmation if price approval is pending or rejected
+    if (
+      newStatus === "Confirmed" &&
+      booking.priceApprovalStatus === "pending"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot confirm booking: customer has not yet approved the finalized price.",
+      });
+    }
+    if (
+      newStatus === "Confirmed" &&
+      booking.priceApprovalStatus === "rejected"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot confirm booking: customer has rejected the proposed price.",
+      });
+    }
     const prevStatus = booking.status;
     booking.status = newStatus;
     booking.statusHistory = booking.statusHistory || [];
@@ -140,6 +163,32 @@ exports.updateBookingStatus = async (req, res) => {
       changedBy: { id: req.session.user?.id, role: "service-provider" },
     });
     await booking.save();
+
+    // Send notification to customer about service status change
+    try {
+      const io2 = req.app.get("io");
+      const statusMessages = {
+        Confirmed: "Your service booking has been confirmed by the provider.",
+        Completed: "Your service booking has been marked as completed.",
+        Rejected: "Your service booking has been rejected by the provider.",
+        Ready: "Your service is ready for pickup/completion.",
+      };
+      await createNotification(
+        {
+          customerId: booking.customerId,
+          type: "service_status",
+          title: `Service ${newStatus}`,
+          message:
+            statusMessages[newStatus] ||
+            `Your service booking status changed to ${newStatus}.`,
+          referenceId: booking._id,
+          referenceModel: "ServiceBooking",
+        },
+        io2,
+      );
+    } catch (e) {
+      console.error("Failed to create service status notification:", e);
+    }
 
     // Emit earnings update event
     if (newStatus === "Ready" || newStatus === "Completed") {
@@ -416,6 +465,8 @@ exports.updateBooking = async (req, res) => {
     if (typeof totalCost !== "undefined") {
       const prevCost = booking.totalCost;
       booking.totalCost = Number(totalCost);
+      booking.priceApprovalStatus = "pending";
+      booking.priceApproved = false;
       booking.costHistory = booking.costHistory || [];
       booking.costHistory.push({
         from: typeof prevCost === "number" ? prevCost : null,
@@ -423,6 +474,29 @@ exports.updateBooking = async (req, res) => {
         changedAt: new Date(),
         changedBy: { id: req.session.user?.id, role: "service-provider" },
       });
+
+      // Send price finalized notification to customer
+      try {
+        const io = req.app.get("io");
+        await createNotification(
+          {
+            customerId: booking.customerId,
+            type: "price_finalized",
+            title: "Price Updated",
+            message: `The service provider has set the price for your booking to \u20b9${booking.totalCost}. Please review and accept or reject.`,
+            referenceId: booking._id,
+            referenceModel: "ServiceBooking",
+            priceApproval: {
+              proposedPrice: booking.totalCost,
+              previousPrice: typeof prevCost === "number" ? prevCost : null,
+              status: "pending",
+            },
+          },
+          io,
+        );
+      } catch (e) {
+        console.error("Failed to create price notification:", e);
+      }
     }
 
     await booking.save();
@@ -444,6 +518,8 @@ exports.updateCost = async (req, res) => {
 
     const prevCost = booking.totalCost;
     booking.totalCost = Number(totalCost);
+    booking.priceApprovalStatus = "pending";
+    booking.priceApproved = false;
     booking.costHistory = booking.costHistory || [];
     booking.costHistory.push({
       from: typeof prevCost === "number" ? prevCost : null,
@@ -452,6 +528,29 @@ exports.updateCost = async (req, res) => {
       changedBy: { id: req.session.user?.id, role: "service-provider" },
     });
     await booking.save();
+
+    // Send price finalized notification to customer
+    try {
+      const io = req.app.get("io");
+      await createNotification(
+        {
+          customerId: booking.customerId,
+          type: "price_finalized",
+          title: "Price Finalized",
+          message: `The service provider has finalized the price for your booking to \u20b9${booking.totalCost}. Please review and accept or reject.`,
+          referenceId: booking._id,
+          referenceModel: "ServiceBooking",
+          priceApproval: {
+            proposedPrice: booking.totalCost,
+            previousPrice: typeof prevCost === "number" ? prevCost : null,
+            status: "pending",
+          },
+        },
+        io,
+      );
+    } catch (e) {
+      console.error("Failed to create price notification:", e);
+    }
 
     res.redirect("/service/bookingManagement");
   } catch (error) {
@@ -723,7 +822,35 @@ exports.updateProductCost = async (req, res) => {
       changedBy: { id: providerId, role: "service-provider" },
     });
 
+    // Set price approval to pending so customer must approve
+    booking.priceApprovalStatus = "pending";
+    booking.priceApproved = false;
+
     await booking.save();
+
+    // Send price finalized notification to customer
+    try {
+      const io = req.app.get("io");
+      await createNotification(
+        {
+          customerId: booking.customerId,
+          type: "price_finalized",
+          title: "Product Cost Added",
+          message: `The service provider has added a product cost of ₹${cost}. Updated total: ₹${booking.totalCost}. Please review and accept or reject.`,
+          referenceId: booking._id,
+          referenceModel: "ServiceBooking",
+          priceApproval: {
+            proposedPrice: booking.totalCost,
+            previousPrice: oldTotal,
+            status: "pending",
+          },
+        },
+        io,
+      );
+    } catch (e) {
+      console.error("Failed to create product cost notification:", e);
+    }
+
     res.json({
       success: true,
       totalCost: booking.totalCost,

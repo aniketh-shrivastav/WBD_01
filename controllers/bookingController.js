@@ -1,5 +1,6 @@
 const ServiceBooking = require("../models/serviceBooking");
 const User = require("../models/User");
+const { createNotification } = require("./notificationController");
 
 exports.createBooking = async (req, res) => {
   try {
@@ -172,6 +173,25 @@ exports.createBooking = async (req, res) => {
     });
 
     await booking.save();
+
+    // Send notification for new service booking
+    try {
+      const io = req.app.get("io");
+      await createNotification(
+        {
+          customerId,
+          type: "new_service",
+          title: "Service Booked",
+          message: `Your service booking for ${selectedServices.join(", ")} with ${provider.workshopName || provider.name} has been created. Total: ₹${totalCost}.`,
+          referenceId: booking._id,
+          referenceModel: "ServiceBooking",
+        },
+        io,
+      );
+    } catch (e) {
+      console.error("Failed to create service booking notification:", e);
+    }
+
     res.status(200).json({ message: "Booking created successfully", booking });
   } catch (error) {
     console.error("Booking creation failed:", error);

@@ -34,6 +34,7 @@ import OrderDetails from "./pages/customer/OrderDetails";
 import ServiceDetails from "./pages/customer/ServiceDetails";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import MockCheckout from "./pages/customer/MockCheckout";
+import CustomerAlerts from "./pages/customer/Alerts";
 
 import ServiceDashboard from "./pages/service/DashboardService";
 import ServiceProfileSettings from "./pages/service/ProfileSettings";
@@ -206,6 +207,14 @@ export default function App() {
         element={
           <RequireRole role="customer">
             <MockCheckout />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/customer/alerts"
+        element={
+          <RequireRole role="customer">
+            <CustomerAlerts />
           </RequireRole>
         }
       />

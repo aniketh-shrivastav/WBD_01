@@ -1,0 +1,7 @@
+[2026-03-01T07:46:42.027Z] POST /service/api/update-product-cost - IP: ::1
+[2026-03-01T07:46:49.070Z] GET /api/session - IP: ::1
+[2026-03-01T07:46:49.243Z] GET /api/session - IP: ::1
+[2026-03-01T07:46:49.342Z] GET /service/api/bookings - IP: ::1
+[2026-03-01T07:46:49.351Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-01T07:46:49.464Z] GET /service/api/bookings - IP: ::1
+[2026-03-01T07:46:54.736Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

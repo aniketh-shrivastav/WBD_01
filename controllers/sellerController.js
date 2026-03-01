@@ -13,6 +13,7 @@ const Product = require("../models/Product");
 const Order = require("../models/Orders");
 const Cart = require("../models/Cart");
 const ProductReview = require("../models/ProductReview");
+const { createNotification } = require("./notificationController");
 
 // Allowed seller verification document types
 const SELLER_DOC_TYPES_INDIVIDUAL = [
@@ -711,6 +712,24 @@ exports.updateOrderStatus = async (req, res) => {
       }
 
       await order.save();
+
+      // Send notification to customer about item status change
+      try {
+        const io = req.app.get("io");
+        await createNotification(
+          {
+            customerId: order.userId,
+            type: "order_status",
+            title: "Order Status Updated",
+            message: `Item "${item.name}" in order #${order._id.toString().slice(-6).toUpperCase()} has been updated to ${newStatus}.`,
+            referenceId: order._id,
+            referenceModel: "Order",
+          },
+          io,
+        );
+      } catch (e) {
+        console.error("Failed to create order status notification:", e);
+      }
 
       return res.json({
         success: true,

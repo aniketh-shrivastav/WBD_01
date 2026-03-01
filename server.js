@@ -113,6 +113,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const serviceCategoryRoutes = require("./routes/serviceCategoryRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 // Mount routes
 app.use("/", profileSettingsRoutes);
@@ -128,6 +129,7 @@ app.use("/bookings", bookingRoutes);
 app.use("/", chatRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/service-categories", serviceCategoryRoutes);
+app.use("/customer", notificationRoutes);
 
 // 8. REACT APP SERVING (for production)
 

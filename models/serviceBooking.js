@@ -49,6 +49,14 @@ const ServiceBookingSchema = new mongoose.Schema({
   // Product cost (added by provider after booking)
   productCost: { type: Number, default: 0 },
 
+  // Price approval workflow (customer must agree to finalized price)
+  priceApproved: { type: Boolean, default: false },
+  priceApprovalStatus: {
+    type: String,
+    enum: ["none", "pending", "accepted", "rejected"],
+    default: "none",
+  },
+
   // Service category (from manager-defined categories)
   serviceCategory: { type: String, default: "" },
 

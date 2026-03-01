@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const Order = require("../models/Orders");
 const CustomerProfile = require("../models/CustomerProfile");
 const User = require("../models/User");
+const { createNotification } = require("./notificationController");
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.user) return next();
@@ -147,6 +148,27 @@ exports.createOrderFromCart = async (req, res) => {
 
     // Step 6: Clear cart
     await Cart.deleteOne({ userId });
+
+    // Step 7: Send notifications for each new order
+    const io = req.app.get("io");
+    for (const order of createdOrders) {
+      const itemNames = order.items.map((i) => i.name).join(", ");
+      try {
+        await createNotification(
+          {
+            customerId: userId,
+            type: "new_order",
+            title: "New Order Placed",
+            message: `Your order #${order._id.toString().slice(-6).toUpperCase()} for ${itemNames} (₹${order.totalAmount}) has been placed successfully.`,
+            referenceId: order._id,
+            referenceModel: "Order",
+          },
+          io,
+        );
+      } catch (e) {
+        console.error("Failed to create order notification:", e);
+      }
+    }
 
     res.status(201).json({
       success: true,

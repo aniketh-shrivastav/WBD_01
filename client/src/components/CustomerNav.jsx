@@ -19,6 +19,7 @@ export default function CustomerNav({ cartCount = 0 }) {
     { to: "/customer/index", label: "Products" },
     { to: "/customer/booking", label: "Services" },
     { to: "/customer/history", label: "Order History" },
+    { to: "/customer/alerts", label: "Alerts" },
     { to: "/customer/cart", label: "Cart", cart: true },
     { to: "/customer/chat", label: "Chat" },
     { to: "/customer/profile", label: "Profile" },
