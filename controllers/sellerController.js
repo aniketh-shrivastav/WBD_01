@@ -386,6 +386,7 @@ exports.addProduct = async (req, res) => {
       price,
       description,
       category,
+      subcategory,
       brand,
       quantity,
       sku,
@@ -429,6 +430,7 @@ exports.addProduct = async (req, res) => {
       price,
       description,
       category,
+      subcategory: subcategory || "",
       brand,
       quantity,
       sku,
@@ -1010,6 +1012,7 @@ exports.editProduct = async (req, res) => {
       price,
       description,
       category,
+      subcategory,
       brand,
       quantity,
       sku,
@@ -1020,6 +1023,7 @@ exports.editProduct = async (req, res) => {
     if (price !== undefined) product.price = Number(price);
     if (description !== undefined) product.description = description;
     if (category !== undefined) product.category = category;
+    if (subcategory !== undefined) product.subcategory = subcategory;
     if (brand !== undefined) product.brand = brand;
     if (quantity !== undefined) product.quantity = Number(quantity);
     if (sku !== undefined) product.sku = sku;

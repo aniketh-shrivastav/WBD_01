@@ -16,6 +16,7 @@ import Payments from "./pages/manager/Payments";
 import Support from "./pages/manager/Support";
 import ManagerChat from "./pages/manager/Chat";
 import ServiceCategories from "./pages/manager/ServiceCategories";
+import ProductCategories from "./pages/manager/ProductCategories";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 
@@ -331,6 +332,14 @@ export default function App() {
         element={
           <RequireRole role="manager">
             <ServiceCategories />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/manager/product-categories"
+        element={
+          <RequireRole role="manager">
+            <ProductCategories />
           </RequireRole>
         }
       />

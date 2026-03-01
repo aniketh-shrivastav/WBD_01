@@ -17,6 +17,7 @@ export default function ManagerNav() {
       { to: "/manager/profiles", label: "User Profiles" },
       { to: "/manager/orders", label: "Orders & Bookings" },
       { to: "/manager/service-categories", label: "Service Categories" },
+      { to: "/manager/product-categories", label: "Product Categories" },
       { to: "/manager/payments", label: "Payments" },
       { to: "/manager/support", label: "Support" },
       { to: "/manager/chat", label: "Chat" },

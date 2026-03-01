@@ -4,12 +4,16 @@ import SellerFooter from "../../components/SellerFooter";
 import "../../Css/seller.css";
 
 export default function ProductManagement() {
+  // Product categories fetched from backend
+  const [productCategories, setProductCategories] = useState([]);
+
   // Local states
   const [form, setForm] = useState({
     name: "",
     price: "",
     description: "",
     category: "",
+    subcategory: "",
     brand: "",
     quantity: "",
     sku: "",
@@ -64,7 +68,7 @@ export default function ProductManagement() {
     const data = { ...form };
 
     data.name = data.name.trim().toUpperCase();
-    data.category = data.category.trim().toUpperCase();
+    data.category = data.category.trim();
 
     for (const [key, fn] of Object.entries(validators)) {
       const msg = fn(data[key] ?? "");
@@ -100,7 +104,21 @@ export default function ProductManagement() {
     }
   }
 
+  // Fetch product categories
   useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/product-categories/active", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        const j = await res.json();
+        if (j.success) setProductCategories(j.categories || []);
+      } catch (e) {
+        console.error("Failed to fetch product categories", e);
+      }
+    }
+    fetchCategories();
     loadProducts();
   }, []);
 
@@ -161,6 +179,7 @@ export default function ProductManagement() {
         price: "",
         description: "",
         category: "",
+        subcategory: "",
         brand: "",
         quantity: "",
         sku: "",
@@ -243,6 +262,7 @@ export default function ProductManagement() {
       price: String(product.price ?? ""),
       description: product.description || "",
       category: product.category || "",
+      subcategory: product.subcategory || "",
       brand: product.brand || "",
       quantity: String(product.quantity ?? ""),
       sku: product.sku || "",
@@ -343,7 +363,6 @@ export default function ProductManagement() {
                   type: "number",
                   step: "0.01",
                 },
-                { label: "Product Category", key: "category", type: "text" },
                 { label: "Product Brand", key: "brand", type: "text" },
                 { label: "Product Quantity", key: "quantity", type: "number" },
                 {
@@ -372,6 +391,60 @@ export default function ProductManagement() {
                   )}
                 </div>
               ))}
+
+              {/* Category & Subcategory dropdowns */}
+              <div className="seller-form-group">
+                <label className="seller-label" htmlFor="category">
+                  Product Category
+                </label>
+                <select
+                  className="seller-input"
+                  id="category"
+                  value={form.category}
+                  onChange={(e) => {
+                    setField("category", e.target.value);
+                    setField("subcategory", "");
+                  }}
+                >
+                  <option value="">-- Select Category --</option>
+                  {productCategories.map((cat) => (
+                    <option key={cat._id} value={cat.name}>
+                      {cat.name}
+                      {cat.requiresCompliance ? " ⚠️" : ""}
+                    </option>
+                  ))}
+                </select>
+                {errors.category && (
+                  <small className="seller-error-text">{errors.category}</small>
+                )}
+              </div>
+              {(() => {
+                const selectedCat = productCategories.find(
+                  (c) => c.name === form.category,
+                );
+                if (!selectedCat || !selectedCat.subcategories?.length)
+                  return null;
+                return (
+                  <div className="seller-form-group">
+                    <label className="seller-label" htmlFor="subcategory">
+                      Subcategory
+                    </label>
+                    <select
+                      className="seller-input"
+                      id="subcategory"
+                      value={form.subcategory}
+                      onChange={(e) => setField("subcategory", e.target.value)}
+                    >
+                      <option value="">-- Select Subcategory --</option>
+                      {selectedCat.subcategories.map((s, i) => (
+                        <option key={i} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="seller-form-group seller-mt-2">
@@ -499,6 +572,7 @@ export default function ProductManagement() {
                       <p className="seller-product-price">₹{p.price}</p>
                       <p className="seller-product-meta">
                         <strong>Category:</strong> {p.category}
+                        {p.subcategory && <> &gt; {p.subcategory}</>}
                       </p>
                       <p className="seller-product-meta">
                         <strong>Brand:</strong> {p.brand}
@@ -641,11 +715,6 @@ export default function ProductManagement() {
                       type: "number",
                       step: "0.01",
                     },
-                    {
-                      label: "Product Category",
-                      key: "category",
-                      type: "text",
-                    },
                     { label: "Product Brand", key: "brand", type: "text" },
                     {
                       label: "Product Quantity",
@@ -684,6 +753,67 @@ export default function ProductManagement() {
                       )}
                     </div>
                   ))}
+
+                  {/* Category & Subcategory dropdowns (edit) */}
+                  <div className="seller-form-group">
+                    <label className="seller-label" htmlFor="edit-category">
+                      Product Category
+                    </label>
+                    <select
+                      className="seller-input"
+                      id="edit-category"
+                      value={editForm.category || ""}
+                      onChange={(e) => {
+                        setEditField("category", e.target.value);
+                        setEditField("subcategory", "");
+                      }}
+                    >
+                      <option value="">-- Select Category --</option>
+                      {productCategories.map((cat) => (
+                        <option key={cat._id} value={cat.name}>
+                          {cat.name}
+                          {cat.requiresCompliance ? " ⚠️" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {editErrors.category && (
+                      <small className="seller-error-text">
+                        {editErrors.category}
+                      </small>
+                    )}
+                  </div>
+                  {(() => {
+                    const selectedCat = productCategories.find(
+                      (c) => c.name === editForm.category,
+                    );
+                    if (!selectedCat || !selectedCat.subcategories?.length)
+                      return null;
+                    return (
+                      <div className="seller-form-group">
+                        <label
+                          className="seller-label"
+                          htmlFor="edit-subcategory"
+                        >
+                          Subcategory
+                        </label>
+                        <select
+                          className="seller-input"
+                          id="edit-subcategory"
+                          value={editForm.subcategory || ""}
+                          onChange={(e) =>
+                            setEditField("subcategory", e.target.value)
+                          }
+                        >
+                          <option value="">-- Select Subcategory --</option>
+                          {selectedCat.subcategories.map((s, i) => (
+                            <option key={i} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div className="seller-form-group seller-mt-2">
