@@ -1,0 +1,7 @@
+[2026-03-06T04:16:29.796Z] GET /api-docs - IP: ::1
+[2026-03-06T04:16:29.805Z] GET /api-docs/ - IP: ::1
+[2026-03-06T04:16:29.831Z] GET /api-docs/swagger-ui.css - IP: ::1
+[2026-03-06T04:16:29.841Z] GET /api-docs/swagger-ui-bundle.js - IP: ::1
+[2026-03-06T04:16:29.843Z] GET /api-docs/swagger-ui-standalone-preset.js - IP: ::1
+[2026-03-06T04:16:29.844Z] GET /api-docs/swagger-ui-init.js - IP: ::1
+[2026-03-06T04:16:30.327Z] GET /api-docs/favicon-32x32.png - IP: ::1

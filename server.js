@@ -8,6 +8,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 const connectDB = require("./db");
 const User = require("./models/User");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
 
 // Import Middleware Modules (organized by type)
 const {
@@ -118,6 +120,19 @@ const productCategoryRoutes = require("./routes/productCategoryRoutes");
 const partsRoutes = require("./routes/partsRoutes");
 
 // Mount routes
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "FFSD Project API Docs",
+  }),
+);
+// Serve raw OpenAPI JSON
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 app.use("/", profileSettingsRoutes);
 app.use("/", authRoutes);
 app.use("/admin", adminRoutes);

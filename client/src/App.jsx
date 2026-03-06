@@ -33,6 +33,7 @@ import OrderDetails from "./pages/customer/OrderDetails";
 import ServiceDetails from "./pages/customer/ServiceDetails";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import MockCheckout from "./pages/customer/MockCheckout";
+import CustomerAlerts from "./pages/customer/Alerts";
 import CustomerAIAssistant from "./components/CustomerAIAssistant";
 
 import ServiceDashboard from "./pages/service/DashboardService";
@@ -118,313 +119,321 @@ export default function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contactus" element={<ContactUs />} />
 
-      {/* Admin (protected) */}
-      <Route
-        path="/admin/dashboard"
-        element={
-          <RequireRole role="admin">
-            <AdminDashboard />
-          </RequireRole>
-        }
-      />
+        {/* Admin (protected) */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <RequireRole role="admin">
+              <AdminDashboard />
+            </RequireRole>
+          }
+        />
 
-      {/* Customer (protected) */}
-      <Route
-        path="/customer/index"
-        element={
-          <RequireRole role="customer">
-            <CustomerIndex />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/booking"
-        element={
-          <RequireRole role="customer">
-            <CustomerBooking />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/history"
-        element={
-          <RequireRole role="customer">
-            <CustomerHistory />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/cart"
-        element={
-          <RequireRole role="customer">
-            <CustomerCart />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/profile"
-        element={
-          <RequireRole role="customer">
-            <CustomerProfile />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/chat"
-        element={
-          <RequireRole role="customer">
-            <CustomerChat />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/product/:id"
-        element={
-          <RequireRole role="customer">
-            <ProductDetails />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/order/:id"
-        element={
-          <RequireRole role="customer">
-            <OrderDetails />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/service/:id"
-        element={
-          <RequireRole role="customer">
-            <ServiceDetails />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/payment-success"
-        element={
-          <RequireRole role="customer">
-            <PaymentSuccess />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/mock-checkout"
-        element={
-          <RequireRole role="customer">
-            <MockCheckout />
-          </RequireRole>
-        }
-      />
+        {/* Customer (protected) */}
+        <Route
+          path="/customer/index"
+          element={
+            <RequireRole role="customer">
+              <CustomerIndex />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/booking"
+          element={
+            <RequireRole role="customer">
+              <CustomerBooking />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/history"
+          element={
+            <RequireRole role="customer">
+              <CustomerHistory />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/cart"
+          element={
+            <RequireRole role="customer">
+              <CustomerCart />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/profile"
+          element={
+            <RequireRole role="customer">
+              <CustomerProfile />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/chat"
+          element={
+            <RequireRole role="customer">
+              <CustomerChat />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/product/:id"
+          element={
+            <RequireRole role="customer">
+              <ProductDetails />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/order/:id"
+          element={
+            <RequireRole role="customer">
+              <OrderDetails />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/service/:id"
+          element={
+            <RequireRole role="customer">
+              <ServiceDetails />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/payment-success"
+          element={
+            <RequireRole role="customer">
+              <PaymentSuccess />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/mock-checkout"
+          element={
+            <RequireRole role="customer">
+              <MockCheckout />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/customer/alerts"
+          element={
+            <RequireRole role="customer">
+              <CustomerAlerts />
+            </RequireRole>
+          }
+        />
 
-      {/* Service Provider */}
-      <Route
-        path="/service/dashboard"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/dashboardService"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/profileSettings"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceProfileSettings />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/profileSettings.html"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceProfileSettings />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/bookingManagement"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceBookingManagement />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/bookingManagement.html"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceBookingManagement />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/reviews"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceReviews />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/service/reviews.html"
-        element={
-          <RequireRole role="service-provider">
-            <ServiceReviews />
-          </RequireRole>
-        }
-      />
+        {/* Service Provider */}
+        <Route
+          path="/service/dashboard"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/dashboardService"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/profileSettings"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceProfileSettings />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/profileSettings.html"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceProfileSettings />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/bookingManagement"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceBookingManagement />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/bookingManagement.html"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceBookingManagement />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/reviews"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceReviews />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/service/reviews.html"
+          element={
+            <RequireRole role="service-provider">
+              <ServiceReviews />
+            </RequireRole>
+          }
+        />
 
-      {/* Manager (protected) */}
-      <Route
-        path="/manager/dashboard"
-        element={
-          <RequireRole role="manager">
-            <ManagerDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/users"
-        element={
-          <RequireRole role="manager">
-            <ManagerUsers />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/profiles"
-        element={
-          <RequireRole role="manager">
-            <Profiles />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/profiles/:id"
-        element={
-          <RequireRole role="manager">
-            <ManagerProfileOverview />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/orders"
-        element={
-          <RequireRole role="manager">
-            <ManagerOrders />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/payments"
-        element={
-          <RequireRole role="manager">
-            <Payments />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/support"
-        element={
-          <RequireRole role="manager">
-            <Support />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/chat"
-        element={
-          <RequireRole role="manager">
-            <ManagerChat />
-          </RequireRole>
-        }
-      />
+        {/* Manager (protected) */}
+        <Route
+          path="/manager/dashboard"
+          element={
+            <RequireRole role="manager">
+              <ManagerDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/users"
+          element={
+            <RequireRole role="manager">
+              <ManagerUsers />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/profiles"
+          element={
+            <RequireRole role="manager">
+              <Profiles />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/profiles/:id"
+          element={
+            <RequireRole role="manager">
+              <ManagerProfileOverview />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/orders"
+          element={
+            <RequireRole role="manager">
+              <ManagerOrders />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/payments"
+          element={
+            <RequireRole role="manager">
+              <Payments />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/support"
+          element={
+            <RequireRole role="manager">
+              <Support />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/chat"
+          element={
+            <RequireRole role="manager">
+              <ManagerChat />
+            </RequireRole>
+          }
+        />
 
-      {/* Seller */}
-      <Route
-        path="/seller/reviews"
-        element={
-          <RequireRole role="seller">
-            <SellerReviews />
-          </RequireRole>
-        }
-      />
+        {/* Seller */}
+        <Route
+          path="/seller/reviews"
+          element={
+            <RequireRole role="seller">
+              <SellerReviews />
+            </RequireRole>
+          }
+        />
 
-      {/* Seller */}
-      <Route
-        path="/seller/dashboard"
-        element={
-          <RequireRole role="seller">
-            <SellerDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/dashboard.html"
-        element={
-          <RequireRole role="seller">
-            <SellerDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/profileSettings"
-        element={
-          <RequireRole role="seller">
-            <SellerProfileSettings />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/profileSettings.html"
-        element={
-          <RequireRole role="seller">
-            <SellerProfileSettings />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/productmanagement"
-        element={
-          <RequireRole role="seller">
-            <SellerProductManagement />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/productManagement.html"
-        element={
-          <RequireRole role="seller">
-            <SellerProductManagement />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/orders"
-        element={
-          <RequireRole role="seller">
-            <SellerOrders />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/seller/orders.html"
-        element={
-          <RequireRole role="seller">
-            <SellerOrders />
-          </RequireRole>
-        }
-      />
+        {/* Seller */}
+        <Route
+          path="/seller/dashboard"
+          element={
+            <RequireRole role="seller">
+              <SellerDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/dashboard.html"
+          element={
+            <RequireRole role="seller">
+              <SellerDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/profileSettings"
+          element={
+            <RequireRole role="seller">
+              <SellerProfileSettings />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/profileSettings.html"
+          element={
+            <RequireRole role="seller">
+              <SellerProfileSettings />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/productmanagement"
+          element={
+            <RequireRole role="seller">
+              <SellerProductManagement />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/productManagement.html"
+          element={
+            <RequireRole role="seller">
+              <SellerProductManagement />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/orders"
+          element={
+            <RequireRole role="seller">
+              <SellerOrders />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/seller/orders.html"
+          element={
+            <RequireRole role="seller">
+              <SellerOrders />
+            </RequireRole>
+          }
+        />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
