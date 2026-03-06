@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -11,13 +11,10 @@ import ManagerDashboard from "./pages/manager/Dashboard";
 import ManagerUsers from "./pages/manager/Users";
 import Profiles from "./pages/manager/Profiles";
 import ManagerProfileOverview from "./pages/manager/ProfileOverview";
-import UserAnalytics from "./pages/manager/UserAnalytics";
 import ManagerOrders from "./pages/manager/Orders";
 import Payments from "./pages/manager/Payments";
 import Support from "./pages/manager/Support";
 import ManagerChat from "./pages/manager/Chat";
-import ServiceCategories from "./pages/manager/ServiceCategories";
-import ProductCategories from "./pages/manager/ProductCategories";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 
@@ -36,7 +33,7 @@ import OrderDetails from "./pages/customer/OrderDetails";
 import ServiceDetails from "./pages/customer/ServiceDetails";
 import PaymentSuccess from "./pages/customer/PaymentSuccess";
 import MockCheckout from "./pages/customer/MockCheckout";
-import CustomerAlerts from "./pages/customer/Alerts";
+import CustomerAIAssistant from "./components/CustomerAIAssistant";
 
 import ServiceDashboard from "./pages/service/DashboardService";
 import ServiceProfileSettings from "./pages/service/ProfileSettings";
@@ -100,18 +97,26 @@ function RequireRole({ role, children }) {
 // ------------------------------------------
 
 export default function App() {
+  const location = useLocation();
+  const { loading, user } = useSession();
+  const showCustomerAssistant =
+    !loading &&
+    user?.role === "customer" &&
+    location.pathname.startsWith("/customer");
+
   return (
-    <Routes>
-      {/* Public pages */}
-      <Route path="/" element={<AllIndex />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/verify-otp" element={<VerifyOtp />} />
-      <Route path="/logout" element={<Logout />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/contactus" element={<ContactUs />} />
+    <>
+      <Routes>
+        {/* Public pages */}
+        <Route path="/" element={<AllIndex />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contactus" element={<ContactUs />} />
 
       {/* Admin (protected) */}
       <Route
@@ -119,78 +124,6 @@ export default function App() {
         element={
           <RequireRole role="admin">
             <AdminDashboard />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <RequireRole role="admin">
-            <ManagerUsers mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/profiles"
-        element={
-          <RequireRole role="admin">
-            <Profiles mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/profiles/:id"
-        element={
-          <RequireRole role="admin">
-            <ManagerProfileOverview mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/profiles/:id/analytics"
-        element={
-          <RequireRole role="admin">
-            <UserAnalytics mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/orders"
-        element={
-          <RequireRole role="admin">
-            <ManagerOrders mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/payments"
-        element={
-          <RequireRole role="admin">
-            <Payments mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/support"
-        element={
-          <RequireRole role="admin">
-            <Support mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/service-categories"
-        element={
-          <RequireRole role="admin">
-            <ServiceCategories mode="admin" />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/admin/product-categories"
-        element={
-          <RequireRole role="admin">
-            <ProductCategories mode="admin" />
           </RequireRole>
         }
       />
@@ -281,14 +214,6 @@ export default function App() {
         element={
           <RequireRole role="customer">
             <MockCheckout />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/customer/alerts"
-        element={
-          <RequireRole role="customer">
-            <CustomerAlerts />
           </RequireRole>
         }
       />
@@ -393,34 +318,10 @@ export default function App() {
         }
       />
       <Route
-        path="/manager/profiles/:id/analytics"
-        element={
-          <RequireRole role="manager">
-            <UserAnalytics />
-          </RequireRole>
-        }
-      />
-      <Route
         path="/manager/orders"
         element={
           <RequireRole role="manager">
             <ManagerOrders />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/service-categories"
-        element={
-          <RequireRole role="manager">
-            <ServiceCategories />
-          </RequireRole>
-        }
-      />
-      <Route
-        path="/manager/product-categories"
-        element={
-          <RequireRole role="manager">
-            <ProductCategories />
           </RequireRole>
         }
       />
@@ -525,8 +426,11 @@ export default function App() {
         }
       />
 
-      {/* 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {showCustomerAssistant ? <CustomerAIAssistant /> : null}
+    </>
   );
 }
