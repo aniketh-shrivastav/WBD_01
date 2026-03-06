@@ -1,0 +1,5 @@
+[2026-03-02T15:04:24.884Z] GET /service/api/profile - IP: ::1
+[2026-03-02T15:04:26.979Z] GET /service/api/bookings - IP: ::1
+[2026-03-02T15:04:27.122Z] GET /service/api/bookings - IP: ::1
+[2026-03-02T15:04:36.202Z] GET /api/product-categories/active - IP: ::1
+[2026-03-02T15:04:36.605Z] GET /api/product-categories/active - IP: ::1

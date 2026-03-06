@@ -1,0 +1,16 @@
+[2026-03-02T15:07:20.020Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:20.388Z] GET /api/product-categories - IP: ::1
+[2026-03-02T15:07:25.522Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:25.533Z] GET /manager/api/payments - IP: ::1
+[2026-03-02T15:07:25.562Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:26.070Z] GET /manager/api/payments - IP: ::1
+[2026-03-02T15:07:30.596Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:30.638Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:30.914Z] GET /manager/api/support - IP: ::1
+[2026-03-02T15:07:31.176Z] GET /manager/api/support - IP: ::1
+[2026-03-02T15:07:39.278Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:39.283Z] GET /api/session - IP: ::1
+[2026-03-02T15:07:39.319Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:39.617Z] GET /api/session - IP: ::1
+[2026-03-02T15:07:39.618Z] GET /chat/customers - IP: ::1
+[2026-03-02T15:07:39.863Z] GET /chat/customers - IP: ::1

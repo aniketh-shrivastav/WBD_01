@@ -1,0 +1,17 @@
+[2026-03-02T15:03:03.200Z] POST /seller/orders/69a5a55b27950741c0ab95bd/status - IP: ::1
+[2026-03-02T15:03:05.222Z] GET /seller/api/orders - IP: ::1
+[2026-03-02T15:03:07.201Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T15:03:12.208Z] POST /login - IP: ::1
+[2026-03-02T15:03:12.511Z] GET /api/session - IP: ::1
+[2026-03-02T15:03:12.525Z] GET /api/session - IP: ::1
+[2026-03-02T15:03:12.579Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:03:12.583Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T15:03:12.637Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:03:12.883Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T15:03:12.910Z] GET /customer/api/index - IP: ::1
+[2026-03-02T15:03:12.913Z] GET /images/cart-icon.png - IP: ::1
+[2026-03-02T15:03:13.348Z] GET /customer/api/index - IP: ::1
+[2026-03-02T15:03:14.825Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:03:14.864Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:03:15.142Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T15:03:18.625Z] GET /customer/api/history - IP: ::1

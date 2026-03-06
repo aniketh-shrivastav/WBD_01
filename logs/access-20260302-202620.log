@@ -1,0 +1,16 @@
+[2026-03-02T14:56:21.013Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T14:56:26.913Z] POST /login - IP: ::1
+[2026-03-02T14:56:27.158Z] GET /api/session - IP: ::1
+[2026-03-02T14:56:27.178Z] GET /api/session - IP: ::1
+[2026-03-02T14:56:27.330Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T14:56:27.370Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T14:56:27.655Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T14:56:27.660Z] GET /customer/api/index - IP: ::1
+[2026-03-02T14:56:27.660Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T14:56:27.661Z] GET /images/cart-icon.png - IP: ::1
+[2026-03-02T14:56:27.912Z] GET /customer/api/index - IP: ::1
+[2026-03-02T14:56:32.155Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T14:56:32.165Z] GET /customer/product/681b0d831d16003f308c41cd - IP: ::1
+[2026-03-02T14:56:32.192Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T14:56:32.470Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T14:56:32.688Z] GET /customer/product/681b0d831d16003f308c41cd - IP: ::1

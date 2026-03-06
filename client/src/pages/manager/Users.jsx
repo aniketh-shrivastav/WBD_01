@@ -1,10 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 const ROLES = ["customer", "seller", "service-provider", "manager", "admin"]; // order matters
 
-export default function ManagerUsers() {
+export default function ManagerUsers({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const readOnly = isAdmin;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [allUsers, setAllUsers] = useState([]);
@@ -96,7 +102,7 @@ export default function ManagerUsers() {
     let cancelled = false;
     async function load() {
       try {
-        const resp = await fetch("/manager/api/users", {
+        const resp = await fetch(`${apiPrefix}/api/users`, {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -220,9 +226,9 @@ export default function ManagerUsers() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -255,144 +261,154 @@ export default function ManagerUsers() {
         </div>
 
         {/* Add Manager */}
-        <div className="add-manager" style={{ margin: "10px 0 20px" }}>
-          <button
-            className="btn btn-view"
-            onClick={() => setShowAdd((s) => !s)}
-          >
-            {showAdd ? "− Hide" : "+ Add Manager"}
-          </button>
-          {showAdd && (
-            <form
-              onSubmit={onCreateManager}
-              style={{ marginTop: 12, maxWidth: 560 }}
+        {!readOnly && (
+          <div className="add-manager" style={{ margin: "10px 0 20px" }}>
+            <button
+              className="btn btn-view"
+              onClick={() => setShowAdd((s) => !s)}
             >
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <input
-                    value={mgrName}
-                    onChange={(e) => setMgrName(e.target.value)}
-                    onBlur={() => markTouched("name")}
-                    placeholder="Full name"
-                    required
-                    style={{
-                      width: "100%",
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 8,
-                    }}
-                  />
-                  {touched.name && validation.errors.name && (
-                    <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}>
-                      {validation.errors.name}
-                    </p>
-                  )}
-                </div>
-                <div style={{ flex: 1, minWidth: 220 }}>
-                  <input
-                    value={mgrEmail}
-                    onChange={(e) => setMgrEmail(e.target.value)}
-                    onBlur={() => markTouched("email")}
-                    type="email"
-                    placeholder="Email"
-                    required
-                    style={{
-                      width: "100%",
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 8,
-                    }}
-                  />
-                  {touched.email && validation.errors.email && (
-                    <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}>
-                      {validation.errors.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  flexWrap: "wrap",
-                  marginTop: 8,
-                }}
+              {showAdd ? "− Hide" : "+ Add Manager"}
+            </button>
+            {showAdd && (
+              <form
+                onSubmit={onCreateManager}
+                style={{ marginTop: 12, maxWidth: 560 }}
               >
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <input
-                    value={mgrPhone}
-                    onChange={(e) =>
-                      setMgrPhone(
-                        e.target.value.replace(/\D/g, "").slice(0, 10),
-                      )
-                    }
-                    onBlur={() => markTouched("phone")}
-                    placeholder="Phone (10 digits)"
-                    style={{
-                      width: "100%",
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 8,
-                    }}
-                  />
-                  {touched.phone && validation.errors.phone && (
-                    <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}>
-                      {validation.errors.phone}
-                    </p>
-                  )}
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <input
+                      value={mgrName}
+                      onChange={(e) => setMgrName(e.target.value)}
+                      onBlur={() => markTouched("name")}
+                      placeholder="Full name"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 8,
+                      }}
+                    />
+                    {touched.name && validation.errors.name && (
+                      <p
+                        style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}
+                      >
+                        {validation.errors.name}
+                      </p>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 220 }}>
+                    <input
+                      value={mgrEmail}
+                      onChange={(e) => setMgrEmail(e.target.value)}
+                      onBlur={() => markTouched("email")}
+                      type="email"
+                      placeholder="Email"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 8,
+                      }}
+                    />
+                    {touched.email && validation.errors.email && (
+                      <p
+                        style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}
+                      >
+                        {validation.errors.email}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div style={{ flex: 1, minWidth: 220 }}>
-                  <input
-                    value={mgrPassword}
-                    onChange={(e) => setMgrPassword(e.target.value)}
-                    onBlur={() => markTouched("password")}
-                    type="password"
-                    placeholder="Password (min 6)"
-                    minLength={6}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 8,
-                    }}
-                  />
-                  {touched.password && validation.errors.password && (
-                    <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}>
-                      {validation.errors.password}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
-                <button
-                  type="submit"
-                  className="btn btn-approve"
-                  disabled={!formValid}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    flexWrap: "wrap",
+                    marginTop: 8,
+                  }}
                 >
-                  Create Manager
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-suspend"
-                  onClick={() => setShowAdd(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-              {formValid ? null : (
-                <div style={{ marginTop: 6, color: "#e74c3c" }}>
-                  Please fill all fields correctly.
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <input
+                      value={mgrPhone}
+                      onChange={(e) =>
+                        setMgrPhone(
+                          e.target.value.replace(/\D/g, "").slice(0, 10),
+                        )
+                      }
+                      onBlur={() => markTouched("phone")}
+                      placeholder="Phone (10 digits)"
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 8,
+                      }}
+                    />
+                    {touched.phone && validation.errors.phone && (
+                      <p
+                        style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}
+                      >
+                        {validation.errors.phone}
+                      </p>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 220 }}>
+                    <input
+                      value={mgrPassword}
+                      onChange={(e) => setMgrPassword(e.target.value)}
+                      onBlur={() => markTouched("password")}
+                      type="password"
+                      placeholder="Password (min 6)"
+                      minLength={6}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 8,
+                      }}
+                    />
+                    {touched.password && validation.errors.password && (
+                      <p
+                        style={{ color: "#b91c1c", fontSize: 13, marginTop: 4 }}
+                      >
+                        {validation.errors.password}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              )}
-              {formMsg && (
-                <div className="status" style={{ marginTop: 6 }}>
-                  {formMsg}
+                <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+                  <button
+                    type="submit"
+                    className="btn btn-approve"
+                    disabled={!formValid}
+                  >
+                    Create Manager
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-suspend"
+                    onClick={() => setShowAdd(false)}
+                  >
+                    Cancel
+                  </button>
                 </div>
-              )}
-            </form>
-          )}
-        </div>
+                {formValid ? null : (
+                  <div style={{ marginTop: 6, color: "#e74c3c" }}>
+                    Please fill all fields correctly.
+                  </div>
+                )}
+                {formMsg && (
+                  <div className="status" style={{ marginTop: 6 }}>
+                    {formMsg}
+                  </div>
+                )}
+              </form>
+            )}
+          </div>
+        )}
 
         {/* Tables per role */}
         {[activeRole === "all" ? "customer" : activeRole].map((roleKey) =>
@@ -402,6 +418,7 @@ export default function ManagerUsers() {
               role={roleKey}
               users={filteredUsersByRole(roleKey)}
               onAction={onAction}
+              readOnly={readOnly}
             />
           ) : (
             <RoleSection
@@ -409,6 +426,7 @@ export default function ManagerUsers() {
               role={roleKey}
               users={filteredUsersByRole(roleKey)}
               onAction={onAction}
+              readOnly={readOnly}
             />
           ),
         )}
@@ -419,6 +437,7 @@ export default function ManagerUsers() {
               role={rk}
               users={filteredUsersByRole(rk)}
               onAction={onAction}
+              readOnly={readOnly}
             />
           ))}
       </div>
@@ -426,7 +445,7 @@ export default function ManagerUsers() {
   );
 }
 
-function RoleSection({ role, users, onAction }) {
+function RoleSection({ role, users, onAction, readOnly }) {
   return (
     <div className={`user-section ${role}-section active`} data-role={role}>
       <h3>{role.charAt(0).toUpperCase() + role.slice(1).replace("-", " ")}</h3>
@@ -438,13 +457,13 @@ function RoleSection({ role, users, onAction }) {
               <th>Name</th>
               <th>Email</th>
               <th>Status</th>
-              <th>Actions</th>
+              {!readOnly && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={5}>No users in this category.</td>
+                <td colSpan={readOnly ? 4 : 5}>No users in this category.</td>
               </tr>
             ) : (
               users.map((u) => {
@@ -480,7 +499,7 @@ function RoleSection({ role, users, onAction }) {
                     <td>{u.name || ""}</td>
                     <td>{u.email || ""}</td>
                     <td>{statusBadge}</td>
-                    <td>{actions}</td>
+                    {!readOnly && <td>{actions}</td>}
                   </tr>
                 );
               })

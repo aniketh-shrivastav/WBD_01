@@ -1,0 +1,9 @@
+[2026-03-02T15:03:24.666Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T15:03:30.685Z] POST /login - IP: ::1
+[2026-03-02T15:03:30.976Z] GET /api/session - IP: ::1
+[2026-03-02T15:03:30.994Z] GET /api/session - IP: ::1
+[2026-03-02T15:03:31.064Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T15:03:31.389Z] GET /seller/api/dashboard - IP: ::1
+[2026-03-02T15:03:31.860Z] GET /seller/api/dashboard - IP: ::1
+[2026-03-02T15:03:34.253Z] GET /seller/api/reviews - IP: ::1
+[2026-03-02T15:03:34.518Z] GET /seller/api/reviews - IP: ::1

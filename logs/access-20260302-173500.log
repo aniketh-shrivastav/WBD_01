@@ -1,0 +1,8 @@
+[2026-03-02T12:05:04.099Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:05:04.105Z] GET /api/product-categories - IP: ::1
+[2026-03-02T12:05:04.136Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:05:04.490Z] GET /api/product-categories - IP: ::1
+[2026-03-02T12:05:08.585Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:05:08.590Z] GET /api/service-categories - IP: ::1
+[2026-03-02T12:05:08.618Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:05:08.975Z] GET /api/service-categories - IP: ::1

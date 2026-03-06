@@ -1,0 +1,4 @@
+[2026-03-02T11:31:23.670Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T11:31:39.580Z] POST /login - IP: ::1
+[2026-03-02T11:31:39.952Z] GET /api/session - IP: ::1
+[2026-03-02T11:31:39.975Z] GET /api/session - IP: ::1

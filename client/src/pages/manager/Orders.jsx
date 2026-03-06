@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 const COMMISSION_RATE = 0.2; // 20% manager commission
@@ -248,12 +249,19 @@ function DetailsModal({ isOpen, onClose, title, children }) {
   );
 }
 
-export default function Orders() {
+export default function Orders({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const readOnly = isAdmin;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [orders, setOrders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [active, setActive] = useState("orders"); // 'orders' | 'services'
+  const [orderSearch, setOrderSearch] = useState("");
+  const [bookingSearch, setBookingSearch] = useState("");
 
   // Modal state
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -269,7 +277,7 @@ export default function Orders() {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch("/manager/api/orders", {
+      const res = await fetch(`${apiPrefix}/api/orders`, {
         headers: { Accept: "application/json" },
       });
       if (res.status === 401 || res.status === 403) {
@@ -723,9 +731,49 @@ export default function Orders() {
     );
   }
 
+  const filteredOrders = useMemo(() => {
+    if (!orderSearch.trim()) return orders;
+    const q = orderSearch.toLowerCase();
+    return orders.filter((o) => {
+      const user = o.userId || {};
+      const sellers = (o.items || [])
+        .map((it) => it.seller?.name || "")
+        .join(" ");
+      return (
+        (o._id || "").toLowerCase().includes(q) ||
+        (user.name || "").toLowerCase().includes(q) ||
+        (user.email || "").toLowerCase().includes(q) ||
+        sellers.toLowerCase().includes(q) ||
+        (o.orderStatus || "").toLowerCase().includes(q)
+      );
+    });
+  }, [orders, orderSearch]);
+
+  const filteredBookings = useMemo(() => {
+    if (!bookingSearch.trim()) return bookings;
+    const q = bookingSearch.toLowerCase();
+    return bookings.filter((b) => {
+      const customer = b.customerId || {};
+      const provider = b.providerId || {};
+      const services = Array.isArray(b.selectedServices)
+        ? b.selectedServices.join(" ")
+        : "";
+      return (
+        (b._id || "").toLowerCase().includes(q) ||
+        (customer.name || "").toLowerCase().includes(q) ||
+        (customer.email || "").toLowerCase().includes(q) ||
+        (provider.workshopName || provider.name || "")
+          .toLowerCase()
+          .includes(q) ||
+        services.toLowerCase().includes(q) ||
+        (b.status || "").toLowerCase().includes(q)
+      );
+    });
+  }, [bookings, bookingSearch]);
+
   const orderRows = useMemo(() => {
     const rows = [];
-    orders.forEach((o) => {
+    filteredOrders.forEach((o) => {
       const user = o.userId || {};
       const earnings = calculateOrderEarnings(o);
       const itemCount = (o.items || []).length;
@@ -795,24 +843,24 @@ export default function Orders() {
                 <button className="btn btn-suspend" disabled>
                   Cancelled
                 </button>
-              ) : (
+              ) : !readOnly ? (
                 <button
                   className="btn btn-suspend"
                   onClick={() => performAction("order", "cancel", o._id)}
                 >
                   Cancel
                 </button>
-              )}
+              ) : null}
             </div>
           </td>
         </tr>,
       );
     });
     return rows;
-  }, [orders]);
+  }, [filteredOrders, readOnly]);
 
   const bookingRows = useMemo(() => {
-    return (bookings || []).map((b) => {
+    return (filteredBookings || []).map((b) => {
       const customer = b.customerId || {};
       const provider = b.providerId || {};
       const earnings = calculateBookingEarnings(b);
@@ -871,35 +919,39 @@ export default function Orders() {
               >
                 View Details
               </button>
-              {b.status === "Rejected" ? (
-                <button
-                  className="btn btn-restore"
-                  onClick={() => performAction("booking", "restore", b._id)}
-                >
-                  Restore
-                </button>
-              ) : (
-                <button
-                  className="btn btn-suspend"
-                  onClick={() => performAction("booking", "cancel", b._id)}
-                >
-                  Cancel
-                </button>
+              {!readOnly && (
+                <>
+                  {b.status === "Rejected" ? (
+                    <button
+                      className="btn btn-restore"
+                      onClick={() => performAction("booking", "restore", b._id)}
+                    >
+                      Restore
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-suspend"
+                      onClick={() => performAction("booking", "cancel", b._id)}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </td>
         </tr>
       );
     });
-  }, [bookings]);
+  }, [filteredBookings, readOnly]);
 
   return (
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -936,61 +988,113 @@ export default function Orders() {
         {!loading && !error && (
           <>
             {active === "orders" ? (
-              <div className="table-responsive">
-                <table className="order-table">
-                  <thead>
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Seller</th>
-                      <th>Customer</th>
-                      <th>Items</th>
-                      <th>Status</th>
-                      <th>Placed At</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>{orderRows}</tbody>
-                </table>
-                {orders.length === 0 && (
-                  <div
+              <>
+                <div
+                  className="search-bar-wrapper"
+                  style={{ margin: "12px 0" }}
+                >
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search orders by ID, seller, customer, status..."
+                    value={orderSearch}
+                    onChange={(e) => setOrderSearch(e.target.value)}
                     style={{
-                      textAlign: "center",
-                      padding: "2rem",
-                      color: "#6b7280",
+                      width: "100%",
+                      maxWidth: 460,
+                      padding: "10px 14px",
+                      borderRadius: 8,
+                      border: "1px solid #d1d5db",
+                      fontSize: "0.9rem",
+                      outline: "none",
+                      transition: "border-color 0.2s",
                     }}
-                  >
-                    No orders found.
-                  </div>
-                )}
-              </div>
+                  />
+                </div>
+                <div className="table-responsive">
+                  <table className="order-table">
+                    <thead>
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Seller</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Status</th>
+                        <th>Placed At</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>{orderRows}</tbody>
+                  </table>
+                  {filteredOrders.length === 0 && (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "2rem",
+                        color: "#6b7280",
+                      }}
+                    >
+                      {orderSearch
+                        ? `No orders match "${orderSearch}".`
+                        : "No orders found."}
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
-              <div className="table-responsive">
-                <table className="order-table">
-                  <thead>
-                    <tr>
-                      <th>Service ID</th>
-                      <th>Service Type</th>
-                      <th>Customer</th>
-                      <th>Provider</th>
-                      <th>Status</th>
-                      <th>Created At</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>{bookingRows}</tbody>
-                </table>
-                {bookings.length === 0 && (
-                  <div
+              <>
+                <div
+                  className="search-bar-wrapper"
+                  style={{ margin: "12px 0" }}
+                >
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search bookings by ID, customer, provider, service, status..."
+                    value={bookingSearch}
+                    onChange={(e) => setBookingSearch(e.target.value)}
                     style={{
-                      textAlign: "center",
-                      padding: "2rem",
-                      color: "#6b7280",
+                      width: "100%",
+                      maxWidth: 460,
+                      padding: "10px 14px",
+                      borderRadius: 8,
+                      border: "1px solid #d1d5db",
+                      fontSize: "0.9rem",
+                      outline: "none",
+                      transition: "border-color 0.2s",
                     }}
-                  >
-                    No service bookings found.
-                  </div>
-                )}
-              </div>
+                  />
+                </div>
+                <div className="table-responsive">
+                  <table className="order-table">
+                    <thead>
+                      <tr>
+                        <th>Service ID</th>
+                        <th>Service Type</th>
+                        <th>Customer</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>{bookingRows}</tbody>
+                  </table>
+                  {filteredBookings.length === 0 && (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "2rem",
+                        color: "#6b7280",
+                      }}
+                    >
+                      {bookingSearch
+                        ? `No bookings match "${bookingSearch}".`
+                        : "No service bookings found."}
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </>
         )}

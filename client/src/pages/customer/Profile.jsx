@@ -716,9 +716,7 @@ export default function CustomerProfile() {
                       </div>
                     )}
                   </div>
-                  \n{" "}
                 </div>
-                \n{" "}
               </div>
 
               {/* Vehicle Technical Details */}

@@ -400,11 +400,9 @@
   height: auto;
   max-height: 400px;
   object-fit: cover;
-  border-radius: var(--pp-radius);
-  box-shadow: var(--pp-shadow);
-  border: 3px solid;
-  border-image: var(--pp-gradient-2) 1;
   border-radius: 16px;
+  box-shadow: var(--pp-shadow);
+  border: 3px solid var(--pp-primary);
   background: var(--pp-bg-secondary);
 }
 
@@ -416,7 +414,7 @@
   right: -10px;
   bottom: -10px;
   border: 2px solid var(--pp-primary);
-  border-radius: var(--pp-radius);
+  border-radius: 16px;
   opacity: 0.4;
   z-index: -1;
   pointer-events: none;

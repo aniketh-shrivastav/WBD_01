@@ -1,0 +1,9 @@
+[2026-03-02T11:45:27.978Z] GET /api/session - IP: ::1
+[2026-03-02T11:45:27.988Z] GET /api/session - IP: ::1
+[2026-03-02T11:45:28.014Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T11:45:28.022Z] GET /images/cart-icon.png - IP: ::1
+[2026-03-02T11:45:28.037Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:45:28.084Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:45:28.350Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T11:45:28.352Z] GET /customer/api/booking - IP: ::1
+[2026-03-02T11:45:28.613Z] GET /customer/api/booking - IP: ::1

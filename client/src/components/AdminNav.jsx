@@ -9,8 +9,17 @@ import ThemeToggle from "./../components/ThemeToggle";
 export default function AdminNav() {
   const [open, setOpen] = useState(false);
   const links = useMemo(
-    () => [{ to: "/admin/dashboard", label: "Admin Dashboard" }],
-    []
+    () => [
+      { to: "/admin/dashboard", label: "Dashboard" },
+      { to: "/admin/users", label: "Users" },
+      { to: "/admin/profiles", label: "Profiles" },
+      { to: "/admin/orders", label: "Orders" },
+      { to: "/admin/service-categories", label: "Service Categories" },
+      { to: "/admin/product-categories", label: "Product Categories" },
+      { to: "/admin/payments", label: "Payments" },
+      { to: "/admin/support", label: "Support" },
+    ],
+    [],
   );
 
   function backendBase() {

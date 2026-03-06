@@ -1,0 +1,13 @@
+[2026-03-02T11:53:04.389Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:53:06.590Z] GET /api/session - IP: ::1
+[2026-03-02T11:53:06.632Z] GET /api/session - IP: ::1
+[2026-03-02T11:53:12.544Z] POST /login - IP: ::1
+[2026-03-02T11:53:12.912Z] GET /api/session - IP: ::1
+[2026-03-02T11:53:13.242Z] GET /api/session - IP: ::1
+[2026-03-02T11:53:13.299Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:53:13.341Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:53:13.607Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T11:53:13.608Z] GET /customer/api/index - IP: ::1
+[2026-03-02T11:53:13.629Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T11:53:13.630Z] GET /images/cart-icon.png - IP: ::1
+[2026-03-02T11:53:13.866Z] GET /customer/api/index - IP: ::1

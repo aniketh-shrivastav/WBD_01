@@ -1165,7 +1165,8 @@ export default function CustomerBooking() {
                       </h3>
                       {profileVehicleData &&
                         (profileVehicleData.registrationNumber ||
-                          profileVehicleData.vehicleMake) && (
+                          profileVehicleData.vehicleMake ||
+                          profileVehicleData.address) && (
                           <button
                             type="button"
                             onClick={() => {
@@ -1188,6 +1189,7 @@ export default function CustomerBooking() {
                                     ? String(p.insuranceValidTill).split("T")[0]
                                     : "",
                                 );
+                                setAddress(p.address || "");
                               } else {
                                 setRegistrationNumber("");
                                 setVehicleMake("");
@@ -1200,6 +1202,7 @@ export default function CustomerBooking() {
                                 setCurrentMileage("");
                                 setInsuranceProvider("");
                                 setInsuranceValidTill("");
+                                setAddress("");
                               }
                               setUseProfileVehicle(!useProfileVehicle);
                             }}

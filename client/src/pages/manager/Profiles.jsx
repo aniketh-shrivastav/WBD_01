@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 const ROLE_TABS = [
@@ -284,7 +285,12 @@ function Card({ type, data, onView }) {
   return null;
 }
 
-export default function Profiles() {
+export default function Profiles({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const basePath = isAdmin ? "/admin" : "/manager";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -305,7 +311,7 @@ export default function Profiles() {
     let cancelled = false;
     async function load() {
       try {
-        const resp = await fetch("/manager/api/services", {
+        const resp = await fetch(`${apiPrefix}/api/services`, {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -374,7 +380,7 @@ export default function Profiles() {
   }, [active, term, data]);
 
   function viewProfile(id) {
-    navigate(`/manager/profiles/${id}`);
+    navigate(`${basePath}/profiles/${id}`);
   }
 
   if (loading)
@@ -394,9 +400,9 @@ export default function Profiles() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">

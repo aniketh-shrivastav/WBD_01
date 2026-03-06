@@ -122,6 +122,78 @@ export default function App() {
           </RequireRole>
         }
       />
+      <Route
+        path="/admin/users"
+        element={
+          <RequireRole role="admin">
+            <ManagerUsers mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/profiles"
+        element={
+          <RequireRole role="admin">
+            <Profiles mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/profiles/:id"
+        element={
+          <RequireRole role="admin">
+            <ManagerProfileOverview mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/profiles/:id/analytics"
+        element={
+          <RequireRole role="admin">
+            <UserAnalytics mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <RequireRole role="admin">
+            <ManagerOrders mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/payments"
+        element={
+          <RequireRole role="admin">
+            <Payments mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/support"
+        element={
+          <RequireRole role="admin">
+            <Support mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/service-categories"
+        element={
+          <RequireRole role="admin">
+            <ServiceCategories mode="admin" />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/admin/product-categories"
+        element={
+          <RequireRole role="admin">
+            <ProductCategories mode="admin" />
+          </RequireRole>
+        }
+      />
 
       {/* Customer (protected) */}
       <Route

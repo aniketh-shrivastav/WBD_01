@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
 import AdminNav from "../../components/AdminNav";
@@ -13,6 +13,114 @@ function formatCurrency(value) {
   return `₹${Number(value || 0).toLocaleString("en-IN")}`;
 }
 
+/* ── Read-only product table (no action buttons) ── */
+function ReadOnlyProductTable({
+  title,
+  products = [],
+  searchTerm = "",
+  onSearchChange,
+}) {
+  const filtered = React.useMemo(() => {
+    if (!searchTerm.trim()) return products;
+    const q = searchTerm.toLowerCase();
+    return products.filter(
+      (p) =>
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.seller?.name || "").toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q) ||
+        (p.brand || "").toLowerCase().includes(q),
+    );
+  }, [products, searchTerm]);
+
+  if (!products.length)
+    return <p style={{ padding: 12 }}>No {title.toLowerCase()} products.</p>;
+
+  return (
+    <>
+      {onSearchChange && (
+        <div className="search-bar-wrapper" style={{ margin: "12px 0" }}>
+          <input
+            type="text"
+            className="search-input"
+            placeholder={`Search ${title.toLowerCase()} products by name, seller, category, brand...`}
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{
+              width: "100%",
+              maxWidth: 460,
+              padding: "10px 14px",
+              borderRadius: 8,
+              border: "1px solid #d1d5db",
+              fontSize: "0.9rem",
+              outline: "none",
+              transition: "border-color 0.2s",
+            }}
+          />
+        </div>
+      )}
+      {filtered.length === 0 ? (
+        <p style={{ padding: 12, color: "#6b7280" }}>
+          No products match "{searchTerm}".
+        </p>
+      ) : (
+        <div
+          className="table-container"
+          style={{ overflowX: "auto", marginTop: 12 }}
+        >
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Seller</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Description</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p) => (
+                <tr key={p._id}>
+                  <td>
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        objectFit: "cover",
+                        borderRadius: 4,
+                      }}
+                    />
+                  </td>
+                  <td>{p.name}</td>
+                  <td>{p.seller?.name || "N/A"}</td>
+                  <td>{formatCurrency(p.price)}</td>
+                  <td>{p.category}</td>
+                  <td>{p.brand}</td>
+                  <td
+                    style={{
+                      maxWidth: 200,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {p.description}
+                  </td>
+                  <td>{p.quantity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function AdminDashboard() {
   const dispatch = useDispatch();
   const {
@@ -22,17 +130,40 @@ export default function AdminDashboard() {
     lastFetched,
   } = useSelector((state) => state.admin);
 
+  // Manager dashboard data (fetched separately)
+  const [mgrData, setMgrData] = useState(null);
+  const [mgrLoading, setMgrLoading] = useState(true);
+  const [mgrError, setMgrError] = useState("");
+  const [activeProductTab, setActiveProductTab] = useState("pending");
+  const [adminProductSearch, setAdminProductSearch] = useState("");
+
   const userDistRef = useRef(null);
   const salesRef = useRef(null);
   const profitLossRef = useRef(null);
   const growthRef = useRef(null);
   const ratingsRef = useRef(null);
+  const mgrRevenueRef = useRef(null);
+
+  // Category analytics chart refs (from manager data)
+  const adminProdCatPieRef = useRef(null);
+  const adminProdCatBarRef = useRef(null);
+  const adminProdCatLineRef = useRef(null);
+  const adminSvcCatPieRef = useRef(null);
+  const adminSvcCatBarRef = useRef(null);
+  const adminSvcCatLineRef = useRef(null);
 
   const userDistChart = useRef();
   const salesChart = useRef();
   const profitLossChart = useRef();
   const growthChart = useRef();
   const ratingsChart = useRef();
+  const mgrRevenueChart = useRef();
+  const adminProdCatPieChart = useRef();
+  const adminProdCatBarChart = useRef();
+  const adminProdCatLineChart = useRef();
+  const adminSvcCatPieChart = useRef();
+  const adminSvcCatBarChart = useRef();
+  const adminSvcCatLineChart = useRef();
 
   const chartData = useMemo(() => {
     const charts = data?.charts || {};
@@ -85,12 +216,39 @@ export default function AdminDashboard() {
     if (shouldFetch) {
       dispatch(fetchAdminDashboard());
     }
+
+    // Also fetch manager dashboard data
+    async function loadMgrData() {
+      try {
+        setMgrLoading(true);
+        const res = await fetch("/admin/api/manager-dashboard", {
+          headers: { Accept: "application/json" },
+        });
+        if (res.status === 401 || res.status === 403) return;
+        if (!res.ok) throw new Error("Failed to load manager data");
+        const j = await res.json();
+        setMgrData(j);
+      } catch (e) {
+        setMgrError(e.message || "Failed to load manager data");
+      } finally {
+        setMgrLoading(false);
+      }
+    }
+    loadMgrData();
+
     return () => {
       userDistChart.current?.destroy?.();
       salesChart.current?.destroy?.();
       profitLossChart.current?.destroy?.();
       growthChart.current?.destroy?.();
       ratingsChart.current?.destroy?.();
+      mgrRevenueChart.current?.destroy?.();
+      adminProdCatPieChart.current?.destroy?.();
+      adminProdCatBarChart.current?.destroy?.();
+      adminProdCatLineChart.current?.destroy?.();
+      adminSvcCatPieChart.current?.destroy?.();
+      adminSvcCatBarChart.current?.destroy?.();
+      adminSvcCatLineChart.current?.destroy?.();
     };
   }, [dispatch, status, lastFetched]);
 
@@ -237,6 +395,193 @@ export default function AdminDashboard() {
       });
     }
   }, [data, chartData]);
+
+  // Manager revenue & commission chart
+  useEffect(() => {
+    if (!mgrData) return;
+    mgrRevenueChart.current?.destroy?.();
+
+    const mgrChartData = mgrData.charts?.monthlyRevenue || {
+      labels: DEFAULT_LABELS,
+      totalRevenue: Array(DEFAULT_LABELS.length).fill(0),
+      commission: Array(DEFAULT_LABELS.length).fill(0),
+    };
+
+    if (mgrRevenueRef.current) {
+      mgrRevenueChart.current = new Chart(mgrRevenueRef.current, {
+        type: "bar",
+        data: {
+          labels: mgrChartData.labels,
+          datasets: [
+            {
+              label: "Total Revenue",
+              data: mgrChartData.totalRevenue,
+              backgroundColor: "#4299e1",
+              borderRadius: 5,
+            },
+            {
+              label: "Commission (20%)",
+              data: mgrChartData.commission,
+              backgroundColor: "#48bb78",
+              borderRadius: 5,
+            },
+          ],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+      });
+    }
+  }, [mgrData]);
+
+  // Category analytics charts (from manager data)
+  useEffect(() => {
+    if (!mgrData?.charts) return;
+
+    const CAT_COLORS = [
+      "#4299e1",
+      "#48bb78",
+      "#ed8936",
+      "#9f7aea",
+      "#f56565",
+      "#38b2ac",
+      "#d69e2e",
+      "#e53e3e",
+      "#667eea",
+      "#fc8181",
+    ];
+
+    adminProdCatPieChart.current?.destroy?.();
+    adminProdCatBarChart.current?.destroy?.();
+    adminProdCatLineChart.current?.destroy?.();
+    adminSvcCatPieChart.current?.destroy?.();
+    adminSvcCatBarChart.current?.destroy?.();
+    adminSvcCatLineChart.current?.destroy?.();
+
+    const pcd = mgrData.charts.productCategoryDistribution;
+    const pcr = mgrData.charts.productCategoryRevenue;
+    const pcm = mgrData.charts.productCategoryMonthly;
+    const scd = mgrData.charts.serviceCategoryDistribution;
+    const scr = mgrData.charts.serviceCategoryRevenue;
+    const scm = mgrData.charts.serviceCategoryMonthly;
+
+    if (adminProdCatPieRef.current && pcd?.labels?.length) {
+      adminProdCatPieChart.current = new Chart(adminProdCatPieRef.current, {
+        type: "pie",
+        data: {
+          labels: pcd.labels,
+          datasets: [
+            {
+              data: pcd.data,
+              backgroundColor: pcd.labels.map(
+                (_, i) => CAT_COLORS[i % CAT_COLORS.length],
+              ),
+            },
+          ],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+      });
+    }
+    if (adminProdCatBarRef.current && pcr?.labels?.length) {
+      adminProdCatBarChart.current = new Chart(adminProdCatBarRef.current, {
+        type: "bar",
+        data: {
+          labels: pcr.labels,
+          datasets: [
+            {
+              label: "Revenue (\u20b9)",
+              data: pcr.revenue,
+              backgroundColor: "#4299e1",
+              borderRadius: 5,
+            },
+            {
+              label: "Units Sold",
+              data: pcr.orders,
+              backgroundColor: "#48bb78",
+              borderRadius: 5,
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          scales: { x: { ticks: { maxRotation: 45 } } },
+        },
+      });
+    }
+    if (adminProdCatLineRef.current && pcm?.datasets?.length) {
+      adminProdCatLineChart.current = new Chart(adminProdCatLineRef.current, {
+        type: "line",
+        data: {
+          labels: pcm.labels,
+          datasets: pcm.datasets.map((ds, i) => ({
+            label: ds.label,
+            data: ds.data,
+            borderColor: CAT_COLORS[i % CAT_COLORS.length],
+            tension: 0.3,
+            fill: false,
+          })),
+        },
+        options: { plugins: { legend: { position: "top" } } },
+      });
+    }
+    if (adminSvcCatPieRef.current && scd?.labels?.length) {
+      adminSvcCatPieChart.current = new Chart(adminSvcCatPieRef.current, {
+        type: "pie",
+        data: {
+          labels: scd.labels,
+          datasets: [
+            {
+              data: scd.data,
+              backgroundColor: scd.labels.map(
+                (_, i) => CAT_COLORS[i % CAT_COLORS.length],
+              ),
+            },
+          ],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+      });
+    }
+    if (adminSvcCatBarRef.current && scr?.labels?.length) {
+      adminSvcCatBarChart.current = new Chart(adminSvcCatBarRef.current, {
+        type: "bar",
+        data: {
+          labels: scr.labels,
+          datasets: [
+            {
+              label: "Revenue (\u20b9)",
+              data: scr.revenue,
+              backgroundColor: "#9f7aea",
+              borderRadius: 5,
+            },
+            {
+              label: "Bookings",
+              data: scr.bookings,
+              backgroundColor: "#38b2ac",
+              borderRadius: 5,
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          scales: { x: { ticks: { maxRotation: 45 } } },
+        },
+      });
+    }
+    if (adminSvcCatLineRef.current && scm?.datasets?.length) {
+      adminSvcCatLineChart.current = new Chart(adminSvcCatLineRef.current, {
+        type: "line",
+        data: {
+          labels: scm.labels,
+          datasets: scm.datasets.map((ds, i) => ({
+            label: ds.label,
+            data: ds.data,
+            borderColor: CAT_COLORS[i % CAT_COLORS.length],
+            tension: 0.3,
+            fill: false,
+          })),
+        },
+        options: { plugins: { legend: { position: "top" } } },
+      });
+    }
+  }, [mgrData]);
 
   const totals = data?.totals || {};
   const reviews = data?.reviews || {};
@@ -624,6 +969,151 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+
+        {/* ── Manager Dashboard Data ── */}
+        <hr
+          style={{
+            margin: "32px 0",
+            border: "none",
+            borderTop: "2px solid #e5e7eb",
+          }}
+        />
+        <h1>Manager Dashboard Overview</h1>
+
+        {mgrLoading && <p>Loading manager data...</p>}
+        {mgrError && <p style={{ color: "#e74c3c" }}>{mgrError}</p>}
+
+        {mgrData && (
+          <>
+            {/* Manager Stats */}
+            <div className="stats-grid" style={{ marginBottom: 24 }}>
+              <div className="stat-card">
+                <h3>Total Earnings</h3>
+                <p className="number">
+                  {formatCurrency(mgrData.totalEarnings)}
+                </p>
+              </div>
+              <div className="stat-card">
+                <h3>Commission (20%)</h3>
+                <p className="number">{formatCurrency(mgrData.commission)}</p>
+              </div>
+            </div>
+
+            {/* Revenue & Commission Chart */}
+            <div className="charts-container" style={{ marginBottom: 24 }}>
+              <div className="chart-wrapper">
+                <h2>Monthly Revenue &amp; Commission</h2>
+                <div className="chart-box">
+                  <canvas ref={mgrRevenueRef} />
+                </div>
+              </div>
+            </div>
+
+            {/* Product Category Analytics */}
+            <div className="charts-container" style={{ marginBottom: 24 }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <h2 style={{ marginBottom: 16 }}>
+                  📦 Product Category Analytics
+                </h2>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Products by Category</h2>
+                <div className="chart-box">
+                  <canvas ref={adminProdCatPieRef} />
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Revenue &amp; Units by Category</h2>
+                <div className="chart-box">
+                  <canvas ref={adminProdCatBarRef} />
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Monthly Product Orders by Category</h2>
+                <div className="chart-box">
+                  <canvas ref={adminProdCatLineRef} />
+                </div>
+              </div>
+            </div>
+
+            {/* Service Category Analytics */}
+            <div className="charts-container" style={{ marginBottom: 24 }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <h2 style={{ marginBottom: 16 }}>
+                  🔧 Service Category Analytics
+                </h2>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Bookings by Service</h2>
+                <div className="chart-box">
+                  <canvas ref={adminSvcCatPieRef} />
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Revenue &amp; Bookings by Service</h2>
+                <div className="chart-box">
+                  <canvas ref={adminSvcCatBarRef} />
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <h2>Monthly Bookings by Service</h2>
+                <div className="chart-box">
+                  <canvas ref={adminSvcCatLineRef} />
+                </div>
+              </div>
+            </div>
+
+            {/* Product Approval (Read-Only) */}
+            <div className="product-tabs">
+              <h2>Product Approval Overview</h2>
+              <div className="tabs">
+                <button
+                  className={`tab-btn ${activeProductTab === "pending" ? "active" : ""}`}
+                  onClick={() => setActiveProductTab("pending")}
+                >
+                  Pending
+                </button>
+                <button
+                  className={`tab-btn ${activeProductTab === "approved" ? "active" : ""}`}
+                  onClick={() => setActiveProductTab("approved")}
+                >
+                  Approved
+                </button>
+                <button
+                  className={`tab-btn ${activeProductTab === "rejected" ? "active" : ""}`}
+                  onClick={() => setActiveProductTab("rejected")}
+                >
+                  Rejected
+                </button>
+              </div>
+
+              {activeProductTab === "pending" && (
+                <ReadOnlyProductTable
+                  title="Pending"
+                  products={mgrData.pendingProducts}
+                  searchTerm={adminProductSearch}
+                  onSearchChange={setAdminProductSearch}
+                />
+              )}
+              {activeProductTab === "approved" && (
+                <ReadOnlyProductTable
+                  title="Approved"
+                  products={mgrData.approvedProducts}
+                  searchTerm={adminProductSearch}
+                  onSearchChange={setAdminProductSearch}
+                />
+              )}
+              {activeProductTab === "rejected" && (
+                <ReadOnlyProductTable
+                  title="Rejected"
+                  products={mgrData.rejectedProducts}
+                  searchTerm={adminProductSearch}
+                  onSearchChange={setAdminProductSearch}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
     </>
   );

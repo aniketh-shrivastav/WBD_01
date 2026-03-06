@@ -1,0 +1,13 @@
+[2026-03-02T11:33:44.020Z] POST /login - IP: ::1
+[2026-03-02T11:33:44.327Z] GET /api/session - IP: ::1
+[2026-03-02T11:33:44.341Z] GET /api/session - IP: ::1
+[2026-03-02T11:33:44.421Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:33:44.496Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:33:44.670Z] GET /manager/api/dashboard - IP: ::1
+[2026-03-02T11:33:44.748Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T11:33:44.935Z] GET /manager/api/dashboard - IP: ::1
+[2026-03-02T11:33:45.089Z] GET /manager/api/dashboard - IP: ::1
+[2026-03-02T11:33:57.502Z] GET /manager/api/users - IP: ::1
+[2026-03-02T11:33:57.855Z] GET /manager/api/users - IP: ::1
+[2026-03-02T11:33:57.970Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:33:58.008Z] GET /chat/unread-count - IP: ::1

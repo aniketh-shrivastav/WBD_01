@@ -1,0 +1,72 @@
+[2026-03-02T11:30:28.124Z] [GET] /main.0efa6a7242590443b3e8.hot-update.json - Status: 404 - Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+Error: Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+    at notFound (F:\WBD-01\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\WBD-01\node_modules\express\lib\router\index.js:328:13)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:346:12)
+    at next (F:\WBD-01\node_modules\express\lib\router\index.js:280:10)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:141:14)
+    at F:\WBD-01\server.js:154:12
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (F:\WBD-01\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:284:15
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:365:14)
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:421:3)
+[2026-03-02T11:30:28.204Z] [GET] /main.0efa6a7242590443b3e8.hot-update.json - Status: 404 - Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+Error: Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+    at notFound (F:\WBD-01\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\WBD-01\node_modules\express\lib\router\index.js:328:13)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:346:12)
+    at next (F:\WBD-01\node_modules\express\lib\router\index.js:280:10)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:141:14)
+    at F:\WBD-01\server.js:154:12
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (F:\WBD-01\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:284:15
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:365:14)
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:421:3)
+[2026-03-02T11:30:28.262Z] [GET] /main.0efa6a7242590443b3e8.hot-update.json - Status: 404 - Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+Error: Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+    at notFound (F:\WBD-01\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\WBD-01\node_modules\express\lib\router\index.js:328:13)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:346:12)
+    at next (F:\WBD-01\node_modules\express\lib\router\index.js:280:10)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:141:14)
+    at F:\WBD-01\server.js:154:12
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (F:\WBD-01\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:284:15
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:365:14)
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:421:3)
+[2026-03-02T11:30:29.955Z] [GET] /main.0efa6a7242590443b3e8.hot-update.json - Status: 404 - Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+Error: Not Found - /main.0efa6a7242590443b3e8.hot-update.json
+    at notFound (F:\WBD-01\middleware\errorMiddleware.js:31:15)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\WBD-01\node_modules\express\lib\router\index.js:328:13)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:346:12)
+    at next (F:\WBD-01\node_modules\express\lib\router\index.js:280:10)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:141:14)
+    at F:\WBD-01\server.js:154:12
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at next (F:\WBD-01\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (F:\WBD-01\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (F:\WBD-01\node_modules\express\lib\router\layer.js:95:5)
+    at F:\WBD-01\node_modules\express\lib\router\index.js:284:15
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:365:14)
+    at param (F:\WBD-01\node_modules\express\lib\router\index.js:376:14)
+    at Function.process_params (F:\WBD-01\node_modules\express\lib\router\index.js:421:3)

@@ -1,0 +1,9 @@
+[2026-03-01T13:39:46.383Z] POST /login - IP: ::1
+[2026-03-01T13:39:46.640Z] GET /api/session - IP: ::1
+[2026-03-01T13:39:46.651Z] GET /api/session - IP: ::1
+[2026-03-01T13:39:46.987Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-01T13:39:47.018Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-01T13:39:47.497Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-01T13:39:48.088Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-01T13:39:49.443Z] GET /admin/api/users - IP: ::1
+[2026-03-01T13:39:49.709Z] GET /admin/api/users - IP: ::1

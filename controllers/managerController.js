@@ -4,6 +4,8 @@ const CustomerProfile = require("../models/CustomerProfile");
 const SellerProfile = require("../models/sellerProfile");
 const Order = require("../models/Orders");
 const Product = require("../models/Product");
+const ProductCategory = require("../models/ProductCategory");
+const ServiceCategory = require("../models/ServiceCategory");
 const ContactMessage = require("../models/ContactMessage");
 const bcrypt = require("bcryptjs");
 const PDFDocument = require("pdfkit");
@@ -51,6 +53,13 @@ async function collectDashboardStats() {
     repeatOrdersCountAgg,
     mostOrderedProductAgg,
     topServicesAgg,
+    // ── Category analytics ──
+    productsByCategoryAgg,
+    orderRevenueByCategoryAgg,
+    productsByCategoryMonthlyAgg,
+    bookingsByServiceCategoryAgg,
+    serviceRevenueByCategoryAgg,
+    serviceBookingsByCategoryMonthlyAgg,
   ] = await Promise.all([
     User.countDocuments({ suspended: { $ne: true } }),
     User.aggregate([
@@ -214,6 +223,96 @@ async function collectDashboardStats() {
       { $sort: { count: -1 } },
       { $limit: 5 },
     ]),
+    // ── Category analytics queries ──
+    // 1. Products per product category (pie chart)
+    Product.aggregate([
+      { $match: { status: "approved" } },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]),
+    // 2. Order revenue by product category (bar chart)
+    Order.aggregate([
+      { $unwind: "$items" },
+      { $match: { "items.itemStatus": { $ne: "cancelled" } } },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.productId",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: { $ifNull: ["$product.category", "Unknown"] },
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+          orders: { $sum: "$items.quantity" },
+        },
+      },
+      { $sort: { revenue: -1 } },
+    ]),
+    // 3. Monthly product orders by top categories (line chart)
+    Order.aggregate([
+      { $match: { placedAt: { $gte: startDate } } },
+      { $unwind: "$items" },
+      { $match: { "items.itemStatus": { $ne: "cancelled" } } },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.productId",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: {
+            category: { $ifNull: ["$product.category", "Unknown"] },
+            year: { $year: "$placedAt" },
+            month: { $month: "$placedAt" },
+          },
+          count: { $sum: "$items.quantity" },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]),
+    // 4. Bookings per service category (pie chart)
+    ServiceBooking.aggregate([
+      { $unwind: "$selectedServices" },
+      { $group: { _id: "$selectedServices", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]),
+    // 5. Revenue by service category (bar chart)
+    ServiceBooking.aggregate([
+      { $match: { status: { $in: ["Ready", "Completed"] } } },
+      { $unwind: "$selectedServices" },
+      {
+        $group: {
+          _id: "$selectedServices",
+          revenue: { $sum: "$totalCost" },
+          bookings: { $sum: 1 },
+        },
+      },
+      { $sort: { revenue: -1 } },
+    ]),
+    // 6. Monthly service bookings by top categories (line chart)
+    ServiceBooking.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $unwind: "$selectedServices" },
+      {
+        $group: {
+          _id: {
+            service: "$selectedServices",
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]),
   ]);
 
   const userDistribution = userCountsAgg.reduce(
@@ -289,6 +388,74 @@ async function collectDashboardStats() {
     userGrowth.sellers.push(runningTotals["seller"] || 0);
   });
 
+  // ── Build category analytics chart data ──
+
+  // Product categories - pie (products per category)
+  const productCategoryDistribution = {
+    labels: (productsByCategoryAgg || []).map((c) => c._id || "Unknown"),
+    data: (productsByCategoryAgg || []).map((c) => c.count),
+  };
+
+  // Product categories - bar (revenue by category)
+  const productCategoryRevenue = {
+    labels: (orderRevenueByCategoryAgg || []).map((c) => c._id || "Unknown"),
+    revenue: (orderRevenueByCategoryAgg || []).map((c) => c.revenue),
+    orders: (orderRevenueByCategoryAgg || []).map((c) => c.orders),
+  };
+
+  // Product categories - line (monthly orders for top 5 categories)
+  const topProductCats = (orderRevenueByCategoryAgg || [])
+    .slice(0, 5)
+    .map((c) => c._id || "Unknown");
+  const productCategoryMonthly = {
+    labels: monthBuckets.map((b) => b.label),
+    datasets: topProductCats.map((cat) => {
+      const series = monthBuckets.map((bucket) => {
+        const key = monthKey(bucket.year, bucket.month);
+        const match = (productsByCategoryMonthlyAgg || []).find(
+          (r) =>
+            (r._id?.category || "Unknown") === cat &&
+            monthKey(r._id.year, r._id.month) === key,
+        );
+        return match ? match.count : 0;
+      });
+      return { label: cat, data: series };
+    }),
+  };
+
+  // Service categories - pie (bookings per service)
+  const serviceCategoryDistribution = {
+    labels: (bookingsByServiceCategoryAgg || []).map((c) => c._id || "Unknown"),
+    data: (bookingsByServiceCategoryAgg || []).map((c) => c.count),
+  };
+
+  // Service categories - bar (revenue by service)
+  const serviceCategoryRevenue = {
+    labels: (serviceRevenueByCategoryAgg || []).map((c) => c._id || "Unknown"),
+    revenue: (serviceRevenueByCategoryAgg || []).map((c) => c.revenue),
+    bookings: (serviceRevenueByCategoryAgg || []).map((c) => c.bookings),
+  };
+
+  // Service categories - line (monthly bookings for top 5 services)
+  const topServiceCats = (bookingsByServiceCategoryAgg || [])
+    .slice(0, 5)
+    .map((c) => c._id || "Unknown");
+  const serviceCategoryMonthly = {
+    labels: monthBuckets.map((b) => b.label),
+    datasets: topServiceCats.map((svc) => {
+      const series = monthBuckets.map((bucket) => {
+        const key = monthKey(bucket.year, bucket.month);
+        const match = (serviceBookingsByCategoryMonthlyAgg || []).find(
+          (r) =>
+            (r._id?.service || "Unknown") === svc &&
+            monthKey(r._id.year, r._id.month) === key,
+        );
+        return match ? match.count : 0;
+      });
+      return { label: svc, data: series };
+    }),
+  };
+
   return {
     totalUsers,
     userCounts,
@@ -309,7 +476,16 @@ async function collectDashboardStats() {
         : null,
       topServices: Array.isArray(topServicesAgg) ? topServicesAgg : [],
     },
-    charts: { monthlyRevenue, userGrowth },
+    charts: {
+      monthlyRevenue,
+      userGrowth,
+      productCategoryDistribution,
+      productCategoryRevenue,
+      productCategoryMonthly,
+      serviceCategoryDistribution,
+      serviceCategoryRevenue,
+      serviceCategoryMonthly,
+    },
   };
 }
 
@@ -1463,7 +1639,7 @@ exports.getProfileOverview = async (req, res) => {
     if (sellerProfile && sellerProfile.sellerId) {
       const sellerUser = sellerProfile.sellerId;
 
-      const [recentOrdersRaw, earningsAgg] = await Promise.all([
+      const [recentOrdersRaw, earningsAgg, sellerProducts] = await Promise.all([
         Order.find({ "items.seller": sellerUser._id })
           .sort({ placedAt: -1 })
           .limit(3)
@@ -1488,6 +1664,7 @@ exports.getProfileOverview = async (req, res) => {
             },
           },
         ]),
+        Product.find({ seller: sellerUser._id }).sort({ createdAt: -1 }).lean(),
       ]);
 
       const sellerEarnings = Array.isArray(earningsAgg) ? earningsAgg[0] : null;
@@ -1537,6 +1714,18 @@ exports.getProfileOverview = async (req, res) => {
         recent: {
           orders: recentOrders,
         },
+        products: (sellerProducts || []).map((p) => ({
+          _id: p._id,
+          name: p.name || "",
+          image: p.image || "",
+          price: p.price || 0,
+          category: p.category || "",
+          brand: p.brand || "",
+          description: p.description || "",
+          quantity: p.quantity || 0,
+          status: p.status || "pending",
+          createdAt: p.createdAt || null,
+        })),
       });
     }
 

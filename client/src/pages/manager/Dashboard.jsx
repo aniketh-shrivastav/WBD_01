@@ -382,7 +382,21 @@ function ProductTable({
   onReject,
   onEdit,
   actionState,
+  searchTerm = "",
+  onSearchChange,
 }) {
+  const filtered = React.useMemo(() => {
+    if (!products || !searchTerm.trim()) return products || [];
+    const q = searchTerm.toLowerCase();
+    return products.filter(
+      (p) =>
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.seller?.name || "").toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q) ||
+        (p.brand || "").toLowerCase().includes(q),
+    );
+  }, [products, searchTerm]);
+
   if (!products || products.length === 0) {
     return (
       <div className="product-tabs">
@@ -394,83 +408,124 @@ function ProductTable({
   return (
     <div className="product-tabs">
       <h2>{title}</h2>
-      <div className="table-responsive">
-        <table className="generic-table">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Seller</th>
-              <th>Price</th>
-              <th>Category</th>
-              <th>Brand</th>
-              <th>Description</th>
-              <th>Stock</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p._id}>
-                <td>
-                  {p.image ? (
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      style={{ width: 50, height: 50, objectFit: "cover" }}
-                    />
-                  ) : (
-                    "No image"
-                  )}
-                </td>
-                <td>{p.name || ""}</td>
-                <td>{(p.seller && p.seller.name) || "N/A"}</td>
-                <td>{formatCurrency(p.price)}</td>
-                <td>{p.category || "N/A"}</td>
-                <td>{p.brand || "N/A"}</td>
-                <td
-                  style={{
-                    maxWidth: 200,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {p.description || "No description"}
-                </td>
-                <td>{p.quantity || 0}</td>
-                <td>
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    <button
-                      type="button"
-                      className="btn btn-edit"
-                      onClick={() => onEdit?.(p)}
-                      style={{
-                        background: "#6366f1",
-                        color: "white",
-                        border: "none",
-                        padding: "6px 12px",
-                        borderRadius: 6,
-                        cursor: "pointer",
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      Edit
-                    </button>
-                    {type === "pending" && (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn-approve"
-                          onClick={() => onApprove?.(p._id)}
-                          disabled={
-                            actionState?.loadingKey === `${p._id}:approve`
-                          }
-                        >
-                          {actionState?.loadingKey === `${p._id}:approve`
-                            ? "..."
-                            : "Approve"}
-                        </button>
+      {onSearchChange && (
+        <div className="search-bar-wrapper" style={{ margin: "12px 0" }}>
+          <input
+            type="text"
+            className="search-input"
+            placeholder={`Search ${type} products by name, seller, category, brand...`}
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{
+              width: "100%",
+              maxWidth: 460,
+              padding: "10px 14px",
+              borderRadius: 8,
+              border: "1px solid #d1d5db",
+              fontSize: "0.9rem",
+              outline: "none",
+              transition: "border-color 0.2s",
+            }}
+          />
+        </div>
+      )}
+      {filtered.length === 0 ? (
+        <p className="empty-state" style={{ padding: "1rem 0" }}>
+          No products match "{searchTerm}".
+        </p>
+      ) : (
+        <div className="table-responsive">
+          <table className="generic-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Seller</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Description</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p) => (
+                <tr key={p._id}>
+                  <td>
+                    {p.image ? (
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        style={{ width: 50, height: 50, objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No image"
+                    )}
+                  </td>
+                  <td>{p.name || ""}</td>
+                  <td>{(p.seller && p.seller.name) || "N/A"}</td>
+                  <td>{formatCurrency(p.price)}</td>
+                  <td>{p.category || "N/A"}</td>
+                  <td>{p.brand || "N/A"}</td>
+                  <td
+                    style={{
+                      maxWidth: 200,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {p.description || "No description"}
+                  </td>
+                  <td>{p.quantity || 0}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        className="btn btn-edit"
+                        onClick={() => onEdit?.(p)}
+                        style={{
+                          background: "#6366f1",
+                          color: "white",
+                          border: "none",
+                          padding: "6px 12px",
+                          borderRadius: 6,
+                          cursor: "pointer",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        Edit
+                      </button>
+                      {type === "pending" && (
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-approve"
+                            onClick={() => onApprove?.(p._id)}
+                            disabled={
+                              actionState?.loadingKey === `${p._id}:approve`
+                            }
+                          >
+                            {actionState?.loadingKey === `${p._id}:approve`
+                              ? "..."
+                              : "Approve"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-suspend"
+                            onClick={() => onReject?.(p._id)}
+                            disabled={
+                              actionState?.loadingKey === `${p._id}:reject`
+                            }
+                          >
+                            {actionState?.loadingKey === `${p._id}:reject`
+                              ? "..."
+                              : "Reject"}
+                          </button>
+                        </>
+                      )}
+                      {type === "approved" && (
                         <button
                           type="button"
                           className="btn btn-suspend"
@@ -483,41 +538,29 @@ function ProductTable({
                             ? "..."
                             : "Reject"}
                         </button>
-                      </>
-                    )}
-                    {type === "approved" && (
-                      <button
-                        type="button"
-                        className="btn btn-suspend"
-                        onClick={() => onReject?.(p._id)}
-                        disabled={actionState?.loadingKey === `${p._id}:reject`}
-                      >
-                        {actionState?.loadingKey === `${p._id}:reject`
-                          ? "..."
-                          : "Reject"}
-                      </button>
-                    )}
-                    {type === "rejected" && (
-                      <button
-                        type="button"
-                        className="btn btn-approve"
-                        onClick={() => onApprove?.(p._id)}
-                        disabled={
-                          actionState?.loadingKey === `${p._id}:approve`
-                        }
-                      >
-                        {actionState?.loadingKey === `${p._id}:approve`
-                          ? "..."
-                          : "Approve"}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      )}
+                      {type === "rejected" && (
+                        <button
+                          type="button"
+                          className="btn btn-approve"
+                          onClick={() => onApprove?.(p._id)}
+                          disabled={
+                            actionState?.loadingKey === `${p._id}:approve`
+                          }
+                        >
+                          {actionState?.loadingKey === `${p._id}:approve`
+                            ? "..."
+                            : "Approve"}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -537,10 +580,25 @@ export default function ManagerDashboard() {
   const userDistChart = useRef();
   const revenueChart = useRef();
   const growthChart = useRef();
+
+  // Category analytics chart refs
+  const prodCatPieRef = useRef(null);
+  const prodCatBarRef = useRef(null);
+  const prodCatLineRef = useRef(null);
+  const svcCatPieRef = useRef(null);
+  const svcCatBarRef = useRef(null);
+  const svcCatLineRef = useRef(null);
+  const prodCatPieChart = useRef();
+  const prodCatBarChart = useRef();
+  const prodCatLineChart = useRef();
+  const svcCatPieChart = useRef();
+  const svcCatBarChart = useRef();
+  const svcCatLineChart = useRef();
   const [productActionState, setProductActionState] = useState({
     loadingKey: null,
     error: null,
   });
+  const [productSearchTerm, setProductSearchTerm] = useState("");
   const [reportState, setReportState] = useState({ loading: false, error: "" });
 
   // Edit product state
@@ -561,6 +619,42 @@ export default function ManagerDashboard() {
     }
     return DEFAULT_USER_GROWTH_CHART;
   }, [data]);
+
+  // Category analytics data
+  const prodCatDistData = useMemo(
+    () => data?.charts?.productCategoryDistribution || { labels: [], data: [] },
+    [data],
+  );
+  const prodCatRevData = useMemo(
+    () =>
+      data?.charts?.productCategoryRevenue || {
+        labels: [],
+        revenue: [],
+        orders: [],
+      },
+    [data],
+  );
+  const prodCatMonthlyData = useMemo(
+    () => data?.charts?.productCategoryMonthly || { labels: [], datasets: [] },
+    [data],
+  );
+  const svcCatDistData = useMemo(
+    () => data?.charts?.serviceCategoryDistribution || { labels: [], data: [] },
+    [data],
+  );
+  const svcCatRevData = useMemo(
+    () =>
+      data?.charts?.serviceCategoryRevenue || {
+        labels: [],
+        revenue: [],
+        bookings: [],
+      },
+    [data],
+  );
+  const svcCatMonthlyData = useMemo(
+    () => data?.charts?.serviceCategoryMonthly || { labels: [], datasets: [] },
+    [data],
+  );
 
   const highlights = data?.highlights || {};
   const bestSeller = highlights.bestSeller || null;
@@ -698,6 +792,12 @@ export default function ManagerDashboard() {
       userDistChart.current?.destroy?.();
       revenueChart.current?.destroy?.();
       growthChart.current?.destroy?.();
+      prodCatPieChart.current?.destroy?.();
+      prodCatBarChart.current?.destroy?.();
+      prodCatLineChart.current?.destroy?.();
+      svcCatPieChart.current?.destroy?.();
+      svcCatBarChart.current?.destroy?.();
+      svcCatLineChart.current?.destroy?.();
     };
   }, [dispatch, status, lastFetched]);
 
@@ -707,6 +807,12 @@ export default function ManagerDashboard() {
     userDistChart.current?.destroy?.();
     revenueChart.current?.destroy?.();
     growthChart.current?.destroy?.();
+    prodCatPieChart.current?.destroy?.();
+    prodCatBarChart.current?.destroy?.();
+    prodCatLineChart.current?.destroy?.();
+    svcCatPieChart.current?.destroy?.();
+    svcCatBarChart.current?.destroy?.();
+    svcCatLineChart.current?.destroy?.();
 
     if (userDistRef.current) {
       userDistChart.current = new Chart(userDistRef.current, {
@@ -789,7 +895,155 @@ export default function ManagerDashboard() {
         },
       });
     }
-  }, [data, revenueChartData, userGrowthChartData]);
+    // ── Product Category Charts ──
+    const CAT_COLORS = [
+      "#4299e1",
+      "#48bb78",
+      "#ed8936",
+      "#9f7aea",
+      "#f56565",
+      "#38b2ac",
+      "#d69e2e",
+      "#e53e3e",
+      "#667eea",
+      "#fc8181",
+    ];
+
+    if (prodCatPieRef.current && prodCatDistData.labels.length) {
+      prodCatPieChart.current = new Chart(prodCatPieRef.current, {
+        type: "pie",
+        data: {
+          labels: prodCatDistData.labels,
+          datasets: [
+            {
+              data: prodCatDistData.data,
+              backgroundColor: prodCatDistData.labels.map(
+                (_, i) => CAT_COLORS[i % CAT_COLORS.length],
+              ),
+            },
+          ],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+      });
+    }
+
+    if (prodCatBarRef.current && prodCatRevData.labels.length) {
+      prodCatBarChart.current = new Chart(prodCatBarRef.current, {
+        type: "bar",
+        data: {
+          labels: prodCatRevData.labels,
+          datasets: [
+            {
+              label: "Revenue (₹)",
+              data: prodCatRevData.revenue,
+              backgroundColor: "#4299e1",
+              borderRadius: 5,
+            },
+            {
+              label: "Units Sold",
+              data: prodCatRevData.orders,
+              backgroundColor: "#48bb78",
+              borderRadius: 5,
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          scales: { x: { ticks: { maxRotation: 45 } } },
+        },
+      });
+    }
+
+    if (prodCatLineRef.current && prodCatMonthlyData.datasets.length) {
+      prodCatLineChart.current = new Chart(prodCatLineRef.current, {
+        type: "line",
+        data: {
+          labels: prodCatMonthlyData.labels,
+          datasets: prodCatMonthlyData.datasets.map((ds, i) => ({
+            label: ds.label,
+            data: ds.data,
+            borderColor: CAT_COLORS[i % CAT_COLORS.length],
+            tension: 0.3,
+            fill: false,
+          })),
+        },
+        options: { plugins: { legend: { position: "top" } } },
+      });
+    }
+
+    // ── Service Category Charts ──
+    if (svcCatPieRef.current && svcCatDistData.labels.length) {
+      svcCatPieChart.current = new Chart(svcCatPieRef.current, {
+        type: "pie",
+        data: {
+          labels: svcCatDistData.labels,
+          datasets: [
+            {
+              data: svcCatDistData.data,
+              backgroundColor: svcCatDistData.labels.map(
+                (_, i) => CAT_COLORS[i % CAT_COLORS.length],
+              ),
+            },
+          ],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+      });
+    }
+
+    if (svcCatBarRef.current && svcCatRevData.labels.length) {
+      svcCatBarChart.current = new Chart(svcCatBarRef.current, {
+        type: "bar",
+        data: {
+          labels: svcCatRevData.labels,
+          datasets: [
+            {
+              label: "Revenue (₹)",
+              data: svcCatRevData.revenue,
+              backgroundColor: "#9f7aea",
+              borderRadius: 5,
+            },
+            {
+              label: "Bookings",
+              data: svcCatRevData.bookings,
+              backgroundColor: "#38b2ac",
+              borderRadius: 5,
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { position: "top" } },
+          scales: { x: { ticks: { maxRotation: 45 } } },
+        },
+      });
+    }
+
+    if (svcCatLineRef.current && svcCatMonthlyData.datasets.length) {
+      svcCatLineChart.current = new Chart(svcCatLineRef.current, {
+        type: "line",
+        data: {
+          labels: svcCatMonthlyData.labels,
+          datasets: svcCatMonthlyData.datasets.map((ds, i) => ({
+            label: ds.label,
+            data: ds.data,
+            borderColor: CAT_COLORS[i % CAT_COLORS.length],
+            tension: 0.3,
+            fill: false,
+          })),
+        },
+        options: { plugins: { legend: { position: "top" } } },
+      });
+    }
+  }, [
+    data,
+    revenueChartData,
+    userGrowthChartData,
+    prodCatDistData,
+    prodCatRevData,
+    prodCatMonthlyData,
+    svcCatDistData,
+    svcCatRevData,
+    svcCatMonthlyData,
+  ]);
 
   const hasData = Boolean(data);
   const isInitialLoading =
@@ -1059,6 +1313,56 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
+        {/* ── Product Category Analytics ── */}
+        <div className="charts-container" style={{ marginTop: 32 }}>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <h2 style={{ marginBottom: 16 }}>📦 Product Category Analytics</h2>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Products by Category</h2>
+            <div className="chart-box">
+              <canvas ref={prodCatPieRef} />
+            </div>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Revenue & Units by Category</h2>
+            <div className="chart-box">
+              <canvas ref={prodCatBarRef} />
+            </div>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Monthly Product Orders by Category</h2>
+            <div className="chart-box">
+              <canvas ref={prodCatLineRef} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Service Category Analytics ── */}
+        <div className="charts-container" style={{ marginTop: 32 }}>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <h2 style={{ marginBottom: 16 }}>🔧 Service Category Analytics</h2>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Bookings by Service</h2>
+            <div className="chart-box">
+              <canvas ref={svcCatPieRef} />
+            </div>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Revenue & Bookings by Service</h2>
+            <div className="chart-box">
+              <canvas ref={svcCatBarRef} />
+            </div>
+          </div>
+          <div className="chart-wrapper">
+            <h2>Monthly Bookings by Service</h2>
+            <div className="chart-box">
+              <canvas ref={svcCatLineRef} />
+            </div>
+          </div>
+        </div>
+
         <div className="product-tabs">
           <h2>Product Approval</h2>
           <div className="tabs">
@@ -1107,6 +1411,8 @@ export default function ManagerDashboard() {
                 onReject={(id) => handleProductAction(id, "reject")}
                 onEdit={handleEditProduct}
                 actionState={productActionState}
+                searchTerm={productSearchTerm}
+                onSearchChange={setProductSearchTerm}
               />
             </div>
           )}
@@ -1120,6 +1426,8 @@ export default function ManagerDashboard() {
                 onReject={(id) => handleProductAction(id, "reject")}
                 onEdit={handleEditProduct}
                 actionState={productActionState}
+                searchTerm={productSearchTerm}
+                onSearchChange={setProductSearchTerm}
               />
             </div>
           )}
@@ -1133,6 +1441,8 @@ export default function ManagerDashboard() {
                 onReject={(id) => handleProductAction(id, "reject")}
                 onEdit={handleEditProduct}
                 actionState={productActionState}
+                searchTerm={productSearchTerm}
+                onSearchChange={setProductSearchTerm}
               />
             </div>
           )}

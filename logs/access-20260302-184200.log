@@ -1,0 +1,5 @@
+[2026-03-02T13:12:05.521Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T13:12:05.565Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T13:12:09.643Z] GET /api/session - IP: ::1
+[2026-03-02T13:12:09.644Z] GET /images2/car-customization.png - IP: ::1
+[2026-03-02T13:12:09.658Z] GET /api/session - IP: ::1

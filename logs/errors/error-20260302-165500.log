@@ -1,0 +1,36 @@
+[2026-03-02T11:25:09.424Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2026-03-02T11:25:10.164Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2026-03-02T11:25:10.805Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2026-03-02T11:25:11.425Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2026-03-02T11:25:12.024Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2026-03-02T11:25:12.635Z] [GET] /admin/api/manager-dashboard - Status: 500 - Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+Error: Failed to lookup view "manager/dashboard" in views directory "F:\WBD-01\views"
+    at Function.render (F:\WBD-01\node_modules\express\lib\application.js:597:17)
+    at ServerResponse.render (F:\WBD-01\node_modules\express\lib\response.js:1049:7)
+    at exports.getDashboard (F:\WBD-01\controllers\managerController.js:734:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)

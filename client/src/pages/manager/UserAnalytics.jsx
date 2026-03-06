@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import Chart from "chart.js/auto";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 /* ── helpers ── */
@@ -1022,7 +1023,12 @@ function ProviderAnalytics({ d }) {
 /* ================================================================
    MAIN PAGE
    ================================================================ */
-export default function UserAnalytics() {
+export default function UserAnalytics({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const basePath = isAdmin ? "/admin" : "/manager";
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -1039,7 +1045,7 @@ export default function UserAnalytics() {
       try {
         setLoading(true);
         setError("");
-        const resp = await fetch(`/manager/api/user-analytics/${id}`, {
+        const resp = await fetch(`${apiPrefix}/api/user-analytics/${id}`, {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -1063,11 +1069,11 @@ export default function UserAnalytics() {
 
   const navLinks = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-      <Link to={`/manager/profiles/${id}`} className="analytics-back-btn">
+      <Link to={`${basePath}/profiles/${id}`} className="analytics-back-btn">
         Back to Profile
       </Link>
       <Link
-        to="/manager/profiles"
+        to={`${basePath}/profiles`}
         className="analytics-back-btn"
         style={{ background: "#374151" }}
       >
@@ -1081,9 +1087,9 @@ export default function UserAnalytics() {
       <>
         <div className="navbar">
           <div className="logo">
-            <h2>Manager's Panel</h2>
+            <h2>{panelTitle}</h2>
           </div>
-          <ManagerNav />
+          <NavComponent />
         </div>
         <div className="main-content">
           <p>Loading analytics...</p>
@@ -1096,9 +1102,9 @@ export default function UserAnalytics() {
       <>
         <div className="navbar">
           <div className="logo">
-            <h2>Manager's Panel</h2>
+            <h2>{panelTitle}</h2>
           </div>
-          <ManagerNav />
+          <NavComponent />
         </div>
         <div className="main-content">
           <p style={{ color: "#e74c3c" }}>{error}</p>
@@ -1111,9 +1117,9 @@ export default function UserAnalytics() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
       <div className="main-content">
         {/* Page header */}

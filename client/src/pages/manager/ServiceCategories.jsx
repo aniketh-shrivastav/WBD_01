@@ -1,8 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
-export default function ServiceCategories() {
+export default function ServiceCategories({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const catApiBase = isAdmin
+    ? "/admin/api/service-categories"
+    : "/api/service-categories";
+  const readOnly = isAdmin;
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,7 +27,7 @@ export default function ServiceCategories() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/service-categories", {
+      const res = await fetch(catApiBase, {
         headers: { Accept: "application/json" },
         credentials: "include",
       });
@@ -35,7 +43,7 @@ export default function ServiceCategories() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [catApiBase]);
 
   useEffect(() => {
     load();
@@ -132,9 +140,9 @@ export default function ServiceCategories() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -157,45 +165,47 @@ export default function ServiceCategories() {
           </p>
 
           {/* Add new category */}
-          <form
-            onSubmit={addCategory}
-            style={{
-              display: "flex",
-              gap: 10,
-              marginBottom: 20,
-              flexWrap: "wrap",
-            }}
-          >
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="New category name..."
+          {!readOnly && (
+            <form
+              onSubmit={addCategory}
               style={{
-                flex: "1 1 250px",
-                padding: "10px 14px",
-                borderRadius: 8,
-                border: "1px solid #d1d5db",
-                fontSize: 14,
-              }}
-            />
-            <button
-              type="submit"
-              disabled={saving || !newName.trim()}
-              style={{
-                padding: "10px 24px",
-                borderRadius: 8,
-                background: "#111827",
-                color: "#fff",
-                border: "none",
-                fontWeight: 700,
-                cursor: "pointer",
-                opacity: saving || !newName.trim() ? 0.5 : 1,
+                display: "flex",
+                gap: 10,
+                marginBottom: 20,
+                flexWrap: "wrap",
               }}
             >
-              {saving ? "Adding..." : "+ Add Category"}
-            </button>
-          </form>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="New category name..."
+                style={{
+                  flex: "1 1 250px",
+                  padding: "10px 14px",
+                  borderRadius: 8,
+                  border: "1px solid #d1d5db",
+                  fontSize: 14,
+                }}
+              />
+              <button
+                type="submit"
+                disabled={saving || !newName.trim()}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: 8,
+                  background: "#111827",
+                  color: "#fff",
+                  border: "none",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  opacity: saving || !newName.trim() ? 0.5 : 1,
+                }}
+              >
+                {saving ? "Adding..." : "+ Add Category"}
+              </button>
+            </form>
+          )}
 
           {loading ? (
             <p>Loading...</p>
@@ -212,7 +222,11 @@ export default function ServiceCategories() {
                   <tr>
                     <th style={{ textAlign: "left" }}>Category Name</th>
                     <th style={{ textAlign: "center", width: 100 }}>Status</th>
-                    <th style={{ textAlign: "center", width: 220 }}>Actions</th>
+                    {!readOnly && (
+                      <th style={{ textAlign: "center", width: 220 }}>
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -254,108 +268,110 @@ export default function ServiceCategories() {
                           {cat.active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 6,
-                            justifyContent: "center",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          {editId === cat._id ? (
-                            <>
-                              <button
-                                onClick={saveEdit}
-                                disabled={saving}
-                                style={{
-                                  padding: "5px 14px",
-                                  borderRadius: 6,
-                                  background: "#059669",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Save
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setEditId(null);
-                                  setEditName("");
-                                }}
-                                style={{
-                                  padding: "5px 14px",
-                                  borderRadius: 6,
-                                  background: "#6b7280",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Cancel
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setEditId(cat._id);
-                                  setEditName(cat.name);
-                                }}
-                                style={{
-                                  padding: "5px 14px",
-                                  borderRadius: 6,
-                                  background: "#2563eb",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => toggleActive(cat)}
-                                style={{
-                                  padding: "5px 14px",
-                                  borderRadius: 6,
-                                  background: cat.active
-                                    ? "#f59e0b"
-                                    : "#10b981",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  fontWeight: 600,
-                                }}
-                              >
-                                {cat.active ? "Deactivate" : "Activate"}
-                              </button>
-                              <button
-                                onClick={() => deleteCategory(cat._id)}
-                                style={{
-                                  padding: "5px 14px",
-                                  borderRadius: 6,
-                                  background: "#dc2626",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: 12,
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Delete
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
+                      {!readOnly && (
+                        <td style={{ textAlign: "center" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              justifyContent: "center",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            {editId === cat._id ? (
+                              <>
+                                <button
+                                  onClick={saveEdit}
+                                  disabled={saving}
+                                  style={{
+                                    padding: "5px 14px",
+                                    borderRadius: 6,
+                                    background: "#059669",
+                                    color: "#fff",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setEditId(null);
+                                    setEditName("");
+                                  }}
+                                  style={{
+                                    padding: "5px 14px",
+                                    borderRadius: 6,
+                                    background: "#6b7280",
+                                    color: "#fff",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setEditId(cat._id);
+                                    setEditName(cat.name);
+                                  }}
+                                  style={{
+                                    padding: "5px 14px",
+                                    borderRadius: 6,
+                                    background: "#2563eb",
+                                    color: "#fff",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => toggleActive(cat)}
+                                  style={{
+                                    padding: "5px 14px",
+                                    borderRadius: 6,
+                                    background: cat.active
+                                      ? "#f59e0b"
+                                      : "#10b981",
+                                    color: "#fff",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {cat.active ? "Deactivate" : "Activate"}
+                                </button>
+                                <button
+                                  onClick={() => deleteCategory(cat._id)}
+                                  style={{
+                                    padding: "5px 14px",
+                                    borderRadius: 6,
+                                    background: "#dc2626",
+                                    color: "#fff",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

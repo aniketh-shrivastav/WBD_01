@@ -1,10 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
-const API = "/api/product-categories";
-
-export default function ProductCategories() {
+export default function ProductCategories({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const API = isAdmin
+    ? "/admin/api/product-categories"
+    : "/api/product-categories";
+  const readOnly = isAdmin;
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -263,9 +269,9 @@ export default function ProductCategories() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -280,104 +286,105 @@ export default function ProductCategories() {
           </p>
 
           {/* ─── Add new category form ─── */}
-          <form
-            onSubmit={addCategory}
-            style={{
-              display: "flex",
-              gap: 10,
-              marginBottom: 20,
-              flexWrap: "wrap",
-              alignItems: "flex-end",
-            }}
-          >
-            <div style={{ flex: "1 1 220px" }}>
-              <label
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#374151",
-                  display: "block",
-                  marginBottom: 4,
-                }}
-              >
-                Category Name
-              </label>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="e.g. Exterior Customization"
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  border: "1px solid #d1d5db",
-                  fontSize: 14,
-                }}
-              />
-            </div>
-            <div style={{ flex: "1 1 300px" }}>
-              <label
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#374151",
-                  display: "block",
-                  marginBottom: 4,
-                }}
-              >
-                Subcategories (comma-separated)
-              </label>
-              <input
-                type="text"
-                value={newSubs}
-                onChange={(e) => setNewSubs(e.target.value)}
-                placeholder="e.g. Body Kits, Spoilers, Car Wraps"
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  border: "1px solid #d1d5db",
-                  fontSize: 14,
-                }}
-              />
-            </div>
-            <label
+          {!readOnly && (
+            <form
+              onSubmit={addCategory}
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 13,
-                fontWeight: 600,
-                color: "#b45309",
-                cursor: "pointer",
-                padding: "10px 0",
+                gap: 10,
+                marginBottom: 20,
+                flexWrap: "wrap",
+                alignItems: "flex-end",
               }}
             >
-              <input
-                type="checkbox"
-                checked={newCompliance}
-                onChange={(e) => setNewCompliance(e.target.checked)}
-              />
-              ⚠️ Compliance
-            </label>
-            <button
-              type="submit"
-              disabled={saving || !newName.trim()}
-              style={{
-                ...btnBase,
-                padding: "10px 24px",
-                borderRadius: 8,
-                background: "#111827",
-                fontWeight: 700,
-                fontSize: 14,
-                opacity: saving || !newName.trim() ? 0.5 : 1,
-              }}
-            >
-              {saving ? "Adding..." : "+ Add Category"}
-            </button>
-          </form>
-
+              <div style={{ flex: "1 1 220px" }}>
+                <label
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#374151",
+                    display: "block",
+                    marginBottom: 4,
+                  }}
+                >
+                  Category Name
+                </label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="e.g. Exterior Customization"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: "1px solid #d1d5db",
+                    fontSize: 14,
+                  }}
+                />
+              </div>
+              <div style={{ flex: "1 1 300px" }}>
+                <label
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#374151",
+                    display: "block",
+                    marginBottom: 4,
+                  }}
+                >
+                  Subcategories (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  value={newSubs}
+                  onChange={(e) => setNewSubs(e.target.value)}
+                  placeholder="e.g. Body Kits, Spoilers, Car Wraps"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: "1px solid #d1d5db",
+                    fontSize: 14,
+                  }}
+                />
+              </div>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#b45309",
+                  cursor: "pointer",
+                  padding: "10px 0",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={newCompliance}
+                  onChange={(e) => setNewCompliance(e.target.checked)}
+                />
+                ⚠️ Compliance
+              </label>
+              <button
+                type="submit"
+                disabled={saving || !newName.trim()}
+                style={{
+                  ...btnBase,
+                  padding: "10px 24px",
+                  borderRadius: 8,
+                  background: "#111827",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  opacity: saving || !newName.trim() ? 0.5 : 1,
+                }}
+              >
+                {saving ? "Adding..." : "+ Add Category"}
+              </button>
+            </form>
+          )}
           {/* ─── Category list ─── */}
           {loading ? (
             <p>Loading...</p>
@@ -526,73 +533,77 @@ export default function ProductCategories() {
                       </span>
 
                       {/* Action buttons */}
-                      <div
-                        style={{ display: "flex", gap: 6, flexWrap: "wrap" }}
-                      >
-                        {isEditing ? (
-                          <>
-                            <button
-                              onClick={saveEdit}
-                              disabled={saving}
-                              style={{ ...btnBase, background: "#059669" }}
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditId(null);
-                                setEditName("");
-                              }}
-                              style={{ ...btnBase, background: "#6b7280" }}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => {
-                                setEditId(cat._id);
-                                setEditName(cat.name);
-                                setEditCompliance(
-                                  cat.requiresCompliance || false,
-                                );
-                              }}
-                              style={{ ...btnBase, background: "#2563eb" }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => toggleActive(cat)}
-                              style={{
-                                ...btnBase,
-                                background: cat.active ? "#f59e0b" : "#10b981",
-                              }}
-                            >
-                              {cat.active ? "Deactivate" : "Activate"}
-                            </button>
-                            <button
-                              onClick={() => toggleCompliance(cat)}
-                              style={{
-                                ...btnBase,
-                                background: cat.requiresCompliance
-                                  ? "#6b7280"
-                                  : "#b45309",
-                              }}
-                            >
-                              {cat.requiresCompliance
-                                ? "Remove Compliance"
-                                : "Add Compliance"}
-                            </button>
-                            <button
-                              onClick={() => deleteCategory(cat._id)}
-                              style={{ ...btnBase, background: "#dc2626" }}
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
+                      {!readOnly && (
+                        <div
+                          style={{ display: "flex", gap: 6, flexWrap: "wrap" }}
+                        >
+                          {isEditing ? (
+                            <>
+                              <button
+                                onClick={saveEdit}
+                                disabled={saving}
+                                style={{ ...btnBase, background: "#059669" }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditId(null);
+                                  setEditName("");
+                                }}
+                                style={{ ...btnBase, background: "#6b7280" }}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditId(cat._id);
+                                  setEditName(cat.name);
+                                  setEditCompliance(
+                                    cat.requiresCompliance || false,
+                                  );
+                                }}
+                                style={{ ...btnBase, background: "#2563eb" }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => toggleActive(cat)}
+                                style={{
+                                  ...btnBase,
+                                  background: cat.active
+                                    ? "#f59e0b"
+                                    : "#10b981",
+                                }}
+                              >
+                                {cat.active ? "Deactivate" : "Activate"}
+                              </button>
+                              <button
+                                onClick={() => toggleCompliance(cat)}
+                                style={{
+                                  ...btnBase,
+                                  background: cat.requiresCompliance
+                                    ? "#6b7280"
+                                    : "#b45309",
+                                }}
+                              >
+                                {cat.requiresCompliance
+                                  ? "Remove Compliance"
+                                  : "Add Compliance"}
+                              </button>
+                              <button
+                                onClick={() => deleteCategory(cat._id)}
+                                style={{ ...btnBase, background: "#dc2626" }}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* ─── Subcategories (expanded) ─── */}
@@ -623,22 +634,26 @@ export default function ProductCategories() {
                                 }}
                               >
                                 {sub}
-                                <button
-                                  onClick={() => removeSubcategory(cat._id, i)}
-                                  style={{
-                                    background: "none",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    color: "#6366f1",
-                                    fontWeight: 700,
-                                    fontSize: 14,
-                                    padding: 0,
-                                    lineHeight: 1,
-                                  }}
-                                  title="Remove subcategory"
-                                >
-                                  ×
-                                </button>
+                                {!readOnly && (
+                                  <button
+                                    onClick={() =>
+                                      removeSubcategory(cat._id, i)
+                                    }
+                                    style={{
+                                      background: "none",
+                                      border: "none",
+                                      cursor: "pointer",
+                                      color: "#6366f1",
+                                      fontWeight: 700,
+                                      fontSize: 14,
+                                      padding: 0,
+                                      lineHeight: 1,
+                                    }}
+                                    title="Remove subcategory"
+                                  >
+                                    ×
+                                  </button>
+                                )}
                               </span>
                             ))}
                           </div>
@@ -655,73 +670,79 @@ export default function ProductCategories() {
                         )}
 
                         {/* Add subcategory inline */}
-                        {addSubId === cat._id ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 8,
-                              alignItems: "center",
-                            }}
-                          >
-                            <input
-                              type="text"
-                              value={addSubName}
-                              onChange={(e) => setAddSubName(e.target.value)}
-                              placeholder="New subcategory name..."
-                              style={{
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                border: "1px solid #d1d5db",
-                                fontSize: 13,
-                                flex: "1 1 200px",
-                              }}
-                              autoFocus
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault();
-                                  addSubcategory(cat._id);
-                                }
-                              }}
-                            />
-                            <button
-                              onClick={() => addSubcategory(cat._id)}
-                              style={{
-                                ...btnBase,
-                                background: "#059669",
-                                fontSize: 12,
-                              }}
-                            >
-                              Add
-                            </button>
-                            <button
-                              onClick={() => {
-                                setAddSubId(null);
-                                setAddSubName("");
-                              }}
-                              style={{
-                                ...btnBase,
-                                background: "#6b7280",
-                                fontSize: 12,
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setAddSubId(cat._id);
-                              setAddSubName("");
-                            }}
-                            style={{
-                              ...btnBase,
-                              background: "#4f46e5",
-                              fontSize: 12,
-                              padding: "6px 14px",
-                            }}
-                          >
-                            + Add Subcategory
-                          </button>
+                        {!readOnly && (
+                          <>
+                            {addSubId === cat._id ? (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: 8,
+                                  alignItems: "center",
+                                }}
+                              >
+                                <input
+                                  type="text"
+                                  value={addSubName}
+                                  onChange={(e) =>
+                                    setAddSubName(e.target.value)
+                                  }
+                                  placeholder="New subcategory name..."
+                                  style={{
+                                    padding: "6px 12px",
+                                    borderRadius: 6,
+                                    border: "1px solid #d1d5db",
+                                    fontSize: 13,
+                                    flex: "1 1 200px",
+                                  }}
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      e.preventDefault();
+                                      addSubcategory(cat._id);
+                                    }
+                                  }}
+                                />
+                                <button
+                                  onClick={() => addSubcategory(cat._id)}
+                                  style={{
+                                    ...btnBase,
+                                    background: "#059669",
+                                    fontSize: 12,
+                                  }}
+                                >
+                                  Add
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setAddSubId(null);
+                                    setAddSubName("");
+                                  }}
+                                  style={{
+                                    ...btnBase,
+                                    background: "#6b7280",
+                                    fontSize: 12,
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setAddSubId(cat._id);
+                                  setAddSubName("");
+                                }}
+                                style={{
+                                  ...btnBase,
+                                  background: "#4f46e5",
+                                  fontSize: 12,
+                                  padding: "6px 14px",
+                                }}
+                              >
+                                + Add Subcategory
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     )}

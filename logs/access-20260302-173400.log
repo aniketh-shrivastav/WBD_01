@@ -1,0 +1,2 @@
+[2026-03-02T12:04:05.252Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:04:11.195Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

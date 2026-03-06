@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
-function TicketCard({ t, onRespond }) {
+function TicketCard({ t, onRespond, readOnly }) {
   const verified = t.verifiedUser ? (
     <span className="badge badge-success">Verified</span>
   ) : (
@@ -23,14 +24,21 @@ function TicketCard({ t, onRespond }) {
       <p>
         <strong>Message:</strong> {t.message || ""}
       </p>
-      <button className="btn-resolve" onClick={() => onRespond(t._id)}>
-        Responded
-      </button>
+      {!readOnly && (
+        <button className="btn-resolve" onClick={() => onRespond(t._id)}>
+          Responded
+        </button>
+      )}
     </div>
   );
 }
 
-export default function Support() {
+export default function Support({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const readOnly = isAdmin;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tickets, setTickets] = useState([]);
@@ -47,7 +55,7 @@ export default function Support() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch("/manager/api/support", {
+        const res = await fetch(`${apiPrefix}/api/support`, {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401 || res.status === 403) {
@@ -97,9 +105,9 @@ export default function Support() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -153,7 +161,12 @@ export default function Support() {
           >
             {filtered.length ? (
               filtered.map((t) => (
-                <TicketCard key={t._id} t={t} onRespond={respond} />
+                <TicketCard
+                  key={t._id}
+                  t={t}
+                  onRespond={respond}
+                  readOnly={readOnly}
+                />
               ))
             ) : (
               <p

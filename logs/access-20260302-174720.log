@@ -1,0 +1,10 @@
+[2026-03-02T12:17:26.259Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:28.947Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:28.961Z] GET /api/service-categories - IP: ::1
+[2026-03-02T12:17:28.978Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:29.334Z] GET /api/service-categories - IP: ::1
+[2026-03-02T12:17:31.865Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:31.871Z] GET /api/product-categories - IP: ::1
+[2026-03-02T12:17:31.907Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:32.281Z] GET /api/product-categories - IP: ::1
+[2026-03-02T12:17:35.558Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

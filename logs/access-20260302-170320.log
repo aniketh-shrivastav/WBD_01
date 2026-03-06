@@ -1,0 +1,5 @@
+[2026-03-02T11:33:24.375Z] GET /admin/api/user-analytics/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-03-02T11:33:24.889Z] GET /admin/api/user-analytics/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-03-02T11:33:36.713Z] GET /admin/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-03-02T11:33:36.973Z] GET /admin/api/profile-overview/67e53d2732c5a757c77e3dfe - IP: ::1
+[2026-03-02T11:33:38.642Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1

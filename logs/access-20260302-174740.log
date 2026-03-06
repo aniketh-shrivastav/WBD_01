@@ -1,0 +1,7 @@
+[2026-03-02T12:17:41.245Z] POST /login - IP: ::1
+[2026-03-02T12:17:41.442Z] GET /api/session - IP: ::1
+[2026-03-02T12:17:41.451Z] GET /api/session - IP: ::1
+[2026-03-02T12:17:41.490Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:41.568Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T12:17:41.781Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T12:17:56.582Z] GET /chat/unread-count - IP: ::1

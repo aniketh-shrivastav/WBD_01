@@ -1,0 +1,8 @@
+[2026-03-02T15:07:43.330Z] GET /chat/customer/67e53cb532c5a757c77e3df8/messages - IP: ::1
+[2026-03-02T15:07:43.650Z] GET /api/session - IP: ::1
+[2026-03-02T15:07:43.998Z] GET /chat/customers - IP: ::1
+[2026-03-02T15:07:54.258Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T15:07:58.111Z] GET /logout?next=http%3A%2F%2Flocalhost%3A5173%2Flogin - IP: ::1
+[2026-03-02T15:07:59.826Z] GET /api/session - IP: ::1
+[2026-03-02T15:07:59.828Z] GET /images2/car-customization.png - IP: ::1
+[2026-03-02T15:07:59.844Z] GET /api/session - IP: ::1

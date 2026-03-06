@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 function formatDateTime(d) {
@@ -47,7 +48,13 @@ function Section({ title, children, right }) {
   );
 }
 
-export default function ManagerProfileOverview() {
+export default function ManagerProfileOverview({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
+  const basePath = isAdmin ? "/admin" : "/manager";
+  const readOnly = isAdmin;
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -64,7 +71,7 @@ export default function ManagerProfileOverview() {
       try {
         setLoading(true);
         setError("");
-        const resp = await fetch(`/manager/api/profile-overview/${id}`, {
+        const resp = await fetch(`${apiPrefix}/api/profile-overview/${id}`, {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -93,7 +100,7 @@ export default function ManagerProfileOverview() {
     () => (
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
         <Link
-          to={`/manager/profiles/${id}/analytics`}
+          to={`${basePath}/profiles/${id}/analytics`}
           style={{
             textDecoration: "none",
             padding: "8px 12px",
@@ -107,7 +114,7 @@ export default function ManagerProfileOverview() {
           View Analytics
         </Link>
         <Link
-          to="/manager/profiles"
+          to={`${basePath}/profiles`}
           style={{
             textDecoration: "none",
             padding: "8px 12px",
@@ -122,7 +129,7 @@ export default function ManagerProfileOverview() {
         </Link>
       </div>
     ),
-    [id],
+    [id, basePath],
   );
 
   const [verifyLoading, setVerifyLoading] = useState(false);
@@ -163,9 +170,12 @@ export default function ManagerProfileOverview() {
                 : "Verification rejected"),
         );
         // Refresh data
-        const refreshResp = await fetch(`/manager/api/profile-overview/${id}`, {
-          headers: { Accept: "application/json" },
-        });
+        const refreshResp = await fetch(
+          `${apiPrefix}/api/profile-overview/${id}`,
+          {
+            headers: { Accept: "application/json" },
+          },
+        );
         const refreshData = await refreshResp.json().catch(() => ({}));
         if (refreshResp.ok) setData(refreshData);
       } catch (e) {
@@ -182,9 +192,9 @@ export default function ManagerProfileOverview() {
       <>
         <div className="navbar">
           <div className="logo">
-            <h2>Manager's Panel</h2>
+            <h2>{panelTitle}</h2>
           </div>
-          <ManagerNav />
+          <NavComponent />
         </div>
         <div className="main-content">
           <p>Loading profile overview...</p>
@@ -197,9 +207,9 @@ export default function ManagerProfileOverview() {
       <>
         <div className="navbar">
           <div className="logo">
-            <h2>Manager's Panel</h2>
+            <h2>{panelTitle}</h2>
           </div>
-          <ManagerNav />
+          <NavComponent />
         </div>
         <div className="main-content">
           <p style={{ color: "#e74c3c" }}>{error}</p>
@@ -212,9 +222,9 @@ export default function ManagerProfileOverview() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content">
@@ -435,7 +445,8 @@ export default function ManagerProfileOverview() {
               )}
 
               {/* Verify / Reject / Unverify buttons */}
-              {(data?.verification?.documents || []).length > 0 &&
+              {!readOnly &&
+                (data?.verification?.documents || []).length > 0 &&
                 data?.verification?.status !== "verified" && (
                   <div
                     style={{
@@ -483,7 +494,7 @@ export default function ManagerProfileOverview() {
                 )}
 
               {/* Unverify button – only when currently verified */}
-              {data?.verification?.status === "verified" && (
+              {!readOnly && data?.verification?.status === "verified" && (
                 <div
                   style={{
                     marginTop: 14,
@@ -785,7 +796,8 @@ export default function ManagerProfileOverview() {
               )}
 
               {/* Verify / Reject buttons */}
-              {(data?.verification?.documents || []).length > 0 &&
+              {!readOnly &&
+                (data?.verification?.documents || []).length > 0 &&
                 data?.verification?.status !== "verified" && (
                   <div
                     style={{
@@ -833,7 +845,7 @@ export default function ManagerProfileOverview() {
                 )}
 
               {/* Unverify button – only when currently verified */}
-              {data?.verification?.status === "verified" && (
+              {!readOnly && data?.verification?.status === "verified" && (
                 <div
                   style={{
                     marginTop: 14,
@@ -961,6 +973,121 @@ export default function ManagerProfileOverview() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </Section>
+
+            {/* Seller Products */}
+            <Section title="📦 Products Listed">
+              {(data?.products || []).length === 0 ? (
+                <p style={{ color: "#6b7280" }}>
+                  No products listed by this seller.
+                </p>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      fontSize: "0.88rem",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          background: "linear-gradient(135deg,#f1f5f9,#e2e8f0)",
+                          textAlign: "left",
+                        }}
+                      >
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Image
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Name
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Category
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Brand
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Price
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Stock
+                        </th>
+                        <th style={{ padding: "10px 12px", fontWeight: 700 }}>
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.products.map((p) => (
+                        <tr
+                          key={p._id}
+                          style={{
+                            borderBottom: "1px solid rgba(17,24,39,0.08)",
+                          }}
+                        >
+                          <td style={{ padding: "8px 12px" }}>
+                            {p.image ? (
+                              <img
+                                src={p.image}
+                                alt={p.name}
+                                style={{
+                                  width: 44,
+                                  height: 44,
+                                  objectFit: "cover",
+                                  borderRadius: 6,
+                                }}
+                              />
+                            ) : (
+                              <span
+                                style={{ color: "#9ca3af", fontSize: "0.8rem" }}
+                              >
+                                No image
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: "8px 12px", fontWeight: 600 }}>
+                            {p.name || "N/A"}
+                          </td>
+                          <td style={{ padding: "8px 12px" }}>
+                            {p.category || "N/A"}
+                          </td>
+                          <td style={{ padding: "8px 12px" }}>
+                            {p.brand || "N/A"}
+                          </td>
+                          <td style={{ padding: "8px 12px" }}>
+                            {formatMoneyINR(p.price)}
+                          </td>
+                          <td style={{ padding: "8px 12px" }}>{p.quantity}</td>
+                          <td style={{ padding: "8px 12px" }}>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                padding: "3px 10px",
+                                borderRadius: 12,
+                                fontSize: "0.78rem",
+                                fontWeight: 700,
+                                color: "#fff",
+                                background:
+                                  p.status === "approved"
+                                    ? "#059669"
+                                    : p.status === "rejected"
+                                      ? "#dc2626"
+                                      : "#d97706",
+                              }}
+                            >
+                              {p.status?.charAt(0).toUpperCase() +
+                                p.status?.slice(1) || "Pending"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </Section>

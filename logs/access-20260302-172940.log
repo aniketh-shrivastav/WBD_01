@@ -1,0 +1,14 @@
+[2026-03-02T11:59:45.030Z] POST /customer/create-order - IP: ::1
+[2026-03-02T11:59:46.946Z] GET /api/session - IP: ::1
+[2026-03-02T11:59:47.153Z] GET /api/session - IP: ::1
+[2026-03-02T11:59:47.177Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T11:59:47.193Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:59:47.226Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:59:47.260Z] GET /styles/styles.css - IP: ::1
+[2026-03-02T11:59:47.481Z] GET /customer/api/history - IP: ::1
+[2026-03-02T11:59:47.511Z] GET /images/cart-icon.png - IP: ::1
+[2026-03-02T11:59:47.629Z] GET /customer/api/history - IP: ::1
+[2026-03-02T11:59:51.334Z] GET /customer/api/notifications?page=1&limit=20 - IP: ::1
+[2026-03-02T11:59:51.336Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:59:51.372Z] GET /chat/unread-count - IP: ::1
+[2026-03-02T11:59:53.989Z] PUT /customer/api/notifications/69a57bb15a50f3765f356faa/read - IP: ::1

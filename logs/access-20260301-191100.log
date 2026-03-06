@@ -1,0 +1,8 @@
+[2026-03-01T13:41:01.492Z] GET /admin/api/product-categories - IP: ::1
+[2026-03-01T13:41:01.887Z] GET /admin/api/product-categories - IP: ::1
+[2026-03-01T13:41:04.700Z] GET /admin/api/service-categories - IP: ::1
+[2026-03-01T13:41:04.956Z] GET /admin/api/service-categories - IP: ::1
+[2026-03-01T13:41:07.199Z] GET /admin/api/orders - IP: ::1
+[2026-03-01T13:41:07.778Z] GET /admin/api/orders - IP: ::1
+[2026-03-01T13:41:10.723Z] GET /admin/api/services - IP: ::1
+[2026-03-01T13:41:10.979Z] GET /admin/api/services - IP: ::1

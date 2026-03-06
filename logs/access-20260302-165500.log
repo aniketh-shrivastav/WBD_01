@@ -1,0 +1,13 @@
+[2026-03-02T11:25:07.134Z] POST /login - IP: ::1
+[2026-03-02T11:25:07.681Z] GET /api/session - IP: ::1
+[2026-03-02T11:25:08.005Z] GET /api/session - IP: ::1
+[2026-03-02T11:25:08.404Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-02T11:25:08.740Z] GET /admin/api/manager-dashboard - IP: ::1
+[2026-03-02T11:25:08.742Z] GET /images3/logo2.jpg - IP: ::1
+[2026-03-02T11:25:09.219Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-02T11:25:09.743Z] GET /admin/api/manager-dashboard - IP: ::1
+[2026-03-02T11:25:09.962Z] GET /admin/api/dashboard - IP: ::1
+[2026-03-02T11:25:10.498Z] GET /admin/api/manager-dashboard - IP: ::1
+[2026-03-02T11:25:11.139Z] GET /admin/api/manager-dashboard - IP: ::1
+[2026-03-02T11:25:11.747Z] GET /admin/api/manager-dashboard - IP: ::1
+[2026-03-02T11:25:12.346Z] GET /admin/api/manager-dashboard - IP: ::1

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
+import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 
 function formatDate(d) {
@@ -10,7 +11,11 @@ function formatDate(d) {
   }
 }
 
-export default function Payments() {
+export default function Payments({ mode = "manager" }) {
+  const isAdmin = mode === "admin";
+  const NavComponent = isAdmin ? AdminNav : ManagerNav;
+  const panelTitle = isAdmin ? "Admin Panel" : "Manager's Panel";
+  const apiPrefix = isAdmin ? "/admin" : "/manager";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [orders, setOrders] = useState([]);
@@ -28,7 +33,7 @@ export default function Payments() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch("/manager/api/payments", {
+        const res = await fetch(`${apiPrefix}/api/payments`, {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401 || res.status === 403) {
@@ -107,9 +112,9 @@ export default function Payments() {
     <>
       <div className="navbar">
         <div className="logo">
-          <h2>Manager's Panel</h2>
+          <h2>{panelTitle}</h2>
         </div>
-        <ManagerNav />
+        <NavComponent />
       </div>
 
       <div className="main-content" style={{ marginTop: 20 }}>
