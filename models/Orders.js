@@ -1,5 +1,18 @@
 const mongoose = require("mongoose");
 
+const DeliveryAddressSchema = new mongoose.Schema(
+  {
+    addressLine1: { type: String, required: true },
+    addressLine2: { type: String, default: "" },
+    landmark: { type: String, default: "" },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    country: { type: String, default: "India" },
+  },
+  { _id: false },
+);
+
 const OrderItemSchema = new mongoose.Schema(
   {
     productId: {
@@ -45,8 +58,9 @@ const OrderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Same as Cart userId
   items: { type: [OrderItemSchema], required: true },
   totalAmount: { type: Number, required: true },
-  deliveryAddress: { type: String, required: true },
-  district: { type: String, required: true },
+  deliveryAddress: { type: String, required: true }, // Legacy display text
+  deliveryAddressDetails: { type: DeliveryAddressSchema, required: true },
+  district: { type: String, default: "" }, // Legacy field mapped from city
   useCustomAddress: { type: Boolean, default: false }, // true if customer provided a different address
   orderStatus: {
     type: String,

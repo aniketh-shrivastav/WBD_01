@@ -66,6 +66,21 @@ exports.getOrderReceipt = async (req, res) => {
     // Header
     addLogo(doc, "Order Receipt");
 
+    const details = order.deliveryAddressDetails || {};
+    const formattedAddress = details.addressLine1
+      ? [
+          [details.addressLine1, details.addressLine2]
+            .filter(Boolean)
+            .join(", "),
+          [details.landmark, details.city, details.state, details.postalCode]
+            .filter(Boolean)
+            .join(", "),
+          details.country,
+        ]
+          .filter(Boolean)
+          .join(", ")
+      : order.deliveryAddress;
+
     // Order Details Table
     let yPos = drawTable(
       doc,
@@ -77,8 +92,10 @@ exports.getOrderReceipt = async (req, res) => {
         ["Placed On", order.placedAt.toLocaleDateString()],
         ["Status", order.orderStatus],
         ["Payment Status", order.paymentStatus],
-        ["Delivery Address", order.deliveryAddress],
-        ["District", order.district],
+        ["Delivery Address", formattedAddress],
+        ["City", details.city || order.district || "-"],
+        ["State", details.state || "-"],
+        ["Postal Code", details.postalCode || "-"],
       ],
       [150, 350],
     );

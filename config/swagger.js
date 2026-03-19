@@ -142,6 +142,19 @@ const options = {
             createdAt: { type: "string", format: "date-time" },
           },
         },
+        DeliveryAddress: {
+          type: "object",
+          properties: {
+            addressLine1: { type: "string" },
+            addressLine2: { type: "string" },
+            landmark: { type: "string" },
+            city: { type: "string" },
+            state: { type: "string" },
+            postalCode: { type: "string" },
+            country: { type: "string", default: "India" },
+          },
+          required: ["addressLine1", "city", "state", "postalCode", "country"],
+        },
         Order: {
           type: "object",
           properties: {
@@ -153,7 +166,13 @@ const options = {
             },
             totalAmount: { type: "number" },
             deliveryAddress: { type: "string" },
-            district: { type: "string" },
+            deliveryAddressDetails: {
+              $ref: "#/components/schemas/DeliveryAddress",
+            },
+            district: {
+              type: "string",
+              description: "Legacy field mapped from city",
+            },
             useCustomAddress: { type: "boolean" },
             orderStatus: {
               type: "string",
@@ -315,8 +334,9 @@ const options = {
           type: "object",
           properties: {
             userId: { type: "string" },
-            address: { type: "string" },
-            district: { type: "string" },
+            deliveryAddress: { $ref: "#/components/schemas/DeliveryAddress" },
+            address: { type: "string", description: "Legacy fallback" },
+            district: { type: "string", description: "Legacy fallback" },
             profilePicture: { type: "string", format: "uri" },
             registrationNumber: { type: "string" },
             vehicleMake: { type: "string" },

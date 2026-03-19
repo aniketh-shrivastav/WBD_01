@@ -4,6 +4,11 @@ const Order = require("../models/Orders");
 const CustomerProfile = require("../models/CustomerProfile");
 const User = require("../models/User");
 const { createNotification } = require("./notificationController");
+const {
+  buildAddressFromLegacy,
+  formatDeliveryAddress,
+  validateDeliveryAddress,
+} = require("../utils/deliveryAddressUtils");
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.user) return next();
@@ -71,41 +76,55 @@ exports.createOrderFromCart = async (req, res) => {
       itemsBySeller[sellerId].push(item);
     }
 
-    // Step 3: Get customer profile info
-    let address = "";
-    let district = "";
+    // Step 3: Get and validate delivery address
+    const reqDeliveryAddress = req.body?.deliveryAddress;
+    let deliveryAddress = null;
 
-    const { deliveryAddress: customAddress, deliveryDistrict: customDistrict } =
-      req.body || {};
+    if (reqDeliveryAddress && typeof reqDeliveryAddress === "object") {
+      const customValidation = validateDeliveryAddress(reqDeliveryAddress, {
+        requireAll: true,
+      });
 
-    if (customAddress && customDistrict) {
-      // Customer provided a custom delivery address
-      address = customAddress;
-      district = customDistrict;
+      if (!customValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid custom delivery address.",
+          errors: customValidation.errors,
+        });
+      }
+
+      deliveryAddress = customValidation.value;
     } else {
-      // Use profile address
-      const profile = await CustomerProfile.findOne({ userId });
-      if (profile) {
-        address = profile.address;
-        district = profile.district;
+      const profile = await CustomerProfile.findOne({ userId }).lean();
+
+      if (profile?.deliveryAddress?.addressLine1) {
+        deliveryAddress = profile.deliveryAddress;
+      } else if (profile?.address || profile?.district) {
+        deliveryAddress = buildAddressFromLegacy(
+          profile.address,
+          profile.district,
+        );
       } else {
-        const user = await User.findById(userId);
-        if (user) {
-          address = user.address;
-          district = user.district;
-        }
+        const user = await User.findById(userId).lean();
+        deliveryAddress = buildAddressFromLegacy(user?.address, user?.district);
       }
     }
 
-    const useCustomAddress = !!(customAddress && customDistrict);
+    const profileAddressValidation = validateDeliveryAddress(deliveryAddress, {
+      requireAll: true,
+    });
 
-    if (!address || !district) {
+    if (!profileAddressValidation.isValid) {
       return res.status(400).json({
         success: false,
         message:
-          "Delivery address or district not found. Please update your profile with complete address and district information.",
+          "Complete delivery address not found. Please update your profile with addressLine1, city, state, postalCode, and country.",
+        errors: profileAddressValidation.errors,
       });
     }
+
+    const validatedAddress = profileAddressValidation.value;
+    const useCustomAddress = !!reqDeliveryAddress;
 
     // Step 4: Create separate orders per seller
     const createdOrders = [];
@@ -120,8 +139,9 @@ exports.createOrderFromCart = async (req, res) => {
         userId,
         items: sellerItems,
         totalAmount,
-        deliveryAddress: address,
-        district,
+        deliveryAddress: formatDeliveryAddress(validatedAddress),
+        deliveryAddressDetails: validatedAddress,
+        district: validatedAddress.city,
         useCustomAddress,
         orderStatus: "pending",
         paymentStatus: "paid",
@@ -181,7 +201,7 @@ exports.createOrderFromCart = async (req, res) => {
       success: false,
       message:
         err.message ||
-        "Failed to create orders. Please ensure your profile has complete address and district information.",
+        "Failed to create orders. Please ensure your profile has a complete delivery address.",
     });
   }
 };

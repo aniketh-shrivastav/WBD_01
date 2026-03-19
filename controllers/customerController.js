@@ -96,7 +96,9 @@ exports.getProviderReviews = async (req, res) => {
 // GET /customer/cart
 exports.getCart = async (req, res) => {
   try {
-    const { items } = await customerService.getCartPageData(req.session.user.id);
+    const { items } = await customerService.getCartPageData(
+      req.session.user.id,
+    );
     res.render("customer/cart", {
       user: req.session.user,
       items,
@@ -340,12 +342,13 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     console.error("Error updating profile:", error);
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      return res.status(500).json({
+      return res.status(error.status || 500).json({
         success: false,
         message: error.message || "Error updating profile",
+        errors: error.details || undefined,
       });
     }
-    res.status(500).send("Error updating profile");
+    res.status(error.status || 500).send("Error updating profile");
   }
 };
 
@@ -454,7 +457,9 @@ exports.submitProductReview = async (req, res) => {
     }
 
     if (err.status) {
-      return res.status(err.status).json({ success: false, message: err.message });
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
     }
 
     console.error("Review submit error:", err);
@@ -479,7 +484,9 @@ exports.rateService = async (req, res) => {
       .json({ success: true, message: "Thank you for your rating!" });
   } catch (err) {
     if (err.status) {
-      return res.status(err.status).json({ success: false, message: err.message });
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
     }
 
     console.error(err);

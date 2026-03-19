@@ -72,6 +72,26 @@ export default function OrderDetails() {
     return d.toLocaleDateString();
   };
 
+  const formatDeliveryAddress = (orderData) => {
+    const details = orderData?.deliveryAddressDetails;
+    if (!details || typeof details !== "object") {
+      return orderData?.deliveryAddress || "-";
+    }
+
+    const line1 = [details.addressLine1, details.addressLine2]
+      .filter(Boolean)
+      .join(", ");
+    const line2 = [
+      details.landmark,
+      details.city,
+      details.state,
+      details.postalCode,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    return [line1, line2, details.country].filter(Boolean).join(", ") || "-";
+  };
+
   return (
     <div className="customer-page">
       <CustomerNav />
@@ -179,9 +199,13 @@ export default function OrderDetails() {
                         color: "var(--customer-text-secondary)",
                       }}
                     >
-                      District
+                      City / State
                     </span>
-                    <div style={{ fontWeight: "500" }}>{order.district}</div>
+                    <div style={{ fontWeight: "500" }}>
+                      {order.deliveryAddressDetails
+                        ? `${order.deliveryAddressDetails.city || "-"}, ${order.deliveryAddressDetails.state || "-"}`
+                        : order.district || "-"}
+                    </div>
                   </div>
                   <div>
                     <span
@@ -219,7 +243,7 @@ export default function OrderDetails() {
                     Delivery Address
                   </span>
                   <div style={{ fontWeight: "500" }}>
-                    {order.deliveryAddress}
+                    {formatDeliveryAddress(order)}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,26 @@
 const User = require("../../models/User");
 const CustomerProfile = require("../../models/CustomerProfile");
 const { createError, uploadFileToCloudinary } = require("./helpers");
+const {
+  buildAddressFromLegacy,
+  validateDeliveryAddress,
+} = require("../../utils/deliveryAddressUtils");
+
+function mapProfileAddress(profile) {
+  if (profile?.deliveryAddress?.addressLine1) {
+    return {
+      addressLine1: profile.deliveryAddress.addressLine1 || "",
+      addressLine2: profile.deliveryAddress.addressLine2 || "",
+      landmark: profile.deliveryAddress.landmark || "",
+      city: profile.deliveryAddress.city || "",
+      state: profile.deliveryAddress.state || "",
+      postalCode: profile.deliveryAddress.postalCode || "",
+      country: profile.deliveryAddress.country || "India",
+    };
+  }
+
+  return buildAddressFromLegacy(profile?.address, profile?.district);
+}
 
 async function getProfilePageData(userId) {
   const user = await User.findById(userId);
@@ -11,9 +31,21 @@ async function getProfilePageData(userId) {
       name: user?.name,
       email: user?.email,
       phone: user?.phone,
-      address: "",
-      district: "",
+      deliveryAddress: {
+        addressLine1: "",
+        addressLine2: "",
+        landmark: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "India",
+      },
       payments: "",
+    };
+  } else {
+    profile = {
+      ...profile.toObject(),
+      deliveryAddress: mapProfileAddress(profile),
     };
   }
 
@@ -26,9 +58,21 @@ async function getProfileApiData(userId) {
 
   if (!profile) {
     profile = {
-      address: "",
-      district: "",
+      deliveryAddress: {
+        addressLine1: "",
+        addressLine2: "",
+        landmark: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "India",
+      },
       payments: "",
+    };
+  } else {
+    profile = {
+      ...profile.toObject(),
+      deliveryAddress: mapProfileAddress(profile),
     };
   }
 
@@ -46,8 +90,13 @@ async function updateProfile(userId, body, files, file) {
   const {
     name,
     phone,
-    address,
-    district,
+    addressLine1,
+    addressLine2,
+    landmark,
+    city,
+    state,
+    postalCode,
+    country,
     payments,
     registrationNumber,
     vehicleMake,
@@ -64,9 +113,29 @@ async function updateProfile(userId, body, files, file) {
 
   await User.findByIdAndUpdate(userId, { name, phone }, { new: true });
 
+  const validation = validateDeliveryAddress(
+    {
+      addressLine1,
+      addressLine2,
+      landmark,
+      city,
+      state,
+      postalCode,
+      country,
+    },
+    { requireAll: true },
+  );
+
+  if (!validation.isValid) {
+    const err = createError(400, "Invalid delivery address");
+    err.details = validation.errors;
+    throw err;
+  }
+
   const updateData = {
-    address,
-    district,
+    deliveryAddress: validation.value,
+    address: validation.value.addressLine1,
+    district: validation.value.city,
     payments,
     registrationNumber: registrationNumber || "",
     vehicleMake: vehicleMake || "",

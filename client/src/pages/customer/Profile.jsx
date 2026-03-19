@@ -20,8 +20,13 @@ export default function CustomerProfile() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    address: "",
-    district: "",
+    addressLine1: "",
+    addressLine2: "",
+    landmark: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
     payments: "",
     profilePicture: "",
     // Vehicle details - Basic
@@ -70,11 +75,17 @@ export default function CustomerProfile() {
         if (!res.ok) throw new Error("Failed to load profile");
         const { user, profile } = await res.json();
         setUserId(user.id);
+        const deliveryAddress = profile.deliveryAddress || {};
         setForm({
           name: user.name || "",
           phone: user.phone || "",
-          address: profile.address || "",
-          district: profile.district || "",
+          addressLine1: deliveryAddress.addressLine1 || profile.address || "",
+          addressLine2: deliveryAddress.addressLine2 || "",
+          landmark: deliveryAddress.landmark || "",
+          city: deliveryAddress.city || profile.district || "",
+          state: deliveryAddress.state || "",
+          postalCode: deliveryAddress.postalCode || "",
+          country: deliveryAddress.country || "India",
           payments: profile.payments || "",
           profilePicture: profile.profilePicture || "",
           registrationNumber: profile.registrationNumber || "",
@@ -181,22 +192,69 @@ export default function CustomerProfile() {
     );
     return false;
   }
-  function validateAddress() {
-    const v = form.address.trim();
-    if (v.length < 5) {
-      showError("address", "Address is too short (min 5 characters).");
+  function validateAddressLine1() {
+    const v = form.addressLine1.trim();
+    if (v.length < 3) {
+      showError(
+        "addressLine1",
+        "House No, Building is required (min 3 characters).",
+      );
       return false;
     }
     return true;
   }
-  function validateDistrict() {
-    const v = form.district.trim();
+  function validateAddressLine2() {
+    const v = form.addressLine2.trim();
+    if (v && v.length < 3) {
+      showError("addressLine2", "Street, Area must be at least 3 characters.");
+      return false;
+    }
+    return true;
+  }
+  function validateLandmark() {
+    const v = form.landmark.trim();
+    if (v && v.length < 2) {
+      showError("landmark", "Landmark must be at least 2 characters.");
+      return false;
+    }
+    return true;
+  }
+  function validateCity() {
+    const v = form.city.trim();
     const re = /^[A-Za-z\s]{2,}$/;
     if (!re.test(v)) {
       showError(
-        "district",
-        "District should contain only letters and spaces (no special characters).",
+        "city",
+        "City should contain only letters and spaces (min 2 chars).",
       );
+      return false;
+    }
+    return true;
+  }
+  function validateState() {
+    const v = form.state.trim();
+    const re = /^[A-Za-z\s]{2,}$/;
+    if (!re.test(v)) {
+      showError(
+        "state",
+        "State should contain only letters and spaces (min 2 chars).",
+      );
+      return false;
+    }
+    return true;
+  }
+  function validatePostalCode() {
+    const v = form.postalCode.trim();
+    if (!/^\d{6}$/.test(v)) {
+      showError("postalCode", "Postal code must be a valid 6-digit number.");
+      return false;
+    }
+    return true;
+  }
+  function validateCountry() {
+    const v = form.country.trim();
+    if (v.length < 2) {
+      showError("country", "Country is required.");
       return false;
     }
     return true;
@@ -296,8 +354,13 @@ export default function CustomerProfile() {
     const ok = [
       validateName(),
       validatePhone(),
-      validateAddress(),
-      validateDistrict(),
+      validateAddressLine1(),
+      validateAddressLine2(),
+      validateLandmark(),
+      validateCity(),
+      validateState(),
+      validatePostalCode(),
+      validateCountry(),
       validatePayments(),
       validateRegistrationNumber(),
       validateVehicleMake(),
@@ -325,8 +388,13 @@ export default function CustomerProfile() {
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("phone", form.phone);
-      formData.append("address", form.address);
-      formData.append("district", form.district);
+      formData.append("addressLine1", form.addressLine1);
+      formData.append("addressLine2", form.addressLine2 || "");
+      formData.append("landmark", form.landmark || "");
+      formData.append("city", form.city);
+      formData.append("state", form.state);
+      formData.append("postalCode", form.postalCode);
+      formData.append("country", form.country || "India");
       formData.append("payments", form.payments);
       // Vehicle details
       formData.append("registrationNumber", form.registrationNumber);
@@ -546,40 +614,131 @@ export default function CustomerProfile() {
                 </h3>
                 <div className="customer-profile-grid">
                   <div className="customer-form-group">
-                    <label className="customer-label" htmlFor="address">
-                      Address
+                    <label className="customer-label" htmlFor="addressLine1">
+                      House No, Building
                     </label>
                     <input
-                      id="address"
-                      name="address"
-                      placeholder="Enter your address"
-                      value={form.address || ""}
-                      onChange={(e) => setField("address", e.target.value)}
-                      onBlur={validateAddress}
-                      className={`customer-input ${errors.address ? "customer-input-error" : ""}`}
+                      id="addressLine1"
+                      name="addressLine1"
+                      placeholder="e.g., 12A, Sunrise Apartments"
+                      value={form.addressLine1 || ""}
+                      onChange={(e) => setField("addressLine1", e.target.value)}
+                      onBlur={validateAddressLine1}
+                      className={`customer-input ${errors.addressLine1 ? "customer-input-error" : ""}`}
                     />
-                    {errors.address && (
+                    {errors.addressLine1 && (
                       <div className="customer-error-text">
-                        {errors.address}
+                        {errors.addressLine1}
                       </div>
                     )}
                   </div>
                   <div className="customer-form-group">
-                    <label className="customer-label" htmlFor="district">
-                      District
+                    <label className="customer-label" htmlFor="addressLine2">
+                      Street, Area (Optional)
                     </label>
                     <input
-                      id="district"
-                      name="district"
-                      placeholder="Enter your district"
-                      value={form.district || ""}
-                      onChange={(e) => setField("district", e.target.value)}
-                      onBlur={validateDistrict}
-                      className={`customer-input ${errors.district ? "customer-input-error" : ""}`}
+                      id="addressLine2"
+                      name="addressLine2"
+                      placeholder="e.g., MG Road, Indiranagar"
+                      value={form.addressLine2 || ""}
+                      onChange={(e) => setField("addressLine2", e.target.value)}
+                      onBlur={validateAddressLine2}
+                      className={`customer-input ${errors.addressLine2 ? "customer-input-error" : ""}`}
                     />
-                    {errors.district && (
+                    {errors.addressLine2 && (
                       <div className="customer-error-text">
-                        {errors.district}
+                        {errors.addressLine2}
+                      </div>
+                    )}
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="landmark">
+                      Landmark (Optional)
+                    </label>
+                    <input
+                      id="landmark"
+                      name="landmark"
+                      placeholder="e.g., Near City Mall"
+                      value={form.landmark || ""}
+                      onChange={(e) => setField("landmark", e.target.value)}
+                      onBlur={validateLandmark}
+                      className={`customer-input ${errors.landmark ? "customer-input-error" : ""}`}
+                    />
+                    {errors.landmark && (
+                      <div className="customer-error-text">
+                        {errors.landmark}
+                      </div>
+                    )}
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="city">
+                      City
+                    </label>
+                    <input
+                      id="city"
+                      name="city"
+                      placeholder="Enter city"
+                      value={form.city || ""}
+                      onChange={(e) => setField("city", e.target.value)}
+                      onBlur={validateCity}
+                      className={`customer-input ${errors.city ? "customer-input-error" : ""}`}
+                    />
+                    {errors.city && (
+                      <div className="customer-error-text">{errors.city}</div>
+                    )}
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="state">
+                      State
+                    </label>
+                    <input
+                      id="state"
+                      name="state"
+                      placeholder="Enter state"
+                      value={form.state || ""}
+                      onChange={(e) => setField("state", e.target.value)}
+                      onBlur={validateState}
+                      className={`customer-input ${errors.state ? "customer-input-error" : ""}`}
+                    />
+                    {errors.state && (
+                      <div className="customer-error-text">{errors.state}</div>
+                    )}
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="postalCode">
+                      Postal Code
+                    </label>
+                    <input
+                      id="postalCode"
+                      name="postalCode"
+                      placeholder="6-digit postal code"
+                      value={form.postalCode || ""}
+                      onChange={(e) => setField("postalCode", e.target.value)}
+                      onBlur={validatePostalCode}
+                      className={`customer-input ${errors.postalCode ? "customer-input-error" : ""}`}
+                    />
+                    {errors.postalCode && (
+                      <div className="customer-error-text">
+                        {errors.postalCode}
+                      </div>
+                    )}
+                  </div>
+                  <div className="customer-form-group">
+                    <label className="customer-label" htmlFor="country">
+                      Country
+                    </label>
+                    <input
+                      id="country"
+                      name="country"
+                      placeholder="Enter country"
+                      value={form.country || "India"}
+                      onChange={(e) => setField("country", e.target.value)}
+                      onBlur={validateCountry}
+                      className={`customer-input ${errors.country ? "customer-input-error" : ""}`}
+                    />
+                    {errors.country && (
+                      <div className="customer-error-text">
+                        {errors.country}
                       </div>
                     )}
                   </div>

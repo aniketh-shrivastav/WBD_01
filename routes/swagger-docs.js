@@ -1297,9 +1297,7 @@
  *             type: object
  *             properties:
  *               deliveryAddress:
- *                 type: string
- *               deliveryDistrict:
- *                 type: string
+ *                 $ref: '#/components/schemas/DeliveryAddress'
  *     responses:
  *       200:
  *         description: Orders created
@@ -1563,9 +1561,19 @@
  *                 type: string
  *               phone:
  *                 type: string
- *               address:
+ *               addressLine1:
  *                 type: string
- *               district:
+ *               addressLine2:
+ *                 type: string
+ *               landmark:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               postalCode:
+ *                 type: string
+ *               country:
  *                 type: string
  *               registrationNumber:
  *                 type: string

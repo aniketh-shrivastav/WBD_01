@@ -28,8 +28,15 @@ export default function CustomerCart() {
 
   // Delivery address choice
   const [addressMode, setAddressMode] = useState("profile"); // "profile" or "custom"
-  const [customAddress, setCustomAddress] = useState("");
-  const [customDistrict, setCustomDistrict] = useState("");
+  const [customDeliveryAddress, setCustomDeliveryAddress] = useState({
+    addressLine1: "",
+    addressLine2: "",
+    landmark: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
+  });
   const [cartErrors, setCartErrors] = useState({});
 
   function backendBase() {
@@ -171,11 +178,35 @@ export default function CustomerCart() {
   function validateCustomAddress() {
     if (addressMode !== "custom") return true;
     const errs = {};
-    if (!customAddress.trim() || customAddress.trim().length < 5) {
-      errs.customAddress = "Delivery address is required (min 5 characters).";
+    if (
+      !customDeliveryAddress.addressLine1.trim() ||
+      customDeliveryAddress.addressLine1.trim().length < 3
+    ) {
+      errs.addressLine1 = "House No, Building is required (min 3 characters).";
     }
-    if (!customDistrict.trim() || customDistrict.trim().length < 2) {
-      errs.customDistrict = "District is required (min 2 characters).";
+    if (
+      customDeliveryAddress.addressLine2.trim() &&
+      customDeliveryAddress.addressLine2.trim().length < 3
+    ) {
+      errs.addressLine2 = "Street, Area must be at least 3 characters.";
+    }
+    if (
+      customDeliveryAddress.landmark.trim() &&
+      customDeliveryAddress.landmark.trim().length < 2
+    ) {
+      errs.landmark = "Landmark must be at least 2 characters.";
+    }
+    if (!/^[A-Za-z\s]{2,}$/.test(customDeliveryAddress.city.trim())) {
+      errs.city = "City is required and must contain only letters/spaces.";
+    }
+    if (!/^[A-Za-z\s]{2,}$/.test(customDeliveryAddress.state.trim())) {
+      errs.state = "State is required and must contain only letters/spaces.";
+    }
+    if (!/^\d{6}$/.test(customDeliveryAddress.postalCode.trim())) {
+      errs.postalCode = "Postal code must be a valid 6-digit number.";
+    }
+    if (!customDeliveryAddress.country.trim()) {
+      errs.country = "Country is required.";
     }
     setCartErrors(errs);
     return Object.keys(errs).length === 0;
@@ -193,8 +224,15 @@ export default function CustomerCart() {
     try {
       const orderBody = { paymentMethod };
       if (addressMode === "custom") {
-        orderBody.deliveryAddress = customAddress.trim();
-        orderBody.deliveryDistrict = customDistrict.trim();
+        orderBody.deliveryAddress = {
+          addressLine1: customDeliveryAddress.addressLine1.trim(),
+          addressLine2: customDeliveryAddress.addressLine2.trim(),
+          landmark: customDeliveryAddress.landmark.trim(),
+          city: customDeliveryAddress.city.trim(),
+          state: customDeliveryAddress.state.trim(),
+          postalCode: customDeliveryAddress.postalCode.trim(),
+          country: customDeliveryAddress.country.trim() || "India",
+        };
       }
 
       const res = await fetch("/customer/create-order", {
@@ -254,12 +292,12 @@ export default function CustomerCart() {
           </div>
         ) : error ? (
           <div className="customer-alert customer-alert-error">
-            <div className="customer-alert-icon">⚠️</div>
+            <div className="customer-alert-icon">!</div>
             <div className="customer-alert-content">{error}</div>
           </div>
         ) : items.length === 0 ? (
           <div className="customer-empty-state">
-            <div className="customer-empty-icon">🛒</div>
+            <div className="customer-empty-icon">Cart</div>
             <h3 className="customer-empty-title">Your Cart is Empty</h3>
             <p className="customer-empty-description">
               Looks like you haven't added any products yet. Start shopping to
@@ -283,14 +321,14 @@ export default function CustomerCart() {
                 />
                 <div className="customer-cart-item-details">
                   <h4 className="customer-cart-item-name">{it.name}</h4>
-                  <div className="customer-cart-item-price">₹{it.price}</div>
+                  <div className="customer-cart-item-price">Rs {it.price}</div>
                 </div>
                 <div className="customer-quantity-controls">
                   <button
                     className="customer-quantity-btn"
                     onClick={() => updateQuantity(it.productId, "decrease")}
                   >
-                    −
+                    -
                   </button>
                   <span className="customer-quantity-value">{it.quantity}</span>
                   <button
@@ -324,9 +362,9 @@ export default function CustomerCart() {
                   }}
                 >
                   <span>
-                    {it.name} × {it.quantity}
+                    {it.name} x {it.quantity}
                   </span>
-                  <span>₹{it.price * it.quantity}</span>
+                  <span>Rs {it.price * it.quantity}</span>
                 </div>
               ))}
               <div
@@ -345,7 +383,7 @@ export default function CustomerCart() {
                   }}
                 >
                   <span>Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>Rs {subtotal.toFixed(2)}</span>
                 </div>
                 <div
                   style={{
@@ -356,7 +394,7 @@ export default function CustomerCart() {
                   }}
                 >
                   <span>Delivery Cost (5%)</span>
-                  <span>₹{deliveryCost.toFixed(2)}</span>
+                  <span>Rs {deliveryCost.toFixed(2)}</span>
                 </div>
                 <div
                   style={{
@@ -367,13 +405,13 @@ export default function CustomerCart() {
                   }}
                 >
                   <span>Tax (18%)</span>
-                  <span>₹{tax.toFixed(2)}</span>
+                  <span>Rs {tax.toFixed(2)}</span>
                 </div>
               </div>
               <div className="customer-cart-total">
                 <span>Total Amount</span>
                 <span className="customer-cart-total-amount">
-                  ₹{totalAmount.toFixed(2)}
+                  Rs {totalAmount.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -389,7 +427,7 @@ export default function CustomerCart() {
               }}
             >
               <h4 style={{ marginBottom: "14px", fontWeight: 600 }}>
-                📍 Delivery Address
+                Delivery Address
               </h4>
               <div
                 style={{
@@ -462,13 +500,13 @@ export default function CustomerCart() {
               {addressMode === "custom" && (
                 <div
                   style={{
-                    display: "flex",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                     gap: "12px",
-                    flexWrap: "wrap",
                     marginTop: "8px",
                   }}
                 >
-                  <div style={{ flex: "2 1 220px" }}>
+                  <div>
                     <label
                       style={{
                         fontSize: "13px",
@@ -478,29 +516,32 @@ export default function CustomerCart() {
                         color: "var(--customer-text-secondary)",
                       }}
                     >
-                      Delivery Address
+                      House No, Building
                     </label>
                     <input
                       type="text"
-                      className={`customer-input ${cartErrors.customAddress ? "customer-input-error" : ""}`}
-                      placeholder="Enter full delivery address"
-                      value={customAddress}
+                      className={`customer-input ${cartErrors.addressLine1 ? "customer-input-error" : ""}`}
+                      placeholder="e.g., 12A, Sunrise Apartments"
+                      value={customDeliveryAddress.addressLine1}
                       onChange={(e) => {
-                        setCustomAddress(e.target.value);
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          addressLine1: e.target.value,
+                        }));
                         setCartErrors((p) => ({
                           ...p,
-                          customAddress: undefined,
+                          addressLine1: undefined,
                         }));
                       }}
                       style={{ width: "100%" }}
                     />
-                    {cartErrors.customAddress && (
+                    {cartErrors.addressLine1 && (
                       <div className="customer-error-text">
-                        {cartErrors.customAddress}
+                        {cartErrors.addressLine1}
                       </div>
                     )}
                   </div>
-                  <div style={{ flex: "1 1 140px" }}>
+                  <div>
                     <label
                       style={{
                         fontSize: "13px",
@@ -510,25 +551,188 @@ export default function CustomerCart() {
                         color: "var(--customer-text-secondary)",
                       }}
                     >
-                      District
+                      Street, Area (Optional)
                     </label>
                     <input
                       type="text"
-                      className={`customer-input ${cartErrors.customDistrict ? "customer-input-error" : ""}`}
-                      placeholder="District"
-                      value={customDistrict}
+                      className={`customer-input ${cartErrors.addressLine2 ? "customer-input-error" : ""}`}
+                      placeholder="e.g., MG Road, Indiranagar"
+                      value={customDeliveryAddress.addressLine2}
                       onChange={(e) => {
-                        setCustomDistrict(e.target.value);
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          addressLine2: e.target.value,
+                        }));
                         setCartErrors((p) => ({
                           ...p,
-                          customDistrict: undefined,
+                          addressLine2: undefined,
                         }));
                       }}
                       style={{ width: "100%" }}
                     />
-                    {cartErrors.customDistrict && (
+                    {cartErrors.addressLine2 && (
                       <div className="customer-error-text">
-                        {cartErrors.customDistrict}
+                        {cartErrors.addressLine2}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      Landmark (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      className={`customer-input ${cartErrors.landmark ? "customer-input-error" : ""}`}
+                      placeholder="e.g., Near City Mall"
+                      value={customDeliveryAddress.landmark}
+                      onChange={(e) => {
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          landmark: e.target.value,
+                        }));
+                        setCartErrors((p) => ({ ...p, landmark: undefined }));
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                    {cartErrors.landmark && (
+                      <div className="customer-error-text">
+                        {cartErrors.landmark}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      className={`customer-input ${cartErrors.city ? "customer-input-error" : ""}`}
+                      placeholder="City"
+                      value={customDeliveryAddress.city}
+                      onChange={(e) => {
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          city: e.target.value,
+                        }));
+                        setCartErrors((p) => ({ ...p, city: undefined }));
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                    {cartErrors.city && (
+                      <div className="customer-error-text">
+                        {cartErrors.city}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      State
+                    </label>
+                    <input
+                      type="text"
+                      className={`customer-input ${cartErrors.state ? "customer-input-error" : ""}`}
+                      placeholder="State"
+                      value={customDeliveryAddress.state}
+                      onChange={(e) => {
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          state: e.target.value,
+                        }));
+                        setCartErrors((p) => ({ ...p, state: undefined }));
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                    {cartErrors.state && (
+                      <div className="customer-error-text">
+                        {cartErrors.state}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      Postal Code
+                    </label>
+                    <input
+                      type="text"
+                      className={`customer-input ${cartErrors.postalCode ? "customer-input-error" : ""}`}
+                      placeholder="6-digit postal code"
+                      value={customDeliveryAddress.postalCode}
+                      onChange={(e) => {
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          postalCode: e.target.value,
+                        }));
+                        setCartErrors((p) => ({ ...p, postalCode: undefined }));
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                    {cartErrors.postalCode && (
+                      <div className="customer-error-text">
+                        {cartErrors.postalCode}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                        display: "block",
+                        color: "var(--customer-text-secondary)",
+                      }}
+                    >
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      className={`customer-input ${cartErrors.country ? "customer-input-error" : ""}`}
+                      placeholder="Country"
+                      value={customDeliveryAddress.country}
+                      onChange={(e) => {
+                        setCustomDeliveryAddress((p) => ({
+                          ...p,
+                          country: e.target.value,
+                        }));
+                        setCartErrors((p) => ({ ...p, country: undefined }));
+                      }}
+                      style={{ width: "100%" }}
+                    />
+                    {cartErrors.country && (
+                      <div className="customer-error-text">
+                        {cartErrors.country}
                       </div>
                     )}
                   </div>
@@ -578,7 +782,7 @@ export default function CustomerCart() {
                   className="customer-modal-close"
                   onClick={() => setShowPayment(false)}
                 >
-                  ×
+                  x
                 </button>
               </div>
               <div className="customer-modal-body">
@@ -591,7 +795,7 @@ export default function CustomerCart() {
                     <div className="customer-payment-radio"></div>
                     <div>
                       <div className="customer-payment-label">
-                        💳 Pay with Card
+                        Pay with Card
                       </div>
                       <div
                         style={{
@@ -614,7 +818,7 @@ export default function CustomerCart() {
                   <div className="customer-payment-radio"></div>
                   <div>
                     <div className="customer-payment-label">
-                      💵 Cash on Delivery
+                      Cash on Delivery
                     </div>
                     <div
                       style={{
@@ -686,14 +890,16 @@ export default function CustomerCart() {
                   className="customer-modal-close"
                   onClick={() => setShowCheckout(false)}
                 >
-                  ×
+                  x
                 </button>
               </div>
               <div
                 className="customer-modal-body"
                 style={{ textAlign: "center" }}
               >
-                <div style={{ fontSize: "48px", marginBottom: "16px" }}>📦</div>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>
+                  Order
+                </div>
                 <h4 style={{ marginBottom: "8px" }}>
                   Ready to Place Your Order?
                 </h4>
@@ -715,7 +921,7 @@ export default function CustomerCart() {
                     }}
                   >
                     <span>Subtotal</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
+                    <span>Rs {subtotal.toFixed(2)}</span>
                   </div>
                   <div
                     style={{
@@ -726,7 +932,7 @@ export default function CustomerCart() {
                     }}
                   >
                     <span>Delivery Cost (5%)</span>
-                    <span>₹{deliveryCost.toFixed(2)}</span>
+                    <span>Rs {deliveryCost.toFixed(2)}</span>
                   </div>
                   <div
                     style={{
@@ -737,7 +943,7 @@ export default function CustomerCart() {
                     }}
                   >
                     <span>Tax (18%)</span>
-                    <span>₹{tax.toFixed(2)}</span>
+                    <span>Rs {tax.toFixed(2)}</span>
                   </div>
                   <div
                     style={{
@@ -750,7 +956,7 @@ export default function CustomerCart() {
                   >
                     <span>Total</span>
                     <span style={{ color: "var(--customer-primary)" }}>
-                      ₹{totalAmount.toFixed(2)}
+                      Rs {totalAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -777,7 +983,7 @@ export default function CustomerCart() {
                   className="customer-btn customer-btn-success customer-btn-lg"
                   onClick={placeOrder}
                 >
-                  ✓ Place Order
+                  Place Order
                 </button>
               </div>
             </div>
