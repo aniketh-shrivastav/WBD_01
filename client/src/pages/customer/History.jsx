@@ -115,6 +115,10 @@ function signatureForOrder(o) {
   });
 }
 
+function getOrderKey(order) {
+  return String(order?.orderId || order?._id || "");
+}
+
 function signatureForBooking(b) {
   const statusHistory = Array.isArray(b?.statusHistory) ? b.statusHistory : [];
   const costHistory = Array.isArray(b?.costHistory) ? b.costHistory : [];
@@ -229,7 +233,7 @@ export default function CustomerHistory() {
 
     const current = {
       orders: Object.fromEntries(
-        allOrders.map((o) => [String(o._id), signatureForOrder(o)]),
+        allOrders.map((o) => [getOrderKey(o), signatureForOrder(o)]),
       ),
       bookings: Object.fromEntries(
         allBookings.map((b) => [String(b._id), signatureForBooking(b)]),
@@ -471,11 +475,11 @@ export default function CustomerHistory() {
 
   const hasUpcomingOrderChanges = useMemo(
     () =>
-      (upcomingOrders || []).some((o) => highlightedIds.orders[String(o?._id)]),
+      (upcomingOrders || []).some((o) => highlightedIds.orders[getOrderKey(o)]),
     [upcomingOrders, highlightedIds],
   );
   const hasPastOrderChanges = useMemo(
-    () => (pastOrders || []).some((o) => highlightedIds.orders[String(o?._id)]),
+    () => (pastOrders || []).some((o) => highlightedIds.orders[getOrderKey(o)]),
     [pastOrders, highlightedIds],
   );
   const hasUpcomingServiceChanges = useMemo(
@@ -578,35 +582,35 @@ export default function CustomerHistory() {
                 ) : (
                   upcomingOrders.map((o) => (
                     <li
-                      key={o._id}
+                      key={getOrderKey(o)}
                       className={`history-item${
-                        highlightedIds.orders[String(o._id)]
+                        highlightedIds.orders[getOrderKey(o)]
                           ? " history-highlight"
                           : ""
                       }${
-                        fadingIds.orders[String(o._id)]
+                        fadingIds.orders[getOrderKey(o)]
                           ? " history-highlight-fade"
                           : ""
                       }`}
                       role="button"
                       tabIndex={0}
                       onClick={() => {
-                        const id = String(o._id);
+                        const id = getOrderKey(o);
                         if (highlightedIds.orders[id])
                           markSeen("orders", id, signatureForOrder(o));
-                        navigate(`/customer/order/${o._id}`);
+                        navigate(`/customer/order/${id}`);
                       }}
                       onKeyDown={(e) => {
                         if (e.key !== "Enter" && e.key !== " ") return;
                         e.preventDefault();
-                        const id = String(o._id);
+                        const id = getOrderKey(o);
                         if (highlightedIds.orders[id])
                           markSeen("orders", id, signatureForOrder(o));
-                        navigate(`/customer/order/${o._id}`);
+                        navigate(`/customer/order/${id}`);
                       }}
                     >
                       <div className="item-details">
-                        <h3>Order ID: {o._id}</h3>
+                        <h3>Order ID: {o.orderId || o._id}</h3>
                         <p>
                           <strong>Placed on:</strong> {formatDate(o.placedAt)}
                         </p>
@@ -683,7 +687,7 @@ export default function CustomerHistory() {
                           className="download-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/customer/order/${o._id}`);
+                            navigate(`/customer/order/${getOrderKey(o)}`);
                           }}
                         >
                           View Details
@@ -693,7 +697,7 @@ export default function CustomerHistory() {
                             className="cancel-btn"
                             onClick={(e) => {
                               e.stopPropagation();
-                              cancelOrder(o._id);
+                              cancelOrder(getOrderKey(o));
                             }}
                           >
                             Cancel Order
@@ -743,35 +747,35 @@ export default function CustomerHistory() {
                 ) : (
                   pastOrders.map((o) => (
                     <li
-                      key={o._id}
+                      key={getOrderKey(o)}
                       className={`history-item${
-                        highlightedIds.orders[String(o._id)]
+                        highlightedIds.orders[getOrderKey(o)]
                           ? " history-highlight"
                           : ""
                       }${
-                        fadingIds.orders[String(o._id)]
+                        fadingIds.orders[getOrderKey(o)]
                           ? " history-highlight-fade"
                           : ""
                       }`}
                       role="button"
                       tabIndex={0}
                       onClick={() => {
-                        const id = String(o._id);
+                        const id = getOrderKey(o);
                         if (highlightedIds.orders[id])
                           markSeen("orders", id, signatureForOrder(o));
-                        navigate(`/customer/order/${o._id}`);
+                        navigate(`/customer/order/${id}`);
                       }}
                       onKeyDown={(e) => {
                         if (e.key !== "Enter" && e.key !== " ") return;
                         e.preventDefault();
-                        const id = String(o._id);
+                        const id = getOrderKey(o);
                         if (highlightedIds.orders[id])
                           markSeen("orders", id, signatureForOrder(o));
-                        navigate(`/customer/order/${o._id}`);
+                        navigate(`/customer/order/${id}`);
                       }}
                     >
                       <div className="item-details">
-                        <h3>Order ID: {o._id}</h3>
+                        <h3>Order ID: {o.orderId || o._id}</h3>
                         <p>
                           <strong>Placed on:</strong> {formatDate(o.placedAt)}
                         </p>
@@ -800,7 +804,7 @@ export default function CustomerHistory() {
                           className="download-btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/customer/order/${o._id}`);
+                            navigate(`/customer/order/${getOrderKey(o)}`);
                           }}
                         >
                           View Details
@@ -809,7 +813,7 @@ export default function CustomerHistory() {
                           .toLowerCase()
                           .includes("cancel") && (
                           <a
-                            href={`${backendBase}/customer/order-receipt/${o._id}`}
+                            href={`${backendBase}/customer/order-receipt/${getOrderKey(o)}`}
                             target="_blank"
                             rel="noreferrer"
                             className="download-btn"

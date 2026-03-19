@@ -1,6 +1,11 @@
 const ServiceBooking = require("../../models/serviceBooking");
 const Order = require("../../models/Orders");
 const { enrichBookings } = require("./helpers");
+const {
+  findOrderByIdentifier,
+  getDisplayOrderId,
+  buildOrderIdentifierFilter,
+} = require("../../utils/orderIdUtils");
 
 async function getHistoryData(customerId, includeSellerDetails = false) {
   const bookingQuery = ServiceBooking.find({ customerId })
@@ -18,13 +23,18 @@ async function getHistoryData(customerId, includeSellerDetails = false) {
   const bookings = await bookingQuery;
   const orders = await orderQuery;
 
+  const normalizedOrders = orders.map((o) => ({
+    ...(typeof o.toObject === "function" ? o.toObject() : o),
+    orderId: getDisplayOrderId(o),
+  }));
+
   const enrichedBookings = enrichBookings(bookings);
 
-  const upcomingOrders = orders.filter((o) =>
+  const upcomingOrders = normalizedOrders.filter((o) =>
     ["pending", "confirmed", "shipped"].includes(o.orderStatus),
   );
 
-  const pastOrders = orders.filter((o) =>
+  const pastOrders = normalizedOrders.filter((o) =>
     ["delivered", "cancelled"].includes(o.orderStatus),
   );
 
@@ -36,12 +46,16 @@ async function getHistoryData(customerId, includeSellerDetails = false) {
 }
 
 async function getOrderDetails(orderId, customerId) {
-  return Order.findOne({
-    _id: orderId,
-    userId: customerId,
-  })
+  const filter = buildOrderIdentifierFilter(orderId, { userId: customerId });
+  const order = await Order.findOne(filter)
     .populate("items.seller", "name email")
     .lean();
+
+  if (!order) return null;
+  return {
+    ...order,
+    orderId: getDisplayOrderId(order),
+  };
 }
 
 async function getServiceDetails(bookingId, customerId) {
@@ -54,7 +68,7 @@ async function getServiceDetails(bookingId, customerId) {
 }
 
 async function cancelOrder(orderId, customerId) {
-  const order = await Order.findOne({ _id: orderId, userId: customerId });
+  const order = await findOrderByIdentifier(orderId, { userId: customerId });
 
   if (!order || order.orderStatus !== "pending") {
     return { success: false, message: "Cannot cancel this order." };

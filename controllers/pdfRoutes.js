@@ -1,7 +1,10 @@
 const PDFDocument = require("pdfkit");
 const path = require("path");
-const Order = require("../models/Orders");
 const ServiceBooking = require("../models/serviceBooking");
+const {
+  findOrderByIdentifier,
+  getDisplayOrderId,
+} = require("../utils/orderIdUtils");
 
 // ===== Helper: Add Logo & Title =====
 function addLogo(doc, title) {
@@ -52,14 +55,14 @@ function drawTable(doc, startX, startY, rows, colWidths) {
 // ===== ORDER RECEIPT =====
 exports.getOrderReceipt = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await findOrderByIdentifier(req.params.id);
     if (!order) return res.status(404).send("Order not found");
 
     const doc = new PDFDocument({ margin: 50 });
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=Order_${order._id}.pdf`,
+      `attachment; filename=Order_${getDisplayOrderId(order)}.pdf`,
     );
     doc.pipe(res);
 
@@ -88,7 +91,7 @@ exports.getOrderReceipt = async (req, res) => {
       doc.y,
       [
         ["Field", "Details"],
-        ["Order ID", order._id],
+        ["Order ID", getDisplayOrderId(order)],
         ["Placed On", order.placedAt.toLocaleDateString()],
         ["Status", order.orderStatus],
         ["Payment Status", order.paymentStatus],

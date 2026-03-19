@@ -14,6 +14,10 @@ const Order = require("../models/Orders");
 const Cart = require("../models/Cart");
 const ProductReview = require("../models/ProductReview");
 const { createNotification } = require("./notificationController");
+const {
+  findOrderByIdentifier,
+  getDisplayOrderId,
+} = require("../utils/orderIdUtils");
 
 // Allowed seller verification document types
 const SELLER_DOC_TYPES_INDIVIDUAL = [
@@ -137,7 +141,7 @@ exports.getDashboard = async (req, res) => {
         ? sellerItem.itemStatus || order.orderStatus || "pending"
         : order.orderStatus || "pending";
       return {
-        orderId: order._id.toString().substring(0, 8).toUpperCase(),
+        orderId: getDisplayOrderId(order),
         customer: order.userId?.name || "Unknown",
         status: itemStatus,
         productName: sellerItem?.name || "N/A",
@@ -310,7 +314,7 @@ exports.getOrders = async (req, res) => {
           const itemStatus = item.itemStatus || order.orderStatus || "pending";
           shaped.push({
             uniqueId: uniqueId,
-            orderId: order._id,
+            orderId: getDisplayOrderId(order),
             productId: item.productId,
             itemIndex: itemIndex,
             customerName: order.userId?.name || "Unknown",
@@ -606,7 +610,7 @@ exports.updateOrderStatus = async (req, res) => {
     const { orderId } = req.params;
     const { newStatus, productId, itemIndex, deliveryDate, otp } = req.body;
 
-    const order = await Order.findById(orderId);
+    const order = await findOrderByIdentifier(orderId);
     if (!order) {
       return res
         .status(404)
@@ -723,7 +727,7 @@ exports.updateOrderStatus = async (req, res) => {
             customerId: order.userId,
             type: "order_status",
             title: "Order Status Updated",
-            message: `Item "${item.name}" in order #${order._id.toString().slice(-6).toUpperCase()} has been updated to ${newStatus}.`,
+            message: `Item "${item.name}" in order #${getDisplayOrderId(order)} has been updated to ${newStatus}.`,
             referenceId: order._id,
             referenceModel: "Order",
           },
@@ -807,7 +811,7 @@ exports.updateDeliveryDate = async (req, res) => {
         .json({ success: false, message: "Delivery date is required" });
     }
 
-    const order = await Order.findById(orderId);
+    const order = await findOrderByIdentifier(orderId);
     if (!order) {
       return res
         .status(404)

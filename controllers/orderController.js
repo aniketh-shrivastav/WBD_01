@@ -9,6 +9,7 @@ const {
   formatDeliveryAddress,
   validateDeliveryAddress,
 } = require("../utils/deliveryAddressUtils");
+const { getDisplayOrderId } = require("../utils/orderIdUtils");
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.user) return next();
@@ -179,7 +180,7 @@ exports.createOrderFromCart = async (req, res) => {
             customerId: userId,
             type: "new_order",
             title: "New Order Placed",
-            message: `Your order #${order._id.toString().slice(-6).toUpperCase()} for ${itemNames} (₹${order.totalAmount}) has been placed successfully.`,
+            message: `Your order #${getDisplayOrderId(order)} for ${itemNames} (₹${order.totalAmount}) has been placed successfully.`,
             referenceId: order._id,
             referenceModel: "Order",
           },

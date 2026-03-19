@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+function generateOrderId() {
+  const timePart = Date.now().toString(36).toUpperCase();
+  const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `ORD-${timePart}-${randomPart}`;
+}
+
 const DeliveryAddressSchema = new mongoose.Schema(
   {
     addressLine1: { type: String, required: true },
@@ -55,6 +61,11 @@ const OrderItemSchema = new mongoose.Schema(
 );
 
 const OrderSchema = new mongoose.Schema({
+  orderId: {
+    type: String,
+    unique: true,
+    index: true,
+  },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Same as Cart userId
   items: { type: [OrderItemSchema], required: true },
   totalAmount: { type: Number, required: true },
@@ -88,6 +99,13 @@ const OrderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+OrderSchema.pre("validate", function setOrderId(next) {
+  if (!this.orderId) {
+    this.orderId = generateOrderId();
+  }
+  next();
 });
 
 module.exports = mongoose.model("Order", OrderSchema);

@@ -9,6 +9,10 @@ const ServiceCategory = require("../models/ServiceCategory");
 const ContactMessage = require("../models/ContactMessage");
 const bcrypt = require("bcryptjs");
 const PDFDocument = require("pdfkit");
+const {
+  findOrderByIdentifier,
+  getDisplayOrderId,
+} = require("../utils/orderIdUtils");
 
 const MONTH_HISTORY = 6;
 
@@ -616,7 +620,11 @@ exports.getApiOrders = async (req, res) => {
         if (allCancelled) computedStatus = "cancelled";
         else if (allDelivered) computedStatus = "delivered";
         else if (anyCancelled || anyDelivered) computedStatus = "partial";
-        return { ...o.toObject(), computedStatus };
+        return {
+          ...o.toObject(),
+          orderId: getDisplayOrderId(o),
+          computedStatus,
+        };
       });
 
     res.json({ orders, bookings });
@@ -1334,7 +1342,7 @@ exports.getProduct = async (req, res) => {
 exports.cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const order = await Order.findById(orderId);
+    const order = await findOrderByIdentifier(orderId);
     if (!order) return res.status(404).send("Order not found");
     if (order.orderStatus === "cancelled")
       return res.status(400).send("Already cancelled");
@@ -1366,7 +1374,7 @@ exports.cancelOrder = async (req, res) => {
 exports.restoreOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const order = await Order.findById(orderId);
+    const order = await findOrderByIdentifier(orderId);
     if (!order) {
       return req.accepts("json")
         ? res.status(404).json({ success: false, message: "Order not found" })
@@ -2018,7 +2026,11 @@ exports.getUserAnalytics = async (req, res) => {
       ordersRaw.forEach((o) => {
         (o.items || []).forEach((it) => {
           if (String(it.seller) === String(sellerId)) {
-            sellerItems.push({ ...it, placedAt: o.placedAt, orderId: o._id });
+            sellerItems.push({
+              ...it,
+              placedAt: o.placedAt,
+              orderId: getDisplayOrderId(o),
+            });
           }
         });
       });

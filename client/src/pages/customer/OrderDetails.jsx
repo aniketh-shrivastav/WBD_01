@@ -147,7 +147,7 @@ export default function OrderDetails() {
                     Order ID
                   </span>
                   <div style={{ fontWeight: "600", fontFamily: "monospace" }}>
-                    {order._id}
+                    {order.orderId || order._id}
                   </div>
                 </div>
                 <span

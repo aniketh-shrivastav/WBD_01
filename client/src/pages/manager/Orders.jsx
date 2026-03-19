@@ -377,7 +377,7 @@ export default function Orders({ mode = "manager" }) {
           <div className="detail-grid">
             <div className="detail-item">
               <label>Order ID</label>
-              <span>{order._id}</span>
+              <span>{order.orderId || order._id}</span>
             </div>
             <div className="detail-item">
               <label>Order Status</label>
@@ -740,7 +740,7 @@ export default function Orders({ mode = "manager" }) {
         .map((it) => it.seller?.name || "")
         .join(" ");
       return (
-        (o._id || "").toLowerCase().includes(q) ||
+        (o.orderId || o._id || "").toLowerCase().includes(q) ||
         (user.name || "").toLowerCase().includes(q) ||
         (user.email || "").toLowerCase().includes(q) ||
         sellers.toLowerCase().includes(q) ||
@@ -780,10 +780,10 @@ export default function Orders({ mode = "manager" }) {
       const firstSeller = (o.items || [])[0]?.seller || {};
 
       rows.push(
-        <tr key={o._id}>
+        <tr key={o.orderId || o._id}>
           <td>
             <div style={{ fontFamily: "monospace", fontSize: "0.85rem" }}>
-              {o._id.slice(-8)}...
+              {o.orderId || o._id}
             </div>
           </td>
           <td>
@@ -846,7 +846,9 @@ export default function Orders({ mode = "manager" }) {
               ) : !readOnly ? (
                 <button
                   className="btn btn-suspend"
-                  onClick={() => performAction("order", "cancel", o._id)}
+                  onClick={() =>
+                    performAction("order", "cancel", o.orderId || o._id)
+                  }
                 >
                   Cancel
                 </button>
