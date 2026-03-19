@@ -20,6 +20,7 @@ const PERF_LOG = null;
 const DEBUG_LOG = path.join(LOG_DIR, "debug.log");
 const ERROR_LOG = path.join(ERROR_LOG_DIR, "error.log");
 const LOG_ROTATION_MS = 20 * 1000;
+const FILE_LOGGING_ENABLED = false;
 
 // Ensure logs directory exists
 if (!fs.existsSync(LOG_DIR)) {
@@ -53,6 +54,7 @@ function resolveRotatedPath(filePath) {
 }
 
 const appendLog = (filePath, message) => {
+  if (!FILE_LOGGING_ENABLED) return;
   if (!filePath) return;
   const targetPath = resolveRotatedPath(filePath);
   fs.appendFile(targetPath, message + "\n", (err) => {
