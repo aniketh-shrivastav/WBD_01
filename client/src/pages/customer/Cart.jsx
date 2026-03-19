@@ -38,6 +38,17 @@ export default function CustomerCart() {
     country: "India",
   });
   const [cartErrors, setCartErrors] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    function handleEscapeKey(e) {
+      if (e.key === "Escape" && selectedImage) {
+        setSelectedImage(null);
+      }
+    }
+    window.addEventListener("keydown", handleEscapeKey);
+    return () => window.removeEventListener("keydown", handleEscapeKey);
+  }, [selectedImage]);
 
   function backendBase() {
     const { protocol, hostname, port } = window.location;
@@ -318,6 +329,8 @@ export default function CustomerCart() {
                   src={it.image}
                   alt={it.name}
                   className="customer-cart-item-image"
+                  onClick={() => setSelectedImage(it.image)}
+                  style={{ cursor: "pointer" }}
                 />
                 <div className="customer-cart-item-details">
                   <h4 className="customer-cart-item-name">{it.name}</h4>
@@ -986,6 +999,74 @@ export default function CustomerCart() {
                   Place Order
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Image Lightbox Modal */}
+        {selectedImage && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 2000,
+            }}
+            onClick={() => setSelectedImage(null)}
+          >
+            <div
+              style={{
+                position: "relative",
+                maxWidth: "85vw",
+                maxHeight: "85vh",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={selectedImage}
+                alt="Large view"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  objectFit: "contain",
+                  borderRadius: "8px",
+                }}
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
+                  border: "2px solid white",
+                  borderRadius: "50%",
+                  width: "45px",
+                  height: "45px",
+                  fontSize: "28px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                }}
+                title="Close (Esc)"
+              >
+                ✕
+              </button>
             </div>
           </div>
         )}
