@@ -55,14 +55,14 @@ function DetailsModal({
       const res = await fetch(
         `/seller/orders/${orderIdentifier}/delivery-date`,
         {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          deliveryDate,
-          productId: order.productId,
-          itemIndex: order.itemIndex,
-        }),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            deliveryDate,
+            productId: order.productId,
+            itemIndex: order.itemIndex,
+          }),
         },
       );
 
@@ -175,7 +175,13 @@ function DetailsModal({
             <div className="seller-detail-grid">
               <div className="seller-detail-item">
                 <label>Expected Delivery Date</label>
-                <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    alignItems: "flex-start",
+                  }}
+                >
                   <div style={{ flex: 1 }}>
                     <input
                       type="date"
@@ -195,7 +201,10 @@ function DetailsModal({
                       color: "white",
                       border: "none",
                       borderRadius: "6px",
-                      cursor: disabled || savingDeliveryDate ? "not-allowed" : "pointer",
+                      cursor:
+                        disabled || savingDeliveryDate
+                          ? "not-allowed"
+                          : "pointer",
                       fontWeight: "500",
                       fontSize: "0.9rem",
                       transition: "background 0.2s",
@@ -523,7 +532,7 @@ export default function SellerOrders() {
     loadOrders();
   }, []);
 
-  async function updateStatus(uniqueId, orderId, productId, itemIndex) {
+  async function updateStatus(uniqueId, orderIdentifier, productId, itemIndex) {
     // Get the pending status or current status
     const order = orders.find((o) => {
       const oUniqueId = o.uniqueId || `${o.orderId}-${o.productId || ""}`;
@@ -556,7 +565,7 @@ export default function SellerOrders() {
     try {
       const deliveryDate = deliveryDates[uniqueId] || null;
 
-      const res = await fetch(`/seller/orders/${orderId}/status`, {
+      const res = await fetch(`/seller/orders/${orderIdentifier}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -816,7 +825,7 @@ export default function SellerOrders() {
                                 e.preventDefault();
                                 updateStatus(
                                   uniqueId,
-                                  o.orderId,
+                                  o._id || o.orderId,
                                   o.productId,
                                   o.itemIndex,
                                 );

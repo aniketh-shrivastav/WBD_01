@@ -726,7 +726,9 @@ exports.updateOrderStatus = async (req, res) => {
         });
       }
 
-      await order.save();
+      // Legacy orders may miss newer required fields (e.g. deliveryAddressDetails).
+      // Save status changes without full-document validation.
+      await order.save({ validateBeforeSave: false });
 
       // Send notification to customer about item status change
       try {
@@ -799,7 +801,9 @@ exports.updateOrderStatus = async (req, res) => {
         changedBy: { id: req.session.user?.id, role: "seller" },
       });
     });
-    await order.save();
+    // Legacy orders may miss newer required fields (e.g. deliveryAddressDetails).
+    // Save status changes without full-document validation.
+    await order.save({ validateBeforeSave: false });
 
     res.json({ success: true });
   } catch (err) {
