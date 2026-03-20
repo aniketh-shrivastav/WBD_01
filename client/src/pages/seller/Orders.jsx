@@ -33,12 +33,52 @@ function DetailsModal({
   order,
   onDeliveryDateChange,
   deliveryDate,
+  onSaveDeliveryDate,
 }) {
   if (!isOpen || !order) return null;
+
+  const [savingDeliveryDate, setSavingDeliveryDate] = useState(false);
 
   const disabled = ["delivered", "cancelled"].includes(
     String(order.status).toLowerCase(),
   );
+
+  const handleSaveDeliveryDate = async () => {
+    if (!deliveryDate) {
+      alert("Please select a delivery date");
+      return;
+    }
+
+    setSavingDeliveryDate(true);
+    try {
+      const orderIdentifier = order._id || order.orderId;
+      const res = await fetch(
+        `/seller/orders/${orderIdentifier}/delivery-date`,
+        {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          deliveryDate,
+          productId: order.productId,
+          itemIndex: order.itemIndex,
+        }),
+        },
+      );
+
+      const data = await res.json();
+      if (data.success) {
+        alert("Delivery date saved successfully!");
+        onSaveDeliveryDate?.();
+      } else {
+        alert(data.message || "Failed to save delivery date");
+      }
+    } catch (e) {
+      alert("Error saving delivery date: " + e.message);
+    } finally {
+      setSavingDeliveryDate(false);
+    }
+  };
 
   return (
     <div className="seller-modal-overlay" onClick={onClose}>
@@ -100,6 +140,15 @@ function DetailsModal({
           {/* Product Information */}
           <div className="seller-detail-section">
             <h3>Product Information</h3>
+            {order.image && (
+              <div className="seller-product-image-container">
+                <img
+                  src={order.image}
+                  alt={order.productName}
+                  className="seller-product-image"
+                />
+              </div>
+            )}
             <div className="seller-detail-grid">
               <div className="seller-detail-item">
                 <label>Product</label>
@@ -126,14 +175,47 @@ function DetailsModal({
             <div className="seller-detail-grid">
               <div className="seller-detail-item">
                 <label>Expected Delivery Date</label>
-                <input
-                  type="date"
-                  className="seller-detail-input"
-                  value={deliveryDate || ""}
-                  onChange={(e) => onDeliveryDateChange(e.target.value)}
-                  disabled={disabled}
-                  min={new Date().toISOString().split("T")[0]}
-                />
+                <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                  <div style={{ flex: 1 }}>
+                    <input
+                      type="date"
+                      className="seller-detail-input"
+                      value={deliveryDate || ""}
+                      onChange={(e) => onDeliveryDateChange(e.target.value)}
+                      disabled={disabled}
+                      min={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                  <button
+                    onClick={handleSaveDeliveryDate}
+                    disabled={disabled || !deliveryDate || savingDeliveryDate}
+                    style={{
+                      padding: "8px 16px",
+                      background: disabled ? "#d1d5db" : "#667eea",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: disabled || savingDeliveryDate ? "not-allowed" : "pointer",
+                      fontWeight: "500",
+                      fontSize: "0.9rem",
+                      transition: "background 0.2s",
+                      opacity: savingDeliveryDate ? 0.7 : 1,
+                      whiteSpace: "nowrap",
+                    }}
+                    onMouseOver={(e) => {
+                      if (!disabled && !savingDeliveryDate) {
+                        e.target.style.background = "#764ba2";
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!disabled && !savingDeliveryDate) {
+                        e.target.style.background = "#667eea";
+                      }
+                    }}
+                  >
+                    {savingDeliveryDate ? "Saving..." : "Save"}
+                  </button>
+                </div>
               </div>
               {order.deliveryOtp && (
                 <div className="seller-detail-item">
@@ -363,6 +445,17 @@ function DetailsModal({
           font-size: 0.8rem;
           color: #9ca3af;
           margin-top: 4px;
+        }
+        .seller-product-image-container {
+          margin-bottom: 16px;
+          text-align: center;
+        }
+        .seller-product-image {
+          max-width: 100%;
+          max-height: 250px;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
       `}</style>
     </div>
@@ -761,6 +854,11 @@ export default function SellerOrders() {
               [uniqueId]: date,
             }));
           }
+        }}
+        onSaveDeliveryDate={() => {
+          // Reload orders after saving delivery date
+          loadOrders();
+          setSelectedOrder(null);
         }}
       />
 

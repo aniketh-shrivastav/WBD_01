@@ -812,12 +812,29 @@ exports.updateOrderStatus = async (req, res) => {
 exports.updateDeliveryDate = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { itemIndex, deliveryDate } = req.body;
+    const { itemIndex, deliveryDate, productId } = req.body;
 
     if (!deliveryDate) {
       return res
         .status(400)
         .json({ success: false, message: "Delivery date is required" });
+    }
+
+    // Accept both yyyy-mm-dd and dd-mm-yyyy to avoid Date cast errors.
+    let parsedDeliveryDate = new Date(deliveryDate);
+    if (Number.isNaN(parsedDeliveryDate.getTime())) {
+      const m = String(deliveryDate).match(/^(\d{2})-(\d{2})-(\d{4})$/);
+      if (m) {
+        const [, dd, mm, yyyy] = m;
+        parsedDeliveryDate = new Date(`${yyyy}-${mm}-${dd}`);
+      }
+    }
+
+    if (Number.isNaN(parsedDeliveryDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid delivery date format",
+      });
     }
 
     const order = await findOrderByIdentifier(orderId);
@@ -827,22 +844,40 @@ exports.updateDeliveryDate = async (req, res) => {
         .json({ success: false, message: "Order not found" });
     }
 
-    const item = order.items[itemIndex];
+    let idx = Number(itemIndex);
+    if (!Number.isInteger(idx) || idx < 0) {
+      idx = -1;
+    }
+
+    // Fallback match by productId + seller when itemIndex is missing/invalid.
+    if (idx < 0 || idx >= order.items.length) {
+      idx = order.items.findIndex(
+        (it) =>
+          String(it.seller) === String(req.user?.id || req.session?.user?.id) &&
+          (productId ? String(it.productId) === String(productId) : true),
+      );
+    }
+
+    const item = idx >= 0 ? order.items[idx] : null;
     if (!item) {
       return res
         .status(404)
         .json({ success: false, message: "Order item not found" });
     }
 
-    if (String(item.seller) !== String(req.user.id)) {
+    if (String(item.seller) !== String(req.user?.id || req.session?.user?.id)) {
       return res.status(403).json({
         success: false,
         message: "Access denied: This item does not belong to you",
       });
     }
 
-    order.items[itemIndex].deliveryDate = new Date(deliveryDate);
-    await order.save();
+    // Update only the targeted nested field to avoid re-validating legacy
+    // required top-level fields (some old orders may not have them).
+    await Order.updateOne(
+      { _id: order._id },
+      { $set: { [`items.${idx}.deliveryDate`]: parsedDeliveryDate } },
+    );
 
     res.json({
       success: true,
