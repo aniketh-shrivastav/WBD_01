@@ -314,6 +314,7 @@ exports.getOrders = async (req, res) => {
           const itemStatus = item.itemStatus || order.orderStatus || "pending";
           shaped.push({
             uniqueId: uniqueId,
+            _id: order._id,
             orderId: getDisplayOrderId(order),
             productId: item.productId,
             itemIndex: itemIndex,
@@ -321,11 +322,19 @@ exports.getOrders = async (req, res) => {
             customerEmail: order.userId?.email || "",
             productName: item.name,
             quantity: item.quantity,
+            price: item.price,
+            image: item.image,
             deliveryAddress: order.deliveryAddress,
+            deliveryAddressDetails: order.deliveryAddressDetails,
             district: order.district,
             status: itemStatus,
             deliveryDate: item.deliveryDate || null,
+            deliveryOtp: item.deliveryOtp || null,
             placedAt: order.placedAt,
+            totalAmount: order.totalAmount,
+            paymentStatus: order.paymentStatus,
+            itemStatusHistory: item.itemStatusHistory || [],
+            orderStatusHistory: order.orderStatusHistory || [],
           });
         }
       });
