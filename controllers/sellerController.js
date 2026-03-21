@@ -1,388 +1,101 @@
-const path = require("path");
-const fs = require("fs");
-const os = require("os");
-const mongoose = require("mongoose");
-const AdmZip = require("adm-zip");
-const csvParser = require("csv-parser");
-const ExcelJS = require("exceljs");
-
-const User = require("../models/User");
-const SellerProfile = require("../models/sellerProfile");
-const cloudinary = require("../config/cloudinaryConfig");
-const Product = require("../models/Product");
-const Order = require("../models/Orders");
-const Cart = require("../models/Cart");
-const ProductReview = require("../models/ProductReview");
+const sellerService = require("../services/sellerService");
 const { createNotification } = require("./notificationController");
-const {
-  findOrderByIdentifier,
-  getDisplayOrderId,
-} = require("../utils/orderIdUtils");
 
-// Allowed seller verification document types
-const SELLER_DOC_TYPES_INDIVIDUAL = [
-  "PAN Card",
-  "Aadhaar Card (Masked)",
-  "Selfie Verification",
-];
-const SELLER_DOC_TYPES_BUSINESS = [
-  "PAN Card (Business)",
-  "GST Certificate",
-  "Certificate of Incorporation",
-  "Shop & Establishment License",
-];
-const ALL_SELLER_DOC_TYPES = [
-  ...SELLER_DOC_TYPES_INDIVIDUAL,
-  ...SELLER_DOC_TYPES_BUSINESS,
-];
-
-function deriveOrderStatus(items, fallback = "pending") {
-  if (!Array.isArray(items) || items.length === 0) return fallback;
-  const statuses = items.map((item) => item.itemStatus || fallback);
-
-  if (statuses.every((s) => s === "cancelled")) return "cancelled";
-  if (statuses.every((s) => s === "delivered")) return "delivered";
-  if (statuses.some((s) => s === "shipped")) return "shipped";
-  if (statuses.some((s) => s === "confirmed")) return "confirmed";
-  return "pending";
+function wantsJson(req) {
+  return (
+    (req.headers.accept || "").includes("application/json") ||
+    (req.headers["content-type"] || "").includes("application/json")
+  );
 }
 
-async function uploadProfilePictureIfPresent(file, folderName) {
-  if (!file) return null;
-  try {
-    const uploadRes = await cloudinary.uploader.upload(file.path, {
-      folder: folderName,
-      resource_type: "image",
-      timeout: 120000,
-    });
-    return uploadRes.secure_url;
-  } finally {
-    if (file.path && fs.existsSync(file.path)) {
-      fs.unlinkSync(file.path);
-    }
-  }
-}
-
-// Dashboard JSON API
 exports.getDashboard = async (req, res) => {
   try {
-    const sellerId = req.user.id;
-
-    const allOrders = await Order.find({ "items.seller": sellerId })
-      .populate("userId", "name email")
-      .sort({ placedAt: -1 })
-      .lean();
-
-    const sellerIdStr = String(sellerId);
-
-    // Calculate Total Sales: Count of items with status "delivered" only
-    let totalSales = 0;
-    allOrders.forEach((order) => {
-      if (!order.items || !Array.isArray(order.items)) return;
-      order.items.forEach((item) => {
-        const itemSellerId = item.seller ? String(item.seller) : null;
-        if (itemSellerId === sellerIdStr) {
-          const itemStatus = item.itemStatus || order.orderStatus || "pending";
-          if (itemStatus === "delivered") {
-            totalSales++;
-          }
-        }
-      });
-    });
-
-    const totalOrders = allOrders.length;
-
-    // Calculate Total Earnings
-    let totalEarnings = 0;
-    let deliveredItemsCount = 0;
-
-    allOrders.forEach((order) => {
-      if (!order.items || !Array.isArray(order.items)) return;
-
-      order.items.forEach((item) => {
-        const itemSellerId = item.seller ? String(item.seller) : null;
-        if (itemSellerId === sellerIdStr) {
-          const itemStatus = item.itemStatus || order.orderStatus || "pending";
-          if (itemStatus === "delivered") {
-            const price = Number(item.price) || 0;
-            const quantity = Number(item.quantity) || 0;
-            totalEarnings += price * quantity;
-            deliveredItemsCount++;
-          }
-        }
-      });
-    });
+    const data = await sellerService.getDashboardData(req.user.id);
 
     console.log(
-      `[Dashboard] Seller ${sellerIdStr}: Total Earnings = ${totalEarnings} from ${deliveredItemsCount} delivered items`,
+      `[Dashboard] Seller ${String(req.user.id)}: Total Earnings = ${data.totalEarnings} from ${data.deliveredItemsCount} delivered items`,
     );
 
-    // Get Stock Alerts
-    const lowStockProducts = await Product.find({
-      seller: sellerId,
-      quantity: { $lte: 15 },
-    })
-      .select("name quantity")
-      .sort({ quantity: 1 })
-      .limit(5)
-      .lean();
-
-    const stockAlerts = lowStockProducts.map((product) => ({
-      product: product.name,
-      stock: product.quantity,
-    }));
-
-    // Get Recent Orders
-    const recentOrders = allOrders.slice(0, 5).map((order) => {
-      const sellerItem = order.items.find(
-        (item) => String(item.seller) === String(sellerId),
-      );
-      const itemStatus = sellerItem
-        ? sellerItem.itemStatus || order.orderStatus || "pending"
-        : order.orderStatus || "pending";
-      return {
-        orderId: getDisplayOrderId(order),
-        customer: order.userId?.name || "Unknown",
-        status: itemStatus,
-        productName: sellerItem?.name || "N/A",
-        amount: sellerItem ? sellerItem.price * sellerItem.quantity : 0,
-      };
+    return res.json({
+      success: true,
+      totalSales: data.totalSales,
+      totalEarnings: data.totalEarnings,
+      totalOrders: data.totalOrders,
+      stockAlerts: data.stockAlerts,
+      recentOrders: data.recentOrders,
+      statusDistribution: data.statusDistribution,
     });
-
-    // Calculate status distribution
-    const statusDistribution = {};
-    allOrders.forEach((order) => {
-      if (!order.items || !Array.isArray(order.items)) return;
-      order.items.forEach((item) => {
-        if (String(item.seller) !== sellerIdStr) return;
-        const itemStatus = item.itemStatus || order.orderStatus || "pending";
-        statusDistribution[itemStatus] =
-          (statusDistribution[itemStatus] || 0) + 1;
-      });
-    });
-
-    const dashboardData = {
-      totalSales,
-      totalEarnings: Math.round(totalEarnings * 100) / 100,
-      totalOrders,
-      stockAlerts,
-      recentOrders,
-    };
-
-    res.json({ success: true, ...dashboardData, statusDistribution });
   } catch (err) {
     console.error("Seller dashboard API error", err);
-    res
+    return res
       .status(500)
       .json({ success: false, message: "Failed to load dashboard" });
   }
 };
 
-// Get profile settings
 exports.getProfileSettings = async (req, res) => {
   try {
-    const sellerProfile = await SellerProfile.findOne({
-      sellerId: req.user.id,
-    }).populate(
-      "sellerId",
-      "name email phone profilePicture verificationStatus verificationDocuments verifiedAt verificationNote",
+    const data = await sellerService.getProfileSettingsData(
+      req.user.id,
+      req.session.user,
     );
 
-    if (!sellerProfile) {
-      const user = await User.findById(req.user.id).select(
-        "name email phone profilePicture verificationStatus verificationDocuments verifiedAt verificationNote",
-      );
-      return res.json({
-        success: true,
-        profile: {
-          storeName: user?.name || req.session.user.name,
-          ownerName: "",
-          contactEmail: user?.email || req.session.user.email,
-          phone: user?.phone || req.session.user.phone || "",
-          address: "",
-          profilePicture: user?.profilePicture || "",
-          sellerType: "individual",
-          verificationStatus: user?.verificationStatus || "unverified",
-          verificationDocuments: user?.verificationDocuments || [],
-          verificationNote: user?.verificationNote || "",
-          verifiedAt: user?.verifiedAt || null,
-        },
-        docTypesIndividual: SELLER_DOC_TYPES_INDIVIDUAL,
-        docTypesBusiness: SELLER_DOC_TYPES_BUSINESS,
-      });
-    }
-    res.json({
-      success: true,
-      profile: {
-        storeName: sellerProfile.sellerId.name,
-        ownerName: sellerProfile.ownerName || "",
-        contactEmail: sellerProfile.sellerId.email,
-        phone: sellerProfile.sellerId.phone || "",
-        address: sellerProfile.address || "",
-        profilePicture: sellerProfile.sellerId.profilePicture || "",
-        sellerType: sellerProfile.sellerType || "individual",
-        verificationStatus:
-          sellerProfile.sellerId.verificationStatus || "unverified",
-        verificationDocuments:
-          sellerProfile.sellerId.verificationDocuments || [],
-        verificationNote: sellerProfile.sellerId.verificationNote || "",
-        verifiedAt: sellerProfile.sellerId.verifiedAt || null,
-      },
-      docTypesIndividual: SELLER_DOC_TYPES_INDIVIDUAL,
-      docTypesBusiness: SELLER_DOC_TYPES_BUSINESS,
-    });
+    return res.json({ success: true, ...data });
   } catch (err) {
     console.error("Profile settings GET API error", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Update profile settings
 exports.updateProfileSettings = async (req, res) => {
   try {
-    const { storeName, contactEmail, phone, ownerName, address, sellerType } =
-      req.body;
-
-    if (!storeName?.trim() || !ownerName?.trim()) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Store and Owner name required" });
-    }
-    const phoneRegex = /^\d{10}$/;
-    if (phone && !phoneRegex.test(phone)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Phone must be 10 digits" });
-    }
-
-    const profilePicture = await uploadProfilePictureIfPresent(
+    const result = await sellerService.updateProfileSettings(
+      req.user.id,
+      req.body,
       req.file,
-      "seller_profiles",
-    );
-    const userUpdate = {
-      name: storeName,
-      email: contactEmail,
-      phone: phone,
-    };
-    if (profilePicture) userUpdate.profilePicture = profilePicture;
-
-    await User.findByIdAndUpdate(req.user.id, userUpdate);
-
-    const profileUpdate = {
-      ownerName,
-      address,
-      sellerId: req.user.id,
-    };
-    if (sellerType && ["individual", "business"].includes(sellerType)) {
-      profileUpdate.sellerType = sellerType;
-    }
-
-    await SellerProfile.findOneAndUpdate(
-      { sellerId: req.user.id },
-      profileUpdate,
-      { new: true, upsert: true },
     );
 
-    if (profilePicture) {
-      req.session.user.profilePicture = profilePicture;
+    if (result.profilePicture) {
+      req.session.user.profilePicture = result.profilePicture;
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: "Profile updated",
-      profilePicture,
+      profilePicture: result.profilePicture,
     });
   } catch (err) {
+    if (err.status) {
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
+    }
+
     console.error("Profile settings POST API error", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Get orders
 exports.getOrders = async (req, res) => {
   try {
-    const sellerId = req.user.id;
-    const orders = await Order.find({ "items.seller": sellerId })
-      .populate("userId", "name email")
-      .sort({ placedAt: -1 })
-      .lean();
-    const shaped = [];
-    orders.forEach((order) => {
-      (order.items || []).forEach((item, itemIndex) => {
-        if (String(item.seller) === String(sellerId)) {
-          const uniqueId = `${order._id}-${item.productId}-${itemIndex}`;
-          const itemStatus = item.itemStatus || order.orderStatus || "pending";
-          shaped.push({
-            uniqueId: uniqueId,
-            _id: order._id,
-            orderId: getDisplayOrderId(order),
-            productId: item.productId,
-            itemIndex: itemIndex,
-            customerName: order.userId?.name || "Unknown",
-            customerEmail: order.userId?.email || "",
-            productName: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            image: item.image,
-            deliveryAddress: order.deliveryAddress,
-            deliveryAddressDetails: order.deliveryAddressDetails,
-            district: order.district,
-            status: itemStatus,
-            deliveryDate: item.deliveryDate || null,
-            deliveryOtp: item.deliveryOtp || null,
-            placedAt: order.placedAt,
-            totalAmount: order.totalAmount,
-            paymentStatus: order.paymentStatus,
-            itemStatusHistory: item.itemStatusHistory || [],
-            orderStatusHistory: order.orderStatusHistory || [],
-          });
-        }
-      });
-    });
-    res.json({ success: true, orders: shaped });
+    const orders = await sellerService.getOrdersData(req.user.id);
+    return res.json({ success: true, orders });
   } catch (err) {
     console.error("Seller orders API error", err);
-    res.status(500).json({ success: false, message: "Failed to load orders" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to load orders" });
   }
 };
 
-// Get reviews
 exports.getReviews = async (req, res) => {
   try {
-    const sellerId = req.user.id;
-    const reviews = await ProductReview.find({ seller: sellerId })
-      .populate("productId", "name image")
-      .populate("userId", "name")
-      .sort({ createdAt: -1 })
-      .lean();
-
-    const summaryMap = new Map();
-    reviews.forEach((r) => {
-      const pid = String(r.productId?._id || r.productId);
-      const existing = summaryMap.get(pid) || {
-        productId: pid,
-        productName: r.productId?.name || "Unknown",
-        productImage: r.productId?.image || "",
-        totalReviews: 0,
-        totalRating: 0,
-      };
-      existing.totalReviews += 1;
-      existing.totalRating += Number(r.rating || 0);
-      summaryMap.set(pid, existing);
+    const data = await sellerService.getReviewsData(req.user.id);
+    return res.json({
+      success: true,
+      reviews: data.reviews,
+      summaries: data.summaries,
     });
-
-    const summaries = Array.from(summaryMap.values()).map((s) => ({
-      productId: s.productId,
-      productName: s.productName,
-      productImage: s.productImage,
-      totalReviews: s.totalReviews,
-      avgRating:
-        s.totalReviews > 0
-          ? Number((s.totalRating / s.totalReviews).toFixed(1))
-          : 0,
-    }));
-
-    return res.json({ success: true, reviews, summaries });
   } catch (err) {
     console.error("Seller reviews API error:", err);
     return res
@@ -391,88 +104,33 @@ exports.getReviews = async (req, res) => {
   }
 };
 
-// Add product
 exports.addProduct = async (req, res) => {
   try {
-    const {
-      name,
-      price,
-      description,
-      category,
-      subcategory,
-      brand,
-      quantity,
-      sku,
-      compatibility,
-    } = req.body;
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one product image required.",
-      });
-    }
-
-    // Upload all images to Cloudinary
-    const uploadedImages = [];
-    for (const file of req.files) {
-      const uploadRes = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "autocustomizer/products",
-            fetch_format: "auto",
-            quality: "auto",
-            resource_type: "image",
-            timeout: 120000,
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
-          },
-        );
-        stream.end(file.buffer);
-      });
-      uploadedImages.push({
-        url: uploadRes.secure_url,
-        publicId: uploadRes.public_id,
-      });
-    }
-
-    const newProduct = new Product({
-      name,
-      price,
-      description,
-      category,
-      subcategory: subcategory || "",
-      brand,
-      quantity,
-      sku,
-      compatibility,
-      image: uploadedImages[0].url,
-      imagePublicId: uploadedImages[0].publicId,
-      images: uploadedImages,
-      seller: req.user.id,
-    });
-
-    await newProduct.save();
+    const product = await sellerService.addProduct(
+      req.user.id,
+      req.body,
+      req.files,
+    );
 
     return res.status(200).json({
       success: true,
       message: "Product added successfully",
-      product: newProduct,
+      product,
     });
   } catch (error) {
     const msg =
       error?.message || error?.error?.message || "Unknown error adding product";
+
     console.error("Error adding product:", msg);
     console.error("Full Error Object:", JSON.stringify(error, null, 2));
 
+    if (error.status) {
+      return res
+        .status(error.status)
+        .json({ success: false, message: error.message });
+    }
+
     if (error.name === "ValidationError") {
-      for (let field in error.errors) {
-        console.error(
-          `Validation error on field "${field}": ${error.errors[field].message}`,
-        );
-      }
       return res
         .status(400)
         .send(
@@ -493,61 +151,44 @@ exports.addProduct = async (req, res) => {
         );
     }
 
-    res.status(500).send(msg || "Internal Server Error: " + error.message);
+    return res
+      .status(500)
+      .send(msg || `Internal Server Error: ${error.message}`);
   }
 };
 
-// Get products
 exports.getProducts = async (req, res) => {
   try {
-    const sellerId = req.user.id;
-    const products = await Product.find({ seller: sellerId }).lean();
-    res.json({ success: true, products });
+    const products = await sellerService.getProducts(req.user.id);
+    return res.json({ success: true, products });
   } catch (err) {
     console.error("Error fetching products for seller:", err);
-    res
+    return res
       .status(500)
       .json({ success: false, message: "Failed to load products" });
   }
 };
 
-// Update stock quantity for a product
 exports.updateStock = async (req, res) => {
   try {
-    const productId = req.params.id;
-    const { quantity } = req.body;
-
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid product id" });
-    }
-
-    const addQty = Number(quantity);
-    if (!Number.isInteger(addQty) || addQty < 1) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity must be a positive integer",
-      });
-    }
-
-    const sellerId = req.user.id;
-    const product = await Product.findOne({ _id: productId, seller: sellerId });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    product.quantity += addQty;
-    await product.save();
+    const newQuantity = await sellerService.updateStock(
+      req.params.id,
+      req.user.id,
+      req.body.quantity,
+    );
 
     return res.json({
       success: true,
-      message: `Stock updated. New quantity: ${product.quantity}`,
-      newQuantity: product.quantity,
+      message: `Stock updated. New quantity: ${newQuantity}`,
+      newQuantity,
     });
   } catch (err) {
+    if (err.status) {
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
+    }
+
     console.error("Error updating stock:", err);
     return res
       .status(500)
@@ -555,356 +196,116 @@ exports.updateStock = async (req, res) => {
   }
 };
 
-// Delete product
 exports.deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    await sellerService.deleteProduct(req.params.id, req.user.id);
 
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid product id" });
-    }
-
-    const sellerId = req.user.id;
-    const product = await Product.findOne({
-      _id: productId,
-      seller: sellerId,
-    });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    if (product?.imagePublicId) {
-      try {
-        await cloudinary.uploader.destroy(product.imagePublicId);
-      } catch (err) {
-        console.warn("Cloudinary delete failed:", err.message);
-      }
-    }
-
-    await Product.deleteOne({ _id: productId });
-    await Cart.updateMany(
-      { "items.productId": productId },
-      { $pull: { items: { productId: productId } } },
-    );
-
-    const wantsJSON =
-      (req.headers.accept || "").includes("application/json") ||
-      (req.headers["content-type"] || "").includes("application/json");
-    if (wantsJSON) {
+    if (wantsJson(req)) {
       return res.json({ success: true });
     }
 
     return res.redirect("/seller/productmanagement");
   } catch (err) {
+    if (err.status) {
+      if (wantsJson(req)) {
+        return res
+          .status(err.status)
+          .json({ success: false, message: err.message });
+      }
+      return res.status(err.status).send(err.message);
+    }
+
     console.error("Error deleting product:", err);
-    const wantsJSON =
-      (req.headers.accept || "").includes("application/json") ||
-      (req.headers["content-type"] || "").includes("application/json");
-    if (wantsJSON) {
+
+    if (wantsJson(req)) {
       return res
         .status(500)
         .json({ success: false, message: "Failed to delete product" });
     }
+
     return res.status(500).send("Failed to delete product");
   }
 };
 
-// Update order status
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
-    const { newStatus, productId, itemIndex, deliveryDate, otp } = req.body;
+    const result = await sellerService.updateOrderStatus({
+      orderId: req.params.orderId,
+      newStatus: req.body.newStatus,
+      productId: req.body.productId,
+      itemIndex: req.body.itemIndex,
+      deliveryDate: req.body.deliveryDate,
+      otp: req.body.otp,
+      sellerId: req.user.id,
+      actorId: req.session.user?.id,
+    });
 
-    const order = await findOrderByIdentifier(orderId);
-    if (!order) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found" });
-    }
-
-    // If productId and itemIndex are provided, update specific item status
-    if (productId !== undefined && itemIndex !== undefined) {
-      const item = order.items[itemIndex];
-      if (!item) {
-        return res.status(404).json({
-          success: false,
-          message: "Order item not found",
-        });
-      }
-
-      if (String(item.seller) !== String(req.user.id)) {
-        return res.status(403).json({
-          success: false,
-          message: "Access denied: This item does not belong to you",
-        });
-      }
-
-      const currentItemStatus = item.itemStatus || order.orderStatus;
-      if (
-        currentItemStatus === "delivered" ||
-        currentItemStatus === "cancelled"
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot change status after it's marked as ${currentItemStatus}`,
-        });
-      }
-
-      if (newStatus === "confirmed") {
-        const existingDeliveryDate = order.items[itemIndex].deliveryDate;
-        if (!deliveryDate && !existingDeliveryDate) {
-          return res.status(400).json({
-            success: false,
-            message: "Please set a delivery date before confirming the order",
-          });
-        }
-        if (deliveryDate) {
-          order.items[itemIndex].deliveryDate = new Date(deliveryDate);
-        }
-      }
-
-      if (deliveryDate) {
-        order.items[itemIndex].deliveryDate = new Date(deliveryDate);
-      }
-
-      // OTP: Generate when shipping, verify when delivering
-      if (newStatus === "shipped") {
-        const otpCode = String(Math.floor(100000 + Math.random() * 900000));
-        order.items[itemIndex].deliveryOtp = otpCode;
-        order.items[itemIndex].deliveryOtpGeneratedAt = new Date();
-      }
-
-      if (newStatus === "delivered") {
-        const storedOtp = order.items[itemIndex].deliveryOtp;
-        if (!storedOtp) {
-          return res.status(400).json({
-            success: false,
-            message: "No delivery OTP found. The item must be shipped first.",
-          });
-        }
-        if (!otp || String(otp).trim() !== String(storedOtp).trim()) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Invalid delivery OTP. Please enter the correct OTP from the customer.",
-          });
-        }
-        // Clear OTP after successful verification
-        order.items[itemIndex].deliveryOtp = undefined;
-        order.items[itemIndex].deliveryOtpGeneratedAt = undefined;
-      }
-
-      const prevItemStatus = order.items[itemIndex].itemStatus || null;
-      order.items[itemIndex].itemStatus = newStatus;
-      order.items[itemIndex].itemStatusHistory =
-        order.items[itemIndex].itemStatusHistory || [];
-      order.items[itemIndex].itemStatusHistory.push({
-        from: prevItemStatus,
-        to: newStatus,
-        changedAt: new Date(),
-        changedBy: { id: req.session.user?.id, role: "seller" },
-      });
-
-      const derivedStatus = deriveOrderStatus(
-        order.items,
-        order.orderStatus || "pending",
-      );
-      if (derivedStatus !== order.orderStatus) {
-        const prevOrderStatus = order.orderStatus;
-        order.previousStatus = order.orderStatus;
-        order.orderStatus = derivedStatus;
-        order.orderStatusHistory = order.orderStatusHistory || [];
-        order.orderStatusHistory.push({
-          from: prevOrderStatus || null,
-          to: derivedStatus,
-          changedAt: new Date(),
-          changedBy: { id: req.session.user?.id, role: "seller" },
-        });
-      }
-
-      // Legacy orders may miss newer required fields (e.g. deliveryAddressDetails).
-      // Save status changes without full-document validation.
-      await order.save({ validateBeforeSave: false });
-
-      // Send notification to customer about item status change
+    if (result.notifyCustomer) {
       try {
         const io = req.app.get("io");
         await createNotification(
           {
-            customerId: order.userId,
+            customerId: result.notifyCustomer.customerId,
             type: "order_status",
-            title: "Order Status Updated",
-            message: `Item "${item.name}" in order #${getDisplayOrderId(order)} has been updated to ${newStatus}.`,
-            referenceId: order._id,
+            title: result.notifyCustomer.title,
+            message: result.notifyCustomer.message,
+            referenceId: result.notifyCustomer.orderId,
             referenceModel: "Order",
           },
           io,
         );
-      } catch (e) {
-        console.error("Failed to create order status notification:", e);
+      } catch (notificationError) {
+        console.error(
+          "Failed to create order status notification:",
+          notificationError,
+        );
       }
-
-      return res.json({
-        success: true,
-        message: "Item status updated successfully",
-      });
     }
 
-    // Fallback: Update entire order status
-    if (
-      order.orderStatus === "delivered" ||
-      order.orderStatus === "cancelled"
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot change status after it's marked as ${order.orderStatus}`,
-      });
-    }
-
-    const prevOrderStatus = order.orderStatus;
-    order.previousStatus = order.orderStatus;
-    order.orderStatus = newStatus;
-    order.orderStatusHistory = order.orderStatusHistory || [];
-    order.orderStatusHistory.push({
-      from: prevOrderStatus || null,
-      to: newStatus,
-      changedAt: new Date(),
-      changedBy: { id: req.session.user?.id, role: "seller" },
-    });
-    order.items.forEach((item, idx) => {
-      // OTP handling for bulk status update
-      if (newStatus === "shipped") {
-        const otpCode = String(Math.floor(100000 + Math.random() * 900000));
-        order.items[idx].deliveryOtp = otpCode;
-        order.items[idx].deliveryOtpGeneratedAt = new Date();
-      }
-      if (newStatus === "delivered") {
-        const storedOtp = order.items[idx].deliveryOtp;
-        if (storedOtp) {
-          order.items[idx].deliveryOtp = undefined;
-          order.items[idx].deliveryOtpGeneratedAt = undefined;
-        }
-      }
-
-      const prevItemStatus = order.items[idx].itemStatus || null;
-      order.items[idx].itemStatus = newStatus;
-      order.items[idx].itemStatusHistory =
-        order.items[idx].itemStatusHistory || [];
-      order.items[idx].itemStatusHistory.push({
-        from: prevItemStatus,
-        to: newStatus,
-        changedAt: new Date(),
-        changedBy: { id: req.session.user?.id, role: "seller" },
-      });
-    });
-    // Legacy orders may miss newer required fields (e.g. deliveryAddressDetails).
-    // Save status changes without full-document validation.
-    await order.save({ validateBeforeSave: false });
-
-    res.json({ success: true });
+    return res.json({ success: true, message: result.message });
   } catch (err) {
+    if (err.status) {
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
+    }
+
     console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Update delivery date
 exports.updateDeliveryDate = async (req, res) => {
   try {
-    const { orderId } = req.params;
-    const { itemIndex, deliveryDate, productId } = req.body;
+    await sellerService.updateDeliveryDate({
+      orderId: req.params.orderId,
+      itemIndex: req.body.itemIndex,
+      deliveryDate: req.body.deliveryDate,
+      productId: req.body.productId,
+      sellerId: req.user?.id || req.session?.user?.id,
+    });
 
-    if (!deliveryDate) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Delivery date is required" });
-    }
-
-    // Accept both yyyy-mm-dd and dd-mm-yyyy to avoid Date cast errors.
-    let parsedDeliveryDate = new Date(deliveryDate);
-    if (Number.isNaN(parsedDeliveryDate.getTime())) {
-      const m = String(deliveryDate).match(/^(\d{2})-(\d{2})-(\d{4})$/);
-      if (m) {
-        const [, dd, mm, yyyy] = m;
-        parsedDeliveryDate = new Date(`${yyyy}-${mm}-${dd}`);
-      }
-    }
-
-    if (Number.isNaN(parsedDeliveryDate.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid delivery date format",
-      });
-    }
-
-    const order = await findOrderByIdentifier(orderId);
-    if (!order) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order not found" });
-    }
-
-    let idx = Number(itemIndex);
-    if (!Number.isInteger(idx) || idx < 0) {
-      idx = -1;
-    }
-
-    // Fallback match by productId + seller when itemIndex is missing/invalid.
-    if (idx < 0 || idx >= order.items.length) {
-      idx = order.items.findIndex(
-        (it) =>
-          String(it.seller) === String(req.user?.id || req.session?.user?.id) &&
-          (productId ? String(it.productId) === String(productId) : true),
-      );
-    }
-
-    const item = idx >= 0 ? order.items[idx] : null;
-    if (!item) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Order item not found" });
-    }
-
-    if (String(item.seller) !== String(req.user?.id || req.session?.user?.id)) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied: This item does not belong to you",
-      });
-    }
-
-    // Update only the targeted nested field to avoid re-validating legacy
-    // required top-level fields (some old orders may not have them).
-    await Order.updateOne(
-      { _id: order._id },
-      { $set: { [`items.${idx}.deliveryDate`]: parsedDeliveryDate } },
-    );
-
-    res.json({
+    return res.json({
       success: true,
       message: "Delivery date updated successfully",
     });
   } catch (err) {
+    if (err.status) {
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
+    }
+
     console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Get bulk upload result
 exports.getBulkUploadResult = (req, res) => {
-  const result = req.session?.bulkUploadResult || {
-    created: 0,
-    skipped: 0,
-    failed: 0,
-    errors: [],
-  };
-  res.json({ success: true, result });
+  const result = sellerService.getBulkUploadResult(req.session);
+  return res.json({ success: true, result });
 };
 
-// Aliases for route compatibility
 exports.getDashboardApi = exports.getDashboard;
 exports.postProfileSettings = exports.updateProfileSettings;
 exports.getApiProfileSettings = exports.getProfileSettings;
@@ -915,216 +316,69 @@ exports.getProductManagement = exports.getProducts;
 exports.getApiProducts = exports.getProducts;
 exports.getApiBulkUploadResult = exports.getBulkUploadResult;
 
-// Upload a verification document for seller
 exports.uploadVerificationDocument = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { docType } = req.body;
-
-    if (!docType || !ALL_SELLER_DOC_TYPES.includes(docType)) {
-      if (req.file?.path && fs.existsSync(req.file.path))
-        fs.unlinkSync(req.file.path);
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid document type" });
-    }
-
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No file uploaded" });
-    }
-
-    // Upload to Cloudinary
-    let docUrl;
-    try {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path, {
-        folder: "seller_verification_docs",
-        resource_type: "auto",
-        timeout: 120000,
-      });
-      docUrl = uploadRes.secure_url;
-    } finally {
-      if (req.file.path && fs.existsSync(req.file.path))
-        fs.unlinkSync(req.file.path);
-    }
-
-    const user = await User.findById(userId);
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-
-    // Remove existing document of the same type (replace)
-    user.verificationDocuments = (user.verificationDocuments || []).filter(
-      (d) => d.docType !== docType,
+    const user = await sellerService.uploadVerificationDocument(
+      req.user.id,
+      req.body.docType,
+      req.file,
     );
-    user.verificationDocuments.push({
-      docType,
-      docUrl,
-      fileName: req.file.originalname,
-      uploadedAt: new Date(),
-    });
 
-    // Set status to pending if currently unverified or rejected
-    if (
-      user.verificationStatus === "unverified" ||
-      user.verificationStatus === "rejected"
-    ) {
-      user.verificationStatus = "pending";
-    }
-
-    await user.save();
-
-    res.json({
+    return res.json({
       success: true,
       message: "Document uploaded successfully",
       verificationDocuments: user.verificationDocuments,
       verificationStatus: user.verificationStatus,
     });
   } catch (error) {
+    if (error.status) {
+      return res
+        .status(error.status)
+        .json({ success: false, message: error.message });
+    }
+
     console.error("Error uploading seller verification document:", error);
-    res
+    return res
       .status(500)
       .json({ success: false, message: "Error uploading document" });
   }
 };
 
-// Delete a verification document for seller
 exports.deleteVerificationDocument = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { docType } = req.params;
-    if (!docType)
-      return res
-        .status(400)
-        .json({ success: false, message: "Document type is required" });
-
-    const user = await User.findById(userId);
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-
-    const before = (user.verificationDocuments || []).length;
-    user.verificationDocuments = (user.verificationDocuments || []).filter(
-      (d) => d.docType !== decodeURIComponent(docType),
+    const user = await sellerService.deleteVerificationDocument(
+      req.user.id,
+      req.params.docType,
     );
 
-    if (user.verificationDocuments.length === before) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Document not found" });
-    }
-
-    // If all docs removed, revert to unverified
-    if (
-      user.verificationDocuments.length === 0 &&
-      user.verificationStatus === "pending"
-    ) {
-      user.verificationStatus = "unverified";
-    }
-
-    await user.save();
-
-    res.json({
+    return res.json({
       success: true,
       message: "Document deleted",
       verificationDocuments: user.verificationDocuments,
       verificationStatus: user.verificationStatus,
     });
   } catch (error) {
+    if (error.status) {
+      return res
+        .status(error.status)
+        .json({ success: false, message: error.message });
+    }
+
     console.error("Error deleting seller verification document:", error);
-    res
+    return res
       .status(500)
       .json({ success: false, message: "Error deleting document" });
   }
 };
 
-// Edit product details
 exports.editProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid product id" });
-    }
-
-    const sellerId = req.user.id;
-    const product = await Product.findOne({ _id: productId, seller: sellerId });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    }
-
-    const {
-      name,
-      price,
-      description,
-      category,
-      subcategory,
-      brand,
-      quantity,
-      sku,
-      compatibility,
-    } = req.body;
-
-    if (name !== undefined) product.name = name;
-    if (price !== undefined) product.price = Number(price);
-    if (description !== undefined) product.description = description;
-    if (category !== undefined) product.category = category;
-    if (subcategory !== undefined) product.subcategory = subcategory;
-    if (brand !== undefined) product.brand = brand;
-    if (quantity !== undefined) product.quantity = Number(quantity);
-    if (sku !== undefined) product.sku = sku;
-    if (compatibility !== undefined) product.compatibility = compatibility;
-
-    // If new images are uploaded, replace images
-    if (req.files && req.files.length > 0) {
-      const uploadedImages = [];
-      for (const file of req.files) {
-        const uploadRes = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            {
-              folder: "autocustomizer/products",
-              fetch_format: "auto",
-              quality: "auto",
-              resource_type: "image",
-              timeout: 120000,
-            },
-            (err, result) => {
-              if (err) return reject(err);
-              return resolve(result);
-            },
-          );
-          stream.end(file.buffer);
-        });
-        uploadedImages.push({
-          url: uploadRes.secure_url,
-          publicId: uploadRes.public_id,
-        });
-      }
-
-      // Delete old images from Cloudinary
-      if (product.imagePublicId) {
-        try {
-          await cloudinary.uploader.destroy(product.imagePublicId);
-        } catch (e) {
-          console.warn("Cloudinary delete failed:", e.message);
-        }
-      }
-
-      product.image = uploadedImages[0].url;
-      product.imagePublicId = uploadedImages[0].publicId;
-      product.images = uploadedImages;
-    }
-
-    // Reset status to pending after edit
-    product.status = "pending";
-
-    await product.save();
+    const product = await sellerService.editProduct(
+      req.params.id,
+      req.user.id,
+      req.body,
+      req.files,
+    );
 
     return res.json({
       success: true,
@@ -1132,6 +386,12 @@ exports.editProduct = async (req, res) => {
       product,
     });
   } catch (err) {
+    if (err.status) {
+      return res
+        .status(err.status)
+        .json({ success: false, message: err.message });
+    }
+
     console.error("Error editing product:", err);
     return res
       .status(500)
@@ -1139,53 +399,46 @@ exports.editProduct = async (req, res) => {
   }
 };
 
-// Earnings & Payouts (placeholder)
 exports.getEarningsPayouts = async (req, res) => {
   try {
-    res.render("seller/earnings-payouts", { user: req.session.user });
+    await sellerService.getEarningsPayoutsData();
+    return res.render("seller/earnings-payouts", { user: req.session.user });
   } catch (err) {
     console.error("Error loading earnings page:", err);
-    res.status(500).send("Internal Server Error");
+    return res.status(500).send("Internal Server Error");
   }
 };
 
 exports.requestPayout = async (req, res) => {
   try {
-    res.json({ success: true, message: "Payout request submitted" });
+    const result = await sellerService.requestPayout();
+    return res.json(result);
   } catch (err) {
     console.error("Error requesting payout:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Bulk Upload pages
 exports.getBulkUpload = (req, res) => {
-  res.render("seller/bulk-upload", { user: req.session.user });
+  return res.render("seller/bulk-upload", { user: req.session.user });
 };
 
 exports.downloadSampleCsv = (req, res) => {
-  const sampleCsv =
-    "name,description,price,quantity,category\nSample Product,Description here,19.99,10,Category1";
+  const sampleCsv = sellerService.getSampleCsv();
   res.setHeader("Content-Type", "text/csv");
   res.setHeader(
     "Content-Disposition",
     "attachment; filename=sample-products.csv",
   );
-  res.send(sampleCsv);
+  return res.send(sampleCsv);
 };
 
 exports.postBulkUpload = async (req, res) => {
   try {
-    // Basic bulk upload handler
-    req.session.bulkUploadResult = {
-      created: 0,
-      skipped: 0,
-      failed: 0,
-      errors: [],
-    };
-    res.redirect("/seller/bulk-upload/result");
+    sellerService.initializeBulkUploadResult(req.session);
+    return res.redirect("/seller/bulk-upload/result");
   } catch (err) {
     console.error("Error processing bulk upload:", err);
-    res.status(500).send("Error processing upload");
+    return res.status(500).send("Error processing upload");
   }
 };
