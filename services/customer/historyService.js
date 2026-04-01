@@ -4,7 +4,6 @@ const { enrichBookings } = require("./helpers");
 const {
   findOrderByIdentifier,
   getDisplayOrderId,
-  buildOrderIdentifierFilter,
 } = require("../../utils/orderIdUtils");
 
 async function getHistoryData(customerId, includeSellerDetails = false) {
@@ -46,12 +45,20 @@ async function getHistoryData(customerId, includeSellerDetails = false) {
 }
 
 async function getOrderDetails(orderId, customerId) {
-  const filter = buildOrderIdentifierFilter(orderId, { userId: customerId });
-  const order = await Order.findOne(filter)
+  const matchedOrder = await findOrderByIdentifier(orderId);
+  if (!matchedOrder) return null;
+
+  const order = await Order.findById(matchedOrder._id)
     .populate("items.seller", "name email")
     .lean();
 
   if (!order) return null;
+
+  // Enforce ownership after identifier resolution to avoid query-casting edge cases.
+  if (String(order.userId) !== String(customerId)) {
+    return null;
+  }
+
   return {
     ...order,
     orderId: getDisplayOrderId(order),

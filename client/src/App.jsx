@@ -11,10 +11,13 @@ import ManagerDashboard from "./pages/manager/Dashboard";
 import ManagerUsers from "./pages/manager/Users";
 import Profiles from "./pages/manager/Profiles";
 import ManagerProfileOverview from "./pages/manager/ProfileOverview";
+import ManagerUserAnalytics from "./pages/manager/UserAnalytics";
 import ManagerOrders from "./pages/manager/Orders";
 import Payments from "./pages/manager/Payments";
 import Support from "./pages/manager/Support";
 import ManagerChat from "./pages/manager/Chat";
+import ProductCategories from "./pages/manager/ProductCategories";
+import ServiceCategories from "./pages/manager/ServiceCategories";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 
@@ -125,6 +128,78 @@ export default function App() {
           element={
             <RequireRole role="admin">
               <AdminDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireRole role="admin">
+              <ManagerUsers mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/profiles"
+          element={
+            <RequireRole role="admin">
+              <Profiles mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/profiles/:id"
+          element={
+            <RequireRole role="admin">
+              <ManagerProfileOverview mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/profiles/:id/analytics"
+          element={
+            <RequireRole role="admin">
+              <ManagerUserAnalytics mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <RequireRole role="admin">
+              <ManagerOrders mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/service-categories"
+          element={
+            <RequireRole role="admin">
+              <ServiceCategories mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/product-categories"
+          element={
+            <RequireRole role="admin">
+              <ProductCategories mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/payments"
+          element={
+            <RequireRole role="admin">
+              <Payments mode="admin" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/support"
+          element={
+            <RequireRole role="admin">
+              <Support mode="admin" />
             </RequireRole>
           }
         />
@@ -327,10 +402,34 @@ export default function App() {
           }
         />
         <Route
+          path="/manager/profiles/:id/analytics"
+          element={
+            <RequireRole role="manager">
+              <ManagerUserAnalytics />
+            </RequireRole>
+          }
+        />
+        <Route
           path="/manager/orders"
           element={
             <RequireRole role="manager">
               <ManagerOrders />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/service-categories"
+          element={
+            <RequireRole role="manager">
+              <ServiceCategories />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/manager/product-categories"
+          element={
+            <RequireRole role="manager">
+              <ProductCategories />
             </RequireRole>
           }
         />

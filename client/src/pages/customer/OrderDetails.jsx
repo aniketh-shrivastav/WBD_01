@@ -38,8 +38,10 @@ export default function OrderDetails() {
           navigate("/login", { replace: true });
           return;
         }
-        if (!res.ok) throw new Error("Failed to load order details");
         const j = await res.json();
+        if (!res.ok) {
+          throw new Error(j?.message || "Failed to load order details");
+        }
         if (!j.success) throw new Error(j.message || "Failed to load order");
         if (!cancelled) setOrder(j.order || null);
       } catch (e) {

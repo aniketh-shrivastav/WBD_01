@@ -4,8 +4,16 @@ const adminController = require("../controllers/adminController");
 const managerController = require("../controllers/managerController");
 const serviceCategoryController = require("../controllers/serviceCategoryController");
 const productCategoryController = require("../controllers/productCategoryController");
+const createAdminGraphqlMiddleware = require("../graphql/adminGraphql");
 
 const { isAuthenticated, isAdmin } = require("../middleware");
+
+router.use(
+  "/graphql",
+  isAuthenticated,
+  isAdmin,
+  createAdminGraphqlMiddleware(),
+);
 
 // Admin's own dashboard
 router.get(
