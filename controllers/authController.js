@@ -3,6 +3,12 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
 const firebaseAdmin = require("../config/firebaseAdmin");
+const {
+  clearAuthToken,
+  createSessionId,
+  issueAuthToken,
+  signAuthToken,
+} = require("../utils/jwtSession");
 
 // Helper to detect if client expects JSON
 function wantsJson(req) {
@@ -10,6 +16,11 @@ function wantsJson(req) {
     (req.headers.accept || "").includes("application/json") ||
     (req.headers["content-type"] || "").includes("application/json")
   );
+}
+
+function isSwaggerDocsRequest(req) {
+  const referer = req.headers.referer || "";
+  return referer.includes("/api-docs");
 }
 
 // Send email helper
@@ -231,14 +242,20 @@ exports.postLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Store user session
-    req.session.user = {
+    const authUser = {
       id: user._id,
       name: user.name,
       email: user.email,
       phone: user.phone,
       role: user.role,
     };
+
+    const sid = req.session?.sid || createSessionId();
+    const token = isSwaggerDocsRequest(req)
+      ? signAuthToken(authUser, sid)
+      : issueAuthToken(res, authUser, sid);
+    req.session.sid = sid;
+    req.session.user = authUser;
 
     // Role-based redirection
     const redirects = {
@@ -259,6 +276,8 @@ exports.postLogin = async (req, res) => {
         success: true,
         role: user.role,
         redirect,
+        token,
+        tokenType: "Bearer",
       });
     }
     return res.redirect(redirect);
@@ -270,20 +289,25 @@ exports.postLogin = async (req, res) => {
 
 exports.logout = (req, res) => {
   const next = req.query.next;
-  req.session.destroy(() => {
-    try {
-      res.clearCookie("connect.sid");
-    } catch {}
-    if (next && /^https?:\/\//.test(next)) {
-      return res.redirect(next);
-    }
-    res.redirect("/");
-  });
+  try {
+    req.session?.destroy?.(() => {});
+  } catch {}
+
+  clearAuthToken(res);
+  try {
+    res.clearCookie("connect.sid");
+  } catch {}
+
+  if (next && /^https?:\/\//.test(next)) {
+    return res.redirect(next);
+  }
+  res.redirect("/");
 };
 
 exports.getSession = (req, res) => {
-  if (req.session && req.session.user) {
-    return res.json({ authenticated: true, user: req.session.user });
+  const user = req.user || req.session?.user;
+  if (user) {
+    return res.json({ authenticated: true, user });
   }
   res.json({ authenticated: false });
 };
@@ -533,7 +557,9 @@ exports.googleSignIn = async (req, res) => {
   const { idToken, role } = req.body;
 
   if (!idToken) {
-    return res.status(400).json({ success: false, message: "ID token is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "ID token is required" });
   }
 
   try {
@@ -542,7 +568,9 @@ exports.googleSignIn = async (req, res) => {
     const { email, name, picture, uid } = decodedToken;
 
     if (!email) {
-      return res.status(400).json({ success: false, message: "Email not found in Google account" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found in Google account" });
     }
 
     // Check if user exists
@@ -551,7 +579,9 @@ exports.googleSignIn = async (req, res) => {
     if (user) {
       // Existing user - log them in
       if (user.suspended) {
-        return res.status(403).json({ success: false, message: "Account is suspended" });
+        return res
+          .status(403)
+          .json({ success: false, message: "Account is suspended" });
       }
 
       // Update profile picture if not set
@@ -560,14 +590,18 @@ exports.googleSignIn = async (req, res) => {
         await user.save();
       }
 
-      // Create session
-      req.session.user = {
+      const authUser = {
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
         profilePicture: user.profilePicture,
       };
+
+      const sid = req.session?.sid || createSessionId();
+      issueAuthToken(res, authUser, sid);
+      req.session.sid = sid;
+      req.session.user = authUser;
 
       // Determine redirect based on role
       const redirectMap = {
@@ -582,25 +616,35 @@ exports.googleSignIn = async (req, res) => {
         success: true,
         message: "Login successful",
         redirect: redirectMap[user.role] || "/",
-        user: req.session.user,
+        user: authUser,
       });
     } else {
       // New user - Google Sign-In is only for login, not signup
-      return res.status(400).json({ 
-        success: false, 
-        message: "No account found with this email. Please sign up first using the registration form." 
+      return res.status(400).json({
+        success: false,
+        message:
+          "No account found with this email. Please sign up first using the registration form.",
       });
     }
   } catch (error) {
     console.error("Google Sign-In error:", error);
-    
+
     if (error.code === "auth/id-token-expired") {
-      return res.status(401).json({ success: false, message: "Token expired. Please try again." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Token expired. Please try again." });
     }
     if (error.code === "auth/invalid-id-token") {
-      return res.status(401).json({ success: false, message: "Invalid token. Please try again." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid token. Please try again." });
     }
-    
-    return res.status(500).json({ success: false, message: "Google Sign-In failed. Please try again." });
+
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Google Sign-In failed. Please try again.",
+      });
   }
 };

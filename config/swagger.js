@@ -19,7 +19,7 @@ const options = {
       },
     ],
     tags: [
-      { name: "Auth", description: "Authentication & session management" },
+      { name: "Auth", description: "Authentication & JWT token management" },
       { name: "Admin", description: "Admin dashboard & management" },
       { name: "Manager", description: "Manager dashboard & management" },
       {
@@ -404,12 +404,12 @@ const options = {
         },
       },
       securitySchemes: {
-        sessionAuth: {
-          type: "apiKey",
-          in: "cookie",
-          name: "connect.sid",
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
           description:
-            "Session-based authentication via express-session cookie",
+            "JWT authorization using Authorization header: Bearer <token>",
         },
       },
     },

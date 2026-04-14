@@ -2,7 +2,6 @@ require("dotenv").config(); // Load environment variables first
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const session = require("express-session");
 const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -10,6 +9,7 @@ const connectDB = require("./db");
 const User = require("./models/User");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
+const { jwtSessionCompat } = require("./middleware/jwtSessionCompat");
 
 // Import Middleware Modules (organized by type)
 const {
@@ -42,15 +42,8 @@ connectDB();
 // morgan: HTTP request logging
 app.use(morgan("dev"));
 
-// express-session: Session management
-app.use(
-  session({
-    secret: "supersecretkey",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  }),
-);
+// JWT-backed auth/session compatibility
+app.use(jwtSessionCompat);
 
 // cors: Cross-Origin Resource Sharing
 app.use(

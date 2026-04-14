@@ -96,7 +96,7 @@
  *   post:
  *     tags: [Auth]
  *     summary: Authenticate user
- *     description: Validates credentials and creates a session. Returns role-based redirect URL.
+ *     description: Validates credentials and issues a JWT token. Returns role-based redirect URL.
  *     requestBody:
  *       required: true
  *       content:
@@ -125,6 +125,12 @@
  *                   type: string
  *                 redirect:
  *                   type: string
+ *                 token:
+ *                   type: string
+ *                   description: JWT access token to use in Swagger Authorize
+ *                 tokenType:
+ *                   type: string
+ *                   example: Bearer
  *       401:
  *         description: Invalid credentials
  */
@@ -135,7 +141,7 @@
  *   get:
  *     tags: [Auth]
  *     summary: Log out
- *     description: Destroys the session and clears the cookie
+ *     description: Clears the JWT auth cookie and logs out the user
  *     responses:
  *       302:
  *         description: Redirect to home or ?next= URL
@@ -146,11 +152,11 @@
  * /api/session:
  *   get:
  *     tags: [Auth]
- *     summary: Get current session info
+ *     summary: Get current auth session info
  *     description: Returns authentication status and user details if logged in
  *     responses:
  *       200:
- *         description: Session information
+ *         description: Authentication information
  *         content:
  *           application/json:
  *             schema:
@@ -372,7 +378,7 @@
  *     summary: Admin dashboard data
  *     description: Returns comprehensive admin dashboard stats including user totals, revenue, profit/loss, monthly charts, user growth, rating distribution, highlights, recent users and reviews
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Dashboard data
@@ -414,7 +420,7 @@
  *     summary: Read-only manager dashboard view
  *     description: Returns the same data as the manager dashboard, accessible by admin
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Manager dashboard data
@@ -431,7 +437,7 @@
  *     tags: [Admin]
  *     summary: List all users
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: User list
@@ -464,7 +470,7 @@
  *     tags: [Admin]
  *     summary: List all service providers, sellers, and customers
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Services data
@@ -494,7 +500,7 @@
  *     tags: [Admin]
  *     summary: List all orders and bookings
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Orders and bookings
@@ -520,7 +526,7 @@
  *     tags: [Admin]
  *     summary: List all payment data
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Payment data
@@ -546,7 +552,7 @@
  *     tags: [Admin]
  *     summary: List all support tickets
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Support tickets
@@ -568,7 +574,7 @@
  *     tags: [Admin]
  *     summary: Get user profile overview
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -588,7 +594,7 @@
  *     tags: [Admin]
  *     summary: Get user analytics
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -608,7 +614,7 @@
  *     tags: [Admin]
  *     summary: List all service categories (admin view)
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Service categories
@@ -632,7 +638,7 @@
  *     tags: [Admin]
  *     summary: List all product categories (admin view)
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Product categories
@@ -658,7 +664,7 @@
  *     tags: [Manager]
  *     summary: List all users
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: User list
@@ -680,7 +686,7 @@
  *     tags: [Manager]
  *     summary: List service providers, sellers, and customers
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Service data
@@ -710,7 +716,7 @@
  *     tags: [Manager]
  *     summary: List all orders and bookings
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Orders and bookings data
@@ -736,7 +742,7 @@
  *     tags: [Manager]
  *     summary: List payment data
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Payment data
@@ -762,7 +768,7 @@
  *     tags: [Manager]
  *     summary: List support tickets
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Support tickets
@@ -785,7 +791,7 @@
  *     summary: Manager dashboard data
  *     description: Returns comprehensive dashboard stats including user counts, earnings, products, monthly revenue, user growth, category analytics, and highlights
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Full dashboard stats
@@ -798,7 +804,7 @@
  *     tags: [Manager]
  *     summary: Download dashboard PDF report
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: PDF report file
@@ -816,7 +822,7 @@
  *     tags: [Manager]
  *     summary: Get user profile overview
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -835,7 +841,7 @@
  *     tags: [Manager]
  *     summary: Get user analytics
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -854,7 +860,7 @@
  *     tags: [Manager]
  *     summary: Suspend a user account
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -880,7 +886,7 @@
  *     tags: [Manager]
  *     summary: Restore a suspended user
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -899,7 +905,7 @@
  *     tags: [Manager]
  *     summary: Create a new manager account
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -929,7 +935,7 @@
  *     tags: [Manager]
  *     summary: Cancel a service booking
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -949,7 +955,7 @@
  *     tags: [Manager]
  *     summary: Restore a cancelled booking
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -968,7 +974,7 @@
  *     tags: [Manager]
  *     summary: Approve a pending product
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -987,7 +993,7 @@
  *     tags: [Manager]
  *     summary: Reject a pending product
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1006,7 +1012,7 @@
  *     tags: [Manager]
  *     summary: Edit a product
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1052,7 +1058,7 @@
  *     tags: [Manager]
  *     summary: Get a product by ID
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1075,7 +1081,7 @@
  *     tags: [Manager]
  *     summary: Cancel an order
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: orderId
@@ -1094,7 +1100,7 @@
  *     tags: [Manager]
  *     summary: Restore a cancelled order
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: orderId
@@ -1113,7 +1119,7 @@
  *     tags: [Manager]
  *     summary: Verify or reject a service provider/seller
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1148,7 +1154,7 @@
  *     summary: List approved products
  *     description: Returns approved products with verified sellers sorted first
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Products list
@@ -1173,7 +1179,7 @@
  *     summary: Get booking page data
  *     description: Returns service providers, services, districts, ratings, and customer profile for the booking page
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Booking page data
@@ -1209,7 +1215,7 @@
  *     tags: [Customer]
  *     summary: Get reviews for a service provider
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1249,7 +1255,7 @@
  *     tags: [Customer]
  *     summary: Get cart items
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Cart contents
@@ -1289,7 +1295,7 @@
  *     summary: Create orders from cart
  *     description: Creates orders grouped by seller, reduces stock, clears cart, sends notifications
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       content:
  *         application/json:
@@ -1323,7 +1329,7 @@
  *     tags: [Customer]
  *     summary: Add product to cart
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1347,7 +1353,7 @@
  *     tags: [Customer]
  *     summary: Get order details
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1375,7 +1381,7 @@
  *     tags: [Customer]
  *     summary: Get service booking details
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1403,7 +1409,7 @@
  *     tags: [Customer]
  *     summary: Get order and booking history
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Customer history
@@ -1433,7 +1439,7 @@
  *     tags: [Customer]
  *     summary: Download order receipt PDF
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1457,7 +1463,7 @@
  *     tags: [Customer]
  *     summary: Download service booking receipt PDF
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1481,7 +1487,7 @@
  *     tags: [Customer]
  *     summary: Cancel a pending order
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1500,7 +1506,7 @@
  *     tags: [Customer]
  *     summary: Cancel an open service booking
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1519,7 +1525,7 @@
  *     tags: [Customer]
  *     summary: Get customer profile
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Customer profile data
@@ -1549,7 +1555,7 @@
  *     summary: Update customer profile
  *     description: Updates profile including vehicle details and file uploads (profile picture, RC book, insurance copy, vehicle photos via Cloudinary)
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1626,7 +1632,7 @@
  *     tags: [Customer]
  *     summary: Remove a vehicle photo
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1649,7 +1655,7 @@
  *     tags: [Customer]
  *     summary: Delete user account
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1672,7 +1678,7 @@
  *     tags: [Customer]
  *     summary: Get product details with reviews
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1711,7 +1717,7 @@
  *     summary: Submit or update a product review
  *     description: Must have purchased the product to review it
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1755,7 +1761,7 @@
  *     tags: [Customer]
  *     summary: Rate a completed service booking
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -1791,7 +1797,7 @@
  *     summary: Service provider dashboard data
  *     description: Returns dashboard data including service labels/counts, earnings, ongoing/completed counts, average rating
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Dashboard data
@@ -1831,7 +1837,7 @@
  *     summary: Update booking status
  *     description: "Update a booking's status: Open→Confirmed/Rejected, Confirmed→Completed/Rejected. Validates price approval and sends notifications."
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1858,7 +1864,7 @@
  *     tags: [Service Provider]
  *     summary: Bulk update booking statuses
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -1886,7 +1892,7 @@
  *     summary: Get earnings chart data
  *     description: Returns earnings data with support for weekly and monthly time ranges
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: timeRange
@@ -1923,7 +1929,7 @@
  *     tags: [Service Provider]
  *     summary: Get provider's reviews
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Reviews list
@@ -1978,7 +1984,7 @@
  *     summary: Update booking status and/or cost
  *     description: If cost changes, triggers price approval workflow and sends customer notification
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2006,7 +2012,7 @@
  *     summary: Update booking total cost
  *     description: Sets priceApprovalStatus to pending and notifies customer
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -2067,7 +2073,7 @@
  *     tags: [Service Provider]
  *     summary: Get service provider profile
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Provider profile data
@@ -2116,7 +2122,7 @@
  *     tags: [Service Provider]
  *     summary: Get recent booking activity
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: limit
@@ -2158,7 +2164,7 @@
  *     summary: Get all provider bookings
  *     description: Returns bookings with full details including vehicle info, linked products, pickup/dropoff info
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Bookings list
@@ -2183,7 +2189,7 @@
  *     summary: Update product cost for a booking
  *     description: Updates the product cost portion and recalculates total. Sends price notification.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2221,7 +2227,7 @@
  *     tags: [Seller]
  *     summary: Seller dashboard data
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Dashboard data
@@ -2257,7 +2263,7 @@
  *     tags: [Seller]
  *     summary: Get seller profile settings
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Seller profile
@@ -2282,7 +2288,7 @@
  *     tags: [Seller]
  *     summary: Update seller profile
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2319,7 +2325,7 @@
  *     summary: Get seller's orders
  *     description: Returns all orders containing items sold by this seller
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Seller orders
@@ -2364,7 +2370,7 @@
  *     tags: [Seller]
  *     summary: Get seller's product reviews
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Reviews with per-product summaries
@@ -2402,7 +2408,7 @@
  *     summary: Add a new product
  *     description: Uploads images to Cloudinary. Product starts as "pending".
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2456,7 +2462,7 @@
  *     tags: [Seller]
  *     summary: List seller's products
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Products list
@@ -2481,7 +2487,7 @@
  *     summary: Delete a product
  *     description: Removes from Cloudinary and all carts
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -2500,7 +2506,7 @@
  *     tags: [Seller]
  *     summary: Add stock to a product
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -2541,7 +2547,7 @@
  *     summary: Update order item status
  *     description: Handles per-item or whole-order status updates. Generates delivery OTP on "shipped", verifies OTP on "delivered".
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: orderId
@@ -2581,7 +2587,7 @@
  *     tags: [Seller]
  *     summary: Update delivery date for an order item
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: orderId
@@ -2614,7 +2620,7 @@
  *     summary: Upload verification document
  *     description: Uploads to Cloudinary and sets verificationStatus to pending
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2653,7 +2659,7 @@
  *     tags: [Seller]
  *     summary: Delete a verification document
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: docType
@@ -2673,7 +2679,7 @@
  *     summary: Edit a product
  *     description: Updates product details and optionally replaces images. Resets status to pending.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -2721,7 +2727,7 @@
  *     tags: [Seller]
  *     summary: Download sample CSV template for bulk upload
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: CSV file download
@@ -2738,7 +2744,7 @@
  *     tags: [Seller]
  *     summary: Bulk upload products from CSV
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2763,7 +2769,7 @@
  *     tags: [Seller]
  *     summary: Get bulk upload result
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Bulk upload result
@@ -2796,7 +2802,7 @@
  *     tags: [Seller]
  *     summary: Request a payout
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Payout requested
@@ -2812,7 +2818,7 @@
  *     summary: Create a service booking
  *     description: Calculates total cost from provider's services. Validates paint color for car painting. Includes pickup/dropoff costs and stores full vehicle details.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -2970,7 +2976,7 @@
  *     summary: Update cart item quantity
  *     description: Increase or decrease item quantity. Validates stock availability.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -3016,7 +3022,7 @@
  *     summary: List chat customers (manager only)
  *     description: Returns customers who have chat threads with latest message preview
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Customer list with chat info
@@ -3054,7 +3060,7 @@
  *     tags: [Chat]
  *     summary: Search customers for chat
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: q
@@ -3080,7 +3086,7 @@
  *     summary: Get chat messages
  *     description: Retrieves messages for a customer thread. Marks opposite-role messages as read.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -3112,7 +3118,7 @@
  *     summary: Send a text message
  *     description: Posts a message and broadcasts via Socket.IO
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -3152,7 +3158,7 @@
  *     summary: Upload file attachment to chat
  *     description: Uploads via Cloudinary with local storage fallback
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -3184,7 +3190,7 @@
  *     summary: Delete a chat message
  *     description: Only the message owner or a manager can delete
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -3217,7 +3223,7 @@
  *     tags: [Chat]
  *     summary: Get unread message count
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Unread count
@@ -3242,7 +3248,7 @@
  *     summary: Create a checkout session
  *     description: Creates a Stripe or mock checkout session depending on configuration
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -3301,7 +3307,7 @@
  *     tags: [Payments]
  *     summary: Get mock payment session details
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: sessionId
@@ -3341,7 +3347,7 @@
  *     summary: Process mock credit card payment
  *     description: "Simulates credit card processing. Card 4000000000000002 triggers decline."
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: sessionId
@@ -3391,7 +3397,7 @@
  *     summary: Verify payment session status
  *     description: Works for both Stripe and mock sessions
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: sessionId
@@ -3497,7 +3503,7 @@
  *     tags: [Contact]
  *     summary: Delete a support ticket
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3518,7 +3524,7 @@
  *     tags: [Profile Settings]
  *     summary: Update service provider profile
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -3557,7 +3563,7 @@
  *     tags: [Profile Settings]
  *     summary: Upload verification document
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -3583,7 +3589,7 @@
  *     tags: [Profile Settings]
  *     summary: Delete a verification document
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: docType
@@ -3604,7 +3610,7 @@
  *     tags: [Service Categories]
  *     summary: Get active service categories
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Active categories
@@ -3628,7 +3634,7 @@
  *     tags: [Service Categories]
  *     summary: Get all service categories (manager)
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: All categories
@@ -3647,7 +3653,7 @@
  *     tags: [Service Categories]
  *     summary: Create a service category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -3679,7 +3685,7 @@
  *     tags: [Service Categories]
  *     summary: Update a service category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3703,7 +3709,7 @@
  *     tags: [Service Categories]
  *     summary: Delete a service category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3724,7 +3730,7 @@
  *     tags: [Product Categories]
  *     summary: Get active product categories
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Active product categories
@@ -3748,7 +3754,7 @@
  *     tags: [Product Categories]
  *     summary: Get all product categories (manager)
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: All product categories
@@ -3767,7 +3773,7 @@
  *     tags: [Product Categories]
  *     summary: Create a product category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -3796,7 +3802,7 @@
  *     tags: [Product Categories]
  *     summary: Update a product category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3826,7 +3832,7 @@
  *     tags: [Product Categories]
  *     summary: Delete a product category
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3845,7 +3851,7 @@
  *     tags: [Product Categories]
  *     summary: Add a subcategory
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3874,7 +3880,7 @@
  *     tags: [Product Categories]
  *     summary: Remove a subcategory by index
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3900,7 +3906,7 @@
  *     tags: [Notifications]
  *     summary: Get paginated notifications
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -3944,7 +3950,7 @@
  *     tags: [Notifications]
  *     summary: Get unread notification count
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Unread count
@@ -3966,7 +3972,7 @@
  *     tags: [Notifications]
  *     summary: Mark all notifications as read
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: All marked as read
@@ -3979,7 +3985,7 @@
  *     tags: [Notifications]
  *     summary: Mark a notification as read
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -3999,7 +4005,7 @@
  *     summary: Accept proposed service price
  *     description: Accepts the proposed price, updates booking, and notifies provider via Socket.IO
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -4018,7 +4024,7 @@
  *     tags: [Notifications]
  *     summary: Reject proposed service price
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -4037,7 +4043,7 @@
  *     tags: [Notifications]
  *     summary: Cancel service from notification
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -4056,7 +4062,7 @@
  *     tags: [Notifications]
  *     summary: Delete a notification
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -4078,7 +4084,7 @@
  *     summary: Search product catalog for parts
  *     description: Returns approved products with available stock for service providers
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: q
@@ -4132,7 +4138,7 @@
  *     summary: Link a product to a booking
  *     description: Reserves stock and recalculates booking total. Sets price approval to pending.
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -4179,7 +4185,7 @@
  *     summary: Unlink a product from a booking
  *     description: Releases reserved stock and recalculates booking total
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -4205,7 +4211,7 @@
  *     summary: Update product allocation status
  *     description: "Transitions: reserved→allocated→installed (consumes stock), or →returned (releases reservation)"
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -4233,7 +4239,7 @@
  *     tags: [Parts]
  *     summary: Get linked products for a booking
  *     security:
- *       - sessionAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: bookingId

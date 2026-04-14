@@ -28,9 +28,8 @@ function wantsJSON(req) {
  * Responds with JSON or redirect based on request type
  */
 const isAuthenticated = (req, res, next) => {
-  if (req.session && req.session.user) {
-    // Normalize user access for downstream handlers.
-    req.user = req.session.user;
+  if (req.user || (req.session && req.session.user)) {
+    req.user = req.user || req.session.user;
     return next();
   }
 
@@ -55,7 +54,7 @@ function requireRole(role, roleName) {
     if (!req.user && req.session?.user) {
       req.user = req.session.user;
     }
-    const currentRole = req.session.user?.role;
+    const currentRole = req.user?.role;
     if (role === "admin" && currentRole === "manager") {
       return next();
     }
