@@ -18,7 +18,9 @@ describe("Logout page", () => {
     render(<Logout />);
 
     expect(window.localStorage.getItem("auth_token")).toBeNull();
-    expect(window.location.href).toContain("http://localhost:3000/logout?next=");
+    expect(window.location.href).toContain(
+      "http://localhost:3000/logout?next=",
+    );
     expect(screen.getByText(/Logging you out/i)).toBeTruthy();
 
     window.location = originalLocation;

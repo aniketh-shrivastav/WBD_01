@@ -40,7 +40,10 @@ describe("authController", () => {
 
   test("postSignup returns 400 for invalid json signup payload", async () => {
     const req = createMockReq({
-      headers: { accept: "application/json", "content-type": "application/json" },
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
       body: {
         name: "John Doe",
         email: "john@invalid.org",

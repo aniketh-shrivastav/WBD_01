@@ -35,7 +35,8 @@ describe("route wiring", () => {
   test("bookingRoutes protects create-booking route", () => {
     const router = require("../../routes/bookingRoutes");
     const layer = router.stack.find(
-      (stackLayer) => stackLayer.route && stackLayer.route.path === "/create-booking",
+      (stackLayer) =>
+        stackLayer.route && stackLayer.route.path === "/create-booking",
     );
 
     expect(layer).toBeTruthy();
