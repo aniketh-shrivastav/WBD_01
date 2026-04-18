@@ -67,6 +67,8 @@ jobs:
 
       - name: Build client
         run: npm run build
+        env:
+          CI: false
 
   docker-build:
     name: Docker Build
@@ -85,3 +87,5 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: ffsd-project:ci
+          provenance: false
+          sbom: false
