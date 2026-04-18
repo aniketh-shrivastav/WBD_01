@@ -135,7 +135,6 @@ export default function ManagerChat() {
       });
     })();
     return () => socketRef.current?.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCustomer]);
 
   async function loadCustomers() {

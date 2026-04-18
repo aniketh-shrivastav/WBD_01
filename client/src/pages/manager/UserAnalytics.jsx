@@ -71,7 +71,7 @@ function useChart(ref, config) {
     return () => {
       chartRef.current?.destroy?.();
     };
-  }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [config]);
 }
 
 /* ================================================================

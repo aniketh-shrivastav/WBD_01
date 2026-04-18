@@ -56,7 +56,6 @@ export default function ManagerNav() {
       cancelled = true;
       if (timer) clearInterval(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

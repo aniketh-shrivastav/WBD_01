@@ -189,7 +189,6 @@ export default function ServiceProfileSettings() {
   // If provider removes Car Painting from services, clear colors locally (server also clears)
   useEffect(() => {
     if (!hasCarPainting && paintColors.length) setPaintColors([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasCarPainting]);
 
   function setField(name, value) {
