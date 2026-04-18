@@ -4,6 +4,9 @@ module.exports = {
   testMatch: ["**/*.test.js"],
   collectCoverage: true,
   collectCoverageFrom: [
+    "controllers/**/*.js",
+    "routes/**/*.js",
+    "services/**/*.js",
     "middleware/**/*.js",
     "!middleware/uploadMiddleware.js",
   ],

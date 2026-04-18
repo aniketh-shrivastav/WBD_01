@@ -6,6 +6,7 @@
     "start": "cross-env PORT=5173 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "react-scripts test --watchAll=false --passWithNoTests",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -22,6 +23,8 @@
     "web-vitals": "4.2.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "baseline-browser-mapping": "^2.9.19",
     "cross-env": "^7.0.3",
     "http-proxy-middleware": "^3.0.2"
