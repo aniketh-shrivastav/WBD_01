@@ -2,25 +2,43 @@ const Product = require("../../models/Product");
 const ProductReview = require("../../models/ProductReview");
 const Order = require("../../models/Orders");
 const { createError } = require("./helpers");
+const { withCache } = require("../../utils/cacheClient");
+
+const PRODUCT_INDEX_CACHE_TTL = Number(process.env.CACHE_TTL_PRODUCTS || 60);
 
 async function getIndexData() {
-  const products = await Product.find({ status: "approved" });
-  return { products };
+  const { data } = await withCache(
+    "cache:products:index:view:v1",
+    PRODUCT_INDEX_CACHE_TTL,
+    async () => {
+      const products = await Product.find({ status: "approved" }).lean();
+      return { products };
+    },
+  );
+
+  return data;
 }
 
 async function getIndexApiData() {
-  const products = await Product.find({ status: "approved" }).populate(
-    "seller",
-    "verificationStatus",
+  const { data } = await withCache(
+    "cache:products:index:api:v1",
+    PRODUCT_INDEX_CACHE_TTL,
+    async () => {
+      const products = await Product.find({ status: "approved" })
+        .populate("seller", "verificationStatus")
+        .lean();
+
+      products.sort((a, b) => {
+        const aVerified = a.seller?.verificationStatus === "verified" ? 0 : 1;
+        const bVerified = b.seller?.verificationStatus === "verified" ? 0 : 1;
+        return aVerified - bVerified;
+      });
+
+      return { products };
+    },
   );
 
-  products.sort((a, b) => {
-    const aVerified = a.seller?.verificationStatus === "verified" ? 0 : 1;
-    const bVerified = b.seller?.verificationStatus === "verified" ? 0 : 1;
-    return aVerified - bVerified;
-  });
-
-  return { products };
+  return data;
 }
 
 async function getProductDetails(productId, userId) {
@@ -51,30 +69,51 @@ async function getProductDetails(productId, userId) {
     .sort({ createdAt: -1 })
     .lean();
 
+  const reviewerIds = Array.from(
+    new Set(
+      reviews
+        .map((review) => review.userId?._id || review.userId)
+        .filter(Boolean)
+        .map((id) => String(id)),
+    ),
+  );
+
+  let verifiedReviewerIdSet = new Set();
+  if (reviewerIds.length) {
+    const deliveredOrders = await Order.find(
+      {
+        userId: { $in: reviewerIds },
+        $or: [
+          {
+            items: {
+              $elemMatch: {
+                productId: product._id,
+                $or: [
+                  { itemStatus: "delivered" },
+                  { itemStatus: { $exists: false } },
+                ],
+              },
+            },
+          },
+          {
+            orderStatus: "delivered",
+            "items.productId": product._id,
+          },
+        ],
+      },
+      { userId: 1, _id: 0 },
+    ).lean();
+
+    verifiedReviewerIdSet = new Set(
+      deliveredOrders.map((order) => String(order.userId)),
+    );
+  }
+
   const reviewsWithVerification = await Promise.all(
     reviews.map(async (review) => {
       const reviewerId = review.userId?._id || review.userId;
       const hasVerifiedPurchase = reviewerId
-        ? await Order.exists({
-            userId: reviewerId,
-            $or: [
-              {
-                items: {
-                  $elemMatch: {
-                    productId: product._id,
-                    $or: [
-                      { itemStatus: "delivered" },
-                      { itemStatus: { $exists: false } },
-                    ],
-                  },
-                },
-              },
-              {
-                orderStatus: "delivered",
-                "items.productId": product._id,
-              },
-            ],
-          })
+        ? verifiedReviewerIdSet.has(String(reviewerId))
         : false;
 
       return {

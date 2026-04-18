@@ -6,4 +6,6 @@ const ServiceCategorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+ServiceCategorySchema.index({ active: 1, name: 1 });
+
 module.exports = mongoose.model("ServiceCategory", ServiceCategorySchema);

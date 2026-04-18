@@ -3,6 +3,9 @@ const Order = require("../../models/Orders");
 const ServiceBooking = require("../../models/serviceBooking");
 const ProductReview = require("../../models/ProductReview");
 const { buildMonthBuckets, monthKey } = require("./common");
+const { withCache } = require("../../utils/cacheClient");
+
+const DASHBOARD_TTL = Number(process.env.CACHE_TTL_DASHBOARD || 60);
 
 async function collectAdminDashboardStats() {
   const roles = ["customer", "service-provider", "seller", "manager", "admin"];
@@ -535,10 +538,16 @@ async function collectAdminDashboardStats() {
 
 exports.getApiDashboard = async (req, res) => {
   try {
-    const stats = await collectAdminDashboardStats();
+    const { data: stats } = await withCache(
+      "cache:dashboard:admin:api:v1",
+      DASHBOARD_TTL,
+      collectAdminDashboardStats,
+    );
     res.json(stats);
   } catch (err) {
     console.error("Admin dashboard API error", err);
     res.status(500).json({ error: "Failed to load admin dashboard data" });
   }
 };
+
+exports.collectAdminDashboardStats = collectAdminDashboardStats;

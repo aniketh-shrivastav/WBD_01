@@ -1,4 +1,13 @@
 const ProductCategory = require("../models/ProductCategory");
+const { deleteByPattern, withCache } = require("../utils/cacheClient");
+
+const PRODUCT_CATEGORY_TTL = Number(process.env.CACHE_TTL_CATEGORIES || 300);
+const PRODUCT_CATEGORIES_ALL_KEY = "cache:product-categories:all:v1";
+const PRODUCT_CATEGORIES_ACTIVE_KEY = "cache:product-categories:active:v1";
+
+async function invalidateProductCategoryCache() {
+  await deleteByPattern("cache:product-categories:*");
+}
 
 const DEFAULT_CATEGORIES = [
   {
@@ -102,7 +111,12 @@ async function seedDefaults() {
 exports.getCategories = async (req, res) => {
   try {
     await seedDefaults();
-    const categories = await ProductCategory.find().sort({ name: 1 }).lean();
+    const { data } = await withCache(
+      PRODUCT_CATEGORIES_ALL_KEY,
+      PRODUCT_CATEGORY_TTL,
+      async () => ProductCategory.find().sort({ name: 1 }).lean(),
+    );
+    const categories = data;
     res.json({ success: true, categories });
   } catch (err) {
     console.error("Error fetching product categories:", err);
@@ -114,9 +128,13 @@ exports.getCategories = async (req, res) => {
 exports.getActiveCategories = async (req, res) => {
   try {
     await seedDefaults();
-    const categories = await ProductCategory.find({ active: true })
-      .sort({ name: 1 })
-      .lean();
+    const { data } = await withCache(
+      PRODUCT_CATEGORIES_ACTIVE_KEY,
+      PRODUCT_CATEGORY_TTL,
+      async () =>
+        ProductCategory.find({ active: true }).sort({ name: 1 }).lean(),
+    );
+    const categories = data;
     res.json({ success: true, categories });
   } catch (err) {
     console.error("Error fetching active product categories:", err);
@@ -150,6 +168,7 @@ exports.addCategory = async (req, res) => {
       active: true,
       requiresCompliance: !!requiresCompliance,
     });
+    await invalidateProductCategoryCache();
     res.json({ success: true, category });
   } catch (err) {
     console.error("Error adding product category:", err);
@@ -180,6 +199,7 @@ exports.updateCategory = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Category not found" });
     }
+    await invalidateProductCategoryCache();
     res.json({ success: true, category });
   } catch (err) {
     console.error("Error updating product category:", err);
@@ -214,6 +234,7 @@ exports.addSubcategory = async (req, res) => {
     }
     category.subcategories.push(trimmed);
     await category.save();
+    await invalidateProductCategoryCache();
     res.json({ success: true, category });
   } catch (err) {
     console.error("Error adding subcategory:", err);
@@ -239,6 +260,7 @@ exports.removeSubcategory = async (req, res) => {
     }
     category.subcategories.splice(idx, 1);
     await category.save();
+    await invalidateProductCategoryCache();
     res.json({ success: true, category });
   } catch (err) {
     console.error("Error removing subcategory:", err);
@@ -256,6 +278,7 @@ exports.deleteCategory = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Category not found" });
     }
+    await invalidateProductCategoryCache();
     res.json({ success: true, message: "Category deleted" });
   } catch (err) {
     console.error("Error deleting product category:", err);

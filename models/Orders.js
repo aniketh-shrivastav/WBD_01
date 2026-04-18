@@ -101,6 +101,12 @@ const OrderSchema = new mongoose.Schema({
   },
 });
 
+OrderSchema.index({ userId: 1, placedAt: -1 });
+OrderSchema.index({ "items.seller": 1, placedAt: -1 });
+OrderSchema.index({ userId: 1, "items.productId": 1, orderStatus: 1 });
+OrderSchema.index({ paymentStatus: 1, placedAt: -1 });
+OrderSchema.index({ orderStatus: 1, placedAt: -1 });
+
 OrderSchema.pre("validate", function setOrderId(next) {
   if (!this.orderId) {
     this.orderId = generateOrderId();

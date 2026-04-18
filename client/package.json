@@ -2,7 +2,6 @@
   "name": "autocustomizer-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3000",
   "scripts": {
     "start": "cross-env PORT=5173 react-scripts start",
     "build": "react-scripts build",
@@ -25,7 +24,11 @@
   "devDependencies": {
     "baseline-browser-mapping": "^2.9.19",
     "cross-env": "^7.0.3",
-    "eslint-plugin-react-hooks": "^7.0.1"
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "http-proxy-middleware": "^3.0.2"
+  },
+  "overrides": {
+    "yaml": "^2.8.3"
   },
   "browserslist": {
     "production": [

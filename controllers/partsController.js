@@ -34,28 +34,36 @@ exports.searchParts = async (req, res) => {
     const { q, category, subcategory, compatibility, limit } = req.query;
 
     const filter = { status: "approved" };
+    const textQuery = typeof q === "string" ? q.trim() : "";
+    const useTextSearch = textQuery.length > 0;
 
-    if (q) {
-      const regex = new RegExp(q, "i");
-      filter.$or = [
-        { name: regex },
-        { description: regex },
-        { brand: regex },
-        { compatibility: regex },
-        { sku: regex },
-      ];
+    if (useTextSearch) {
+      filter.$text = { $search: textQuery };
     }
-    if (category) filter.category = new RegExp(`^${category}$`, "i");
-    if (subcategory) filter.subcategory = new RegExp(`^${subcategory}$`, "i");
+    if (category) filter.category = category;
+    if (subcategory) filter.subcategory = subcategory;
     if (compatibility) filter.compatibility = new RegExp(compatibility, "i");
 
-    const products = await Product.find(filter)
-      .select(
-        "name price category subcategory brand quantity reservedQuantity sku compatibility image images",
-      )
-      .limit(Number(limit) || 30)
-      .sort({ name: 1 })
+    const selectFields =
+      "name price category subcategory brand quantity reservedQuantity sku compatibility image images";
+
+    const parsedLimit = Math.min(Math.max(Number(limit) || 30, 1), 100);
+
+    let query = Product.find(filter)
+      .select(selectFields)
+      .limit(parsedLimit)
+      .collation({ locale: "en", strength: 2 })
       .lean();
+
+    if (useTextSearch) {
+      query = query
+        .select({ score: { $meta: "textScore" } })
+        .sort({ score: { $meta: "textScore" }, name: 1 });
+    } else {
+      query = query.sort({ name: 1 });
+    }
+
+    const products = await query;
 
     // Attach available stock
     const results = products.map((p) => ({
@@ -258,12 +266,10 @@ exports.unlinkProduct = async (req, res) => {
       (lp) => String(lp.productId) === String(productId),
     );
     if (idx < 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Product not linked to this booking",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Product not linked to this booking",
+      });
     }
 
     const removed = booking.linkedProducts[idx];
@@ -350,12 +356,10 @@ exports.updateAllocationStatus = async (req, res) => {
       (lp) => String(lp.productId) === String(productId),
     );
     if (!linked) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Product not linked to this booking",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Product not linked to this booking",
+      });
     }
 
     const oldStatus = linked.allocationStatus;

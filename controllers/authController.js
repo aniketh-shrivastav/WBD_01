@@ -88,6 +88,9 @@ exports.postSignup = async (req, res) => {
   const { name, email, password, role, businessName, workshopName, phone } =
     req.body;
   const finalName = name || businessName || workshopName;
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
   const isJson = wantsJson(req);
 
   // Validation regex
@@ -102,11 +105,14 @@ exports.postSignup = async (req, res) => {
   ];
 
   let error = null;
-  if (!finalName || !email || !password || !role) {
+  if (!finalName || !normalizedEmail || !password || !role) {
     error = "All fields are required";
   } else if (!allowedRoles.includes(role)) {
     error = "Invalid role";
-  } else if (!emailRegex.test(email) || !/(\.com|\.in)$/i.test(email)) {
+  } else if (
+    !emailRegex.test(normalizedEmail) ||
+    !/(\.com|\.in)$/i.test(normalizedEmail)
+  ) {
     error = "Please enter a valid email ending in .com or .in";
   } else if (!nameRegex.test(finalName)) {
     error = "Name should not contain numbers or special characters";
@@ -123,7 +129,7 @@ exports.postSignup = async (req, res) => {
 
   try {
     // Check if email already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       const errMsg = "Email already exists";
       if (isJson) {
@@ -149,7 +155,7 @@ exports.postSignup = async (req, res) => {
     // Save user in MongoDB (unverified until OTP confirmed)
     const newUser = new User({
       name: finalName,
-      email,
+      email: normalizedEmail,
       phone,
       password: hashedPassword,
       role,
@@ -168,21 +174,21 @@ exports.postSignup = async (req, res) => {
 
     // Send OTP email
     const { emailSent, previewUrl } = await sendEmail(
-      email,
+      normalizedEmail,
       "Verify your AutoCustomizer account",
       `Your verification code is ${rawOtp}. It expires in 10 minutes.`,
       `<p>Welcome to AutoCustomizer!</p><p>Your verification code is <b>${rawOtp}</b>. It expires in 10 minutes.</p>`,
     );
 
     if (!emailSent) {
-      console.log("Signup OTP for", email, "=", rawOtp);
+      console.log("Signup OTP for", normalizedEmail, "=", rawOtp);
     }
 
     const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
     const redirect = `${frontendBase.replace(
       /\/$/,
       "",
-    )}/verify-otp?email=${encodeURIComponent(email)}`;
+    )}/verify-otp?email=${encodeURIComponent(normalizedEmail)}`;
 
     if (isJson) {
       return res.json({
@@ -209,20 +215,40 @@ exports.getLogin = (req, res) => {
 
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
   const isJson = wantsJson(req);
+  const authDebug = process.env.NODE_ENV !== "production";
+
+  if (authDebug) {
+    console.log("[auth] login attempt", {
+      emailInputLength: String(email || "").length,
+      normalizedEmail,
+      passwordLength: String(password || "").length,
+    });
+  }
 
   try {
     // Find user in MongoDB
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
+      if (authDebug) {
+        console.log("[auth] login failed: user not found", { normalizedEmail });
+      }
       return res.status(401).json({ message: "Invalid credentials" });
     }
     if (user.emailVerified === false) {
+      if (authDebug) {
+        console.log("[auth] login blocked: email not verified", {
+          normalizedEmail,
+        });
+      }
       const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
       const verifyUrl = `${frontendBase.replace(
         /\/$/,
         "",
-      )}/verify-otp?email=${encodeURIComponent(email)}`;
+      )}/verify-otp?email=${encodeURIComponent(normalizedEmail)}`;
       return res.status(403).json({
         message: "Please verify your email to continue.",
         redirect: verifyUrl,
@@ -231,6 +257,11 @@ exports.postLogin = async (req, res) => {
 
     // Check if the user is suspended
     if (user.suspended) {
+      if (authDebug) {
+        console.log("[auth] login blocked: suspended user", {
+          normalizedEmail,
+        });
+      }
       return res.status(403).json({
         message: "Your account is suspended. Contact support for assistance.",
       });
@@ -239,7 +270,21 @@ exports.postLogin = async (req, res) => {
     // Compare entered password with hashed password in MongoDB
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      if (authDebug) {
+        console.log("[auth] login failed: password mismatch", {
+          normalizedEmail,
+          hashPrefix: String(user.password || "").slice(0, 4),
+          hashLength: String(user.password || "").length,
+        });
+      }
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (authDebug) {
+      console.log("[auth] login success", {
+        normalizedEmail,
+        role: user.role,
+      });
     }
 
     const authUser = {
@@ -640,11 +685,9 @@ exports.googleSignIn = async (req, res) => {
         .json({ success: false, message: "Invalid token. Please try again." });
     }
 
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Google Sign-In failed. Please try again.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Google Sign-In failed. Please try again.",
+    });
   }
 };

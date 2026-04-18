@@ -5,12 +5,14 @@ const itemSchema = new mongoose.Schema({
   name: String,
   price: Number,
   image: String,
-  quantity: Number
+  quantity: Number,
 });
 
 const cartSchema = new mongoose.Schema({
   userId: String,
-  items: [itemSchema]
+  items: [itemSchema],
 });
+
+cartSchema.index({ userId: 1 });
 
 module.exports = mongoose.model("Cart", cartSchema);

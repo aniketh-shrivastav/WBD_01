@@ -12,7 +12,7 @@ const attachmentSchema = new mongoose.Schema(
       default: "local",
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const messageSchema = new mongoose.Schema(
@@ -35,9 +35,12 @@ const messageSchema = new mongoose.Schema(
     readByCustomer: { type: Boolean, default: false, index: true },
     readByManager: { type: Boolean, default: false, index: true },
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: false } },
 );
 
 messageSchema.index({ customerId: 1, createdAt: 1 });
+messageSchema.index({ customerId: 1, createdAt: -1 });
+messageSchema.index({ customerId: 1, readByManager: 1, createdAt: -1 });
+messageSchema.index({ customerId: 1, readByCustomer: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Message", messageSchema);

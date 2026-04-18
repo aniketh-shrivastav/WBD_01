@@ -55,4 +55,6 @@ const customerProfileSchema = new mongoose.Schema({
   vehiclePhotos: [{ type: String }], // front, rear, interior etc.
 });
 
+customerProfileSchema.index({ registrationNumber: 1 });
+
 module.exports = mongoose.model("CustomerProfile", customerProfileSchema);

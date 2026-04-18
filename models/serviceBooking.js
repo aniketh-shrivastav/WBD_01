@@ -127,4 +127,11 @@ const ServiceBookingSchema = new mongoose.Schema({
   ],
 });
 
+ServiceBookingSchema.index({ providerId: 1, createdAt: -1 });
+ServiceBookingSchema.index({ customerId: 1, createdAt: -1 });
+ServiceBookingSchema.index({ providerId: 1, status: 1, createdAt: -1 });
+ServiceBookingSchema.index({ customerId: 1, status: 1, createdAt: -1 });
+ServiceBookingSchema.index({ status: 1, createdAt: -1 });
+ServiceBookingSchema.index({ serviceCategory: 1, status: 1, createdAt: -1 });
+
 module.exports = mongoose.model("ServiceBooking", ServiceBookingSchema);

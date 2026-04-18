@@ -3,8 +3,18 @@
   "version": "1.0.0",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --ci",
+    "test:report": "npm run test:coverage",
+    "start": "node server.js",
+    "docker:build": "docker build -t ffsd-project:latest .",
+    "docker:run": "docker run --rm -p 3000:3000 --env-file .env ffsd-project:latest",
+    "docker:compose": "docker compose up --build",
+    "docker:compose:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "perf:db": "node scripts/dbPerfReport.js",
+    "perf:db:compare": "node scripts/dbPerfCompare.js",
+    "perf:cache": "node scripts/cachePerfReport.js"
   },
   "keywords": [],
   "author": "",
@@ -31,11 +41,16 @@
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^7.0.3",
     "pdfkit": "^0.17.2",
+    "redis": "^4.7.1",
     "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7",
     "stripe": "^20.3.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^30.0.5",
+    "jest-junit": "^16.0.0"
   }
 }

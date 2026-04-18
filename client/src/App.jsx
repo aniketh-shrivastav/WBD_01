@@ -63,8 +63,13 @@ function useSession() {
 
     (async () => {
       try {
+        const token = localStorage.getItem("auth_token") || "";
         const res = await fetch("/api/session", {
-          headers: { Accept: "application/json" },
+          headers: {
+            Accept: "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
         });
         const j = await res.json().catch(() => ({}));
         if (!cancelled) setState({ loading: false, user: j?.user || null });

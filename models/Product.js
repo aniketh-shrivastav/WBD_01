@@ -86,6 +86,34 @@ const ProductSchema = new mongoose.Schema({
   },
 });
 
+ProductSchema.index({ status: 1, createdAt: -1 });
+ProductSchema.index({ seller: 1, createdAt: -1 });
+ProductSchema.index({ category: 1, subcategory: 1, status: 1, name: 1 });
+ProductSchema.index({ status: 1, quantity: 1 });
+ProductSchema.index(
+  {
+    name: "text",
+    description: "text",
+    brand: "text",
+    compatibility: "text",
+    sku: "text",
+    category: "text",
+    subcategory: "text",
+  },
+  {
+    weights: {
+      name: 10,
+      brand: 6,
+      sku: 8,
+      category: 4,
+      subcategory: 4,
+      compatibility: 3,
+      description: 1,
+    },
+    name: "product_text_search_idx",
+  },
+);
+
 const Product =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);
 module.exports = Product;

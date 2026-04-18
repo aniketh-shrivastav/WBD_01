@@ -62,5 +62,9 @@ const UserSchema = new mongoose.Schema({
   firebaseUid: { type: String },
 });
 
+UserSchema.index({ role: 1, suspended: 1, createdAt: -1 });
+UserSchema.index({ verificationStatus: 1, role: 1 });
+UserSchema.index({ createdAt: -1 });
+
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

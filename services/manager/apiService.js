@@ -8,6 +8,9 @@ const ContactMessage = require("../../models/ContactMessage");
 const PDFDocument = require("pdfkit");
 const { getDisplayOrderId } = require("../../utils/orderIdUtils");
 const { buildMonthBuckets, monthKey } = require("./common");
+const { withCache } = require("../../utils/cacheClient");
+
+const DASHBOARD_TTL = Number(process.env.CACHE_TTL_DASHBOARD || 60);
 
 async function collectDashboardStats() {
   const roles = ["customer", "service-provider", "seller", "manager"];
@@ -668,7 +671,11 @@ async function getApiSupport(req, res) {
 
 async function getApiDashboard(req, res) {
   try {
-    const stats = await collectDashboardStats();
+    const { data: stats } = await withCache(
+      "cache:dashboard:manager:api:v1",
+      DASHBOARD_TTL,
+      collectDashboardStats,
+    );
     res.json(stats);
   } catch (err) {
     console.error("Dashboard API error", err);
@@ -678,7 +685,11 @@ async function getApiDashboard(req, res) {
 
 async function getApiDashboardReport(req, res) {
   try {
-    const stats = await collectDashboardStats();
+    const { data: stats } = await withCache(
+      "cache:dashboard:manager:api:v1",
+      DASHBOARD_TTL,
+      collectDashboardStats,
+    );
     const doc = new PDFDocument({ margin: 40, size: "A4" });
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -877,6 +888,7 @@ async function getApiDashboardReport(req, res) {
 }
 
 module.exports = {
+  collectDashboardStats,
   getApiUsers,
   getApiServices,
   getApiOrders,
