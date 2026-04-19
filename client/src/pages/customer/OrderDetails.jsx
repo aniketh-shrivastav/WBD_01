@@ -379,8 +379,9 @@ export default function OrderDetails() {
                         </strong>
                       </div>
 
-                      {String(item.itemStatus || order.orderStatus || "").toLowerCase() ===
-                        "delivered" &&
+                      {String(
+                        item.itemStatus || order.orderStatus || "",
+                      ).toLowerCase() === "delivered" &&
                         item.productId && (
                           <div style={{ marginTop: "12px" }}>
                             <button

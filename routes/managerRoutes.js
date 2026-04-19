@@ -87,25 +87,10 @@ router.get(
 );
 
 // Main page routes
-router.get(
-  "/dashboard",
-  isAuthenticated,
-  isManager,
-  serveManagerSpa,
-);
+router.get("/dashboard", isAuthenticated, isManager, serveManagerSpa);
 router.get("/orders", isAuthenticated, isManager, serveManagerSpa);
-router.get(
-  "/payments",
-  isAuthenticated,
-  isManager,
-  serveManagerSpa,
-);
-router.get(
-  "/services",
-  isAuthenticated,
-  isManager,
-  serveManagerSpa,
-);
+router.get("/payments", isAuthenticated, isManager, serveManagerSpa);
+router.get("/services", isAuthenticated, isManager, serveManagerSpa);
 router.get("/users", isAuthenticated, isManager, serveManagerSpa);
 
 // Profile routes

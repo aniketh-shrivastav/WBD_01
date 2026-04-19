@@ -558,7 +558,9 @@ export default function ServiceDetails() {
 
             <div className="customer-card" style={{ marginBottom: "24px" }}>
               <div className="customer-card-header">
-                <h3 style={{ margin: 0, fontSize: "1rem" }}>⭐ Service Review</h3>
+                <h3 style={{ margin: 0, fontSize: "1rem" }}>
+                  ⭐ Service Review
+                </h3>
               </div>
               <div className="customer-card-body">
                 {booking.rating ? (
@@ -571,14 +573,22 @@ export default function ServiceDetails() {
                         <strong>Your Comment:</strong> {booking.review}
                       </p>
                     ) : (
-                      <p style={{ margin: 0, color: "var(--customer-text-secondary)" }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "var(--customer-text-secondary)",
+                        }}
+                      >
                         You submitted a rating without a comment.
                       </p>
                     )}
                   </div>
                 ) : String(booking.status || "").toLowerCase() === "ready" ? (
                   <form onSubmit={submitRating}>
-                    <div className="customer-form-group" style={{ marginBottom: "12px" }}>
+                    <div
+                      className="customer-form-group"
+                      style={{ marginBottom: "12px" }}
+                    >
                       <label className="customer-label" htmlFor="serviceRating">
                         Rating (1 to 5)
                       </label>
@@ -591,16 +601,24 @@ export default function ServiceDetails() {
                         value={ratingValue}
                         onChange={(e) => {
                           setRatingValue(e.target.value);
-                          setRatingErrors((prev) => ({ ...prev, rating: undefined }));
+                          setRatingErrors((prev) => ({
+                            ...prev,
+                            rating: undefined,
+                          }));
                         }}
                         className={`customer-input ${ratingErrors.rating ? "customer-input-error" : ""}`}
                         style={{ maxWidth: "120px" }}
                       />
                       {ratingErrors.rating && (
-                        <div className="customer-error-text">{ratingErrors.rating}</div>
+                        <div className="customer-error-text">
+                          {ratingErrors.rating}
+                        </div>
                       )}
                     </div>
-                    <div className="customer-form-group" style={{ marginBottom: "12px" }}>
+                    <div
+                      className="customer-form-group"
+                      style={{ marginBottom: "12px" }}
+                    >
                       <label className="customer-label" htmlFor="serviceReview">
                         Comment (optional)
                       </label>
@@ -610,13 +628,18 @@ export default function ServiceDetails() {
                         value={ratingReview}
                         onChange={(e) => {
                           setRatingReview(e.target.value);
-                          setRatingErrors((prev) => ({ ...prev, review: undefined }));
+                          setRatingErrors((prev) => ({
+                            ...prev,
+                            review: undefined,
+                          }));
                         }}
                         className={`customer-input ${ratingErrors.review ? "customer-input-error" : ""}`}
                         placeholder="Share your experience..."
                       />
                       {ratingErrors.review && (
-                        <div className="customer-error-text">{ratingErrors.review}</div>
+                        <div className="customer-error-text">
+                          {ratingErrors.review}
+                        </div>
                       )}
                     </div>
                     <button
@@ -639,8 +662,14 @@ export default function ServiceDetails() {
                     )}
                   </form>
                 ) : (
-                  <p style={{ margin: 0, color: "var(--customer-text-secondary)" }}>
-                    You can submit a review once the service status becomes Ready.
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "var(--customer-text-secondary)",
+                    }}
+                  >
+                    You can submit a review once the service status becomes
+                    Ready.
                   </p>
                 )}
               </div>

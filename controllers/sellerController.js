@@ -1,5 +1,6 @@
 const sellerService = require("../services/sellerService");
 const { createNotification } = require("./notificationController");
+const path = require("path");
 
 function wantsJson(req) {
   return (
@@ -169,6 +170,27 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+exports.getProductManagement = async (req, res) => {
+  try {
+    if (wantsJson(req) || req.xhr) {
+      const products = await sellerService.getProducts(req.user.id);
+      return res.json({ success: true, products });
+    }
+
+    return res.sendFile(
+      path.join(__dirname, "..", "client", "build", "index.html"),
+    );
+  } catch (err) {
+    console.error("Product management page error:", err);
+    if (wantsJson(req)) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to load product management" });
+    }
+    return res.status(500).send("Failed to load product management");
+  }
+};
+
 exports.updateStock = async (req, res) => {
   try {
     const newQuantity = await sellerService.updateStock(
@@ -312,7 +334,6 @@ exports.getApiProfileSettings = exports.getProfileSettings;
 exports.postApiProfileSettings = exports.updateProfileSettings;
 exports.getApiOrders = exports.getOrders;
 exports.getApiReviews = exports.getReviews;
-exports.getProductManagement = exports.getProducts;
 exports.getApiProducts = exports.getProducts;
 exports.getApiBulkUploadResult = exports.getBulkUploadResult;
 
