@@ -570,24 +570,25 @@ exports.postResendOtp = async (req, res) => {
 // Static page routes
 const path = require("path");
 
+function sendReactApp(res) {
+  const reactIndexPath = path.join(__dirname, "..", "client", "build", "index.html");
+  return res.sendFile(reactIndexPath);
+}
+
 exports.getIndex = (req, res) => {
-  const staticPath = path.join(__dirname, "../public/all/index.html");
-  return res.sendFile(staticPath);
+  return sendReactApp(res);
 };
 
 exports.getContactUs = (req, res) => {
-  const staticPath = path.join(__dirname, "../public/all/contactus.html");
-  return res.sendFile(staticPath);
+  return sendReactApp(res);
 };
 
 exports.getFeedback = (req, res) => {
-  const staticPath = path.join(__dirname, "../public/all/feedback.html");
-  return res.sendFile(staticPath);
+  return sendReactApp(res);
 };
 
 exports.getFaq = (req, res) => {
-  const staticPath = path.join(__dirname, "../public/all/faq.html");
-  return res.sendFile(staticPath);
+  return sendReactApp(res);
 };
 
 // Aliases for route compatibility
