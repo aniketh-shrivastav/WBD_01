@@ -336,14 +336,6 @@ export default function ProductManagement() {
         <h1 className="seller-title">Product Management</h1>
         <p className="seller-subtitle">Add, manage, and track your products</p>
 
-        <a
-          href="/Seller/bulk-upload"
-          className="seller-btn seller-btn-secondary seller-mb-3"
-          style={{ display: "inline-block" }}
-        >
-          Bulk Upload Products
-        </a>
-
         {/* Product Form */}
         <div className="seller-card seller-mb-3">
           <div className="seller-card-header">
