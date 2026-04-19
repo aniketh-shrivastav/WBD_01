@@ -1,5 +1,7 @@
 const Product = require("../../models/Product");
 
+const SOLR_SPECIAL_CHAR_PATTERN = /([+\-!(){}\[\]^"~*?:\\/]|&&|\|\|)/g;
+
 function normalizeLimit(rawLimit) {
   const parsed = Number(rawLimit);
   if (!Number.isFinite(parsed)) return 30;
@@ -10,6 +12,41 @@ function normalizeOffset(rawOffset) {
   const parsed = Number(rawOffset);
   if (!Number.isFinite(parsed)) return 0;
   return Math.max(0, Math.trunc(parsed));
+}
+
+function escapeSolrTerm(value) {
+  return String(value).replace(SOLR_SPECIAL_CHAR_PATTERN, "\\$1");
+}
+
+function buildSolrQuery(rawQuery) {
+  const trimmed = String(rawQuery || "").trim();
+  if (!trimmed) {
+    return "*:*";
+  }
+
+  const terms = trimmed
+    .split(/\s+/)
+    .map((term) => escapeSolrTerm(term))
+    .filter(Boolean);
+
+  if (!terms.length) {
+    return "*:*";
+  }
+
+  const exactClause = terms.join(" ");
+  const fuzzyClause = terms
+    .map((term) => {
+      if (term.length <= 2) return term;
+      if (term.length <= 5) return `${term}~1`;
+      return `${term}~2`;
+    })
+    .join(" ");
+
+  if (fuzzyClause === exactClause) {
+    return exactClause;
+  }
+
+  return `(${exactClause}) OR (${fuzzyClause})`;
 }
 
 function buildMongoFilter({ q, category }) {
@@ -57,12 +94,14 @@ async function mongoSearch({ q, category, limit, offset }) {
 async function solrSearch({ q, category, limit, offset }) {
   const baseUrl = process.env.SOLR_BASE_URL || "http://localhost:8983";
   const collection = process.env.SOLR_COLLECTION || "products";
+  const solrQuery = buildSolrQuery(q);
 
   const params = new URLSearchParams({
     wt: "json",
     defType: "edismax",
-    q: q || "*:*",
+    q: solrQuery,
     qf: "name^6 brand^4 sku^5 category^3 subcategory^2 compatibility^2 description^1",
+    mm: "1<75%",
     rows: String(limit),
     start: String(offset),
     sort: q ? "score desc, createdAt desc" : "createdAt desc",
@@ -140,4 +179,8 @@ async function searchProducts(rawOptions = {}) {
 
 module.exports = {
   searchProducts,
+  __testables: {
+    buildSolrQuery,
+    escapeSolrTerm,
+  },
 };

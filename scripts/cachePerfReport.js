@@ -169,6 +169,40 @@ async function main() {
 
   reports.push(
     await runSuite(
+      "Manager users snapshot",
+      async () => {
+        await managerApiService.collectUsersData();
+      },
+      async () => {
+        await withCache(
+          "cache:manager:users:api:v1",
+          Number(process.env.CACHE_TTL_MANAGER_DATA || 45),
+          managerApiService.collectUsersData,
+        );
+      },
+      "cache:manager:users:*",
+    ),
+  );
+
+  reports.push(
+    await runSuite(
+      "Manager orders/bookings snapshot",
+      async () => {
+        await managerApiService.collectOrdersData();
+      },
+      async () => {
+        await withCache(
+          "cache:manager:orders:api:v1",
+          Number(process.env.CACHE_TTL_MANAGER_DATA || 45),
+          managerApiService.collectOrdersData,
+        );
+      },
+      "cache:manager:orders:*",
+    ),
+  );
+
+  reports.push(
+    await runSuite(
       "Admin dashboard aggregates",
       async () => {
         await adminApiService.collectAdminDashboardStats();

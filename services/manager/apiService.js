@@ -11,6 +11,12 @@ const { buildMonthBuckets, monthKey } = require("./common");
 const { withCache } = require("../../utils/cacheClient");
 
 const DASHBOARD_TTL = Number(process.env.CACHE_TTL_DASHBOARD || 60);
+const MANAGER_DATA_TTL = Number(process.env.CACHE_TTL_MANAGER_DATA || 45);
+const MANAGER_USERS_CACHE_KEY = "cache:manager:users:api:v1";
+const MANAGER_SERVICES_CACHE_KEY = "cache:manager:services:api:v1";
+const MANAGER_ORDERS_CACHE_KEY = "cache:manager:orders:api:v1";
+const MANAGER_PAYMENTS_CACHE_KEY = "cache:manager:payments:api:v1";
+const MANAGER_SUPPORT_CACHE_KEY = "cache:manager:support:api:v1";
 
 async function collectDashboardStats() {
   const roles = ["customer", "service-provider", "seller", "manager"];
@@ -478,195 +484,235 @@ async function collectDashboardStats() {
 
 async function getApiUsers(req, res) {
   try {
-    const users = await User.find({}, "name email role suspended");
-    const formatted = users.map((user) => ({
-      ...user.toObject(),
-      status: user.suspended ? "Suspended" : "Active",
-      joined: "2024-01-15",
-    }));
-    res.json({ users: formatted });
+    const { data } = await withCache(
+      MANAGER_USERS_CACHE_KEY,
+      MANAGER_DATA_TTL,
+      collectUsersData,
+    );
+    res.json(data);
   } catch (err) {
     console.error("Users API error", err);
     res.status(500).json({ error: "Failed to load users" });
   }
 }
 
+async function collectUsersData() {
+  const users = await User.find({}, "name email role suspended");
+  const formatted = users.map((user) => ({
+    ...user.toObject(),
+    status: user.suspended ? "Suspended" : "Active",
+    joined: "2024-01-15",
+  }));
+  return { users: formatted };
+}
+
 async function getApiServices(req, res) {
   try {
-    const serviceProvidersRaw = await User.find(
-      { role: "service-provider", suspended: { $ne: true } },
-      "name email phone servicesOffered district profilePicture verificationStatus",
+    const { data } = await withCache(
+      MANAGER_SERVICES_CACHE_KEY,
+      MANAGER_DATA_TTL,
+      collectServicesData,
     );
-
-    const providerIds = serviceProvidersRaw
-      .map((provider) => provider._id)
-      .filter(Boolean);
-    const ratingAgg = providerIds.length
-      ? await ServiceBooking.aggregate([
-          { $match: { providerId: { $in: providerIds }, rating: { $gte: 1 } } },
-          { $sort: { createdAt: -1 } },
-          {
-            $group: {
-              _id: "$providerId",
-              ratingAvg: { $avg: "$rating" },
-              ratingCount: { $sum: 1 },
-              latestRating: { $first: "$rating" },
-              latestReview: { $first: "$review" },
-              latestRatedAt: { $first: "$createdAt" },
-            },
-          },
-        ])
-      : [];
-
-    const statsByProviderId = new Map(
-      (ratingAgg || []).map((row) => [String(row._id), row]),
-    );
-
-    const serviceProviders = serviceProvidersRaw.map((provider) => {
-      const stats = statsByProviderId.get(String(provider._id));
-      return {
-        ...provider.toObject(),
-        ratingAvg:
-          typeof stats?.ratingAvg === "number" ? Number(stats.ratingAvg) : null,
-        ratingCount:
-          typeof stats?.ratingCount === "number" ? stats.ratingCount : 0,
-        latestRating:
-          typeof stats?.latestRating === "number" ? stats.latestRating : null,
-        latestReview:
-          typeof stats?.latestReview === "string" ? stats.latestReview : "",
-        latestRatedAt: stats?.latestRatedAt || null,
-      };
-    });
-
-    const sellersAll = await SellerProfile.find().populate(
-      "sellerId",
-      "name email phone profilePicture suspended verificationStatus verificationDocuments verifiedAt verificationNote",
-    );
-    const sellers = sellersAll.filter(
-      (seller) => seller.sellerId && !seller.sellerId.suspended,
-    );
-
-    const customersAll = await CustomerProfile.find().populate(
-      "userId",
-      "name email phone profilePicture suspended",
-    );
-    const customers = customersAll.filter(
-      (customer) => customer.userId && !customer.userId.suspended,
-    );
-
-    res.json({ serviceProviders, sellers, customers });
+    res.json(data);
   } catch (err) {
     console.error("Services API error", err);
     res.status(500).json({ error: "Failed to load profiles" });
   }
 }
 
+async function collectServicesData() {
+  const serviceProvidersRaw = await User.find(
+    { role: "service-provider", suspended: { $ne: true } },
+    "name email phone servicesOffered district profilePicture verificationStatus",
+  );
+
+  const providerIds = serviceProvidersRaw
+    .map((provider) => provider._id)
+    .filter(Boolean);
+  const ratingAgg = providerIds.length
+    ? await ServiceBooking.aggregate([
+        { $match: { providerId: { $in: providerIds }, rating: { $gte: 1 } } },
+        { $sort: { createdAt: -1 } },
+        {
+          $group: {
+            _id: "$providerId",
+            ratingAvg: { $avg: "$rating" },
+            ratingCount: { $sum: 1 },
+            latestRating: { $first: "$rating" },
+            latestReview: { $first: "$review" },
+            latestRatedAt: { $first: "$createdAt" },
+          },
+        },
+      ])
+    : [];
+
+  const statsByProviderId = new Map(
+    (ratingAgg || []).map((row) => [String(row._id), row]),
+  );
+
+  const serviceProviders = serviceProvidersRaw.map((provider) => {
+    const stats = statsByProviderId.get(String(provider._id));
+    return {
+      ...provider.toObject(),
+      ratingAvg:
+        typeof stats?.ratingAvg === "number" ? Number(stats.ratingAvg) : null,
+      ratingCount: typeof stats?.ratingCount === "number" ? stats.ratingCount : 0,
+      latestRating:
+        typeof stats?.latestRating === "number" ? stats.latestRating : null,
+      latestReview:
+        typeof stats?.latestReview === "string" ? stats.latestReview : "",
+      latestRatedAt: stats?.latestRatedAt || null,
+    };
+  });
+
+  const sellersAll = await SellerProfile.find().populate(
+    "sellerId",
+    "name email phone profilePicture suspended verificationStatus verificationDocuments verifiedAt verificationNote",
+  );
+  const sellers = sellersAll.filter(
+    (seller) => seller.sellerId && !seller.sellerId.suspended,
+  );
+
+  const customersAll = await CustomerProfile.find().populate(
+    "userId",
+    "name email phone profilePicture suspended",
+  );
+  const customers = customersAll.filter(
+    (customer) => customer.userId && !customer.userId.suspended,
+  );
+
+  return { serviceProviders, sellers, customers };
+}
+
 async function getApiOrders(req, res) {
   try {
-    const bookingsRaw = await ServiceBooking.find()
-      .populate("customerId")
-      .populate("providerId")
-      .sort({ createdAt: -1 });
-
-    const bookings = bookingsRaw.filter(
-      (booking) =>
-        booking.customerId &&
-        !booking.customerId.suspended &&
-        booking.providerId &&
-        !booking.providerId.suspended,
+    const { data } = await withCache(
+      MANAGER_ORDERS_CACHE_KEY,
+      MANAGER_DATA_TTL,
+      collectOrdersData,
     );
-
-    const ordersRaw = await Order.find()
-      .populate("userId")
-      .populate("items.seller")
-      .sort({ placedAt: -1 });
-
-    const orders = ordersRaw
-      .filter(
-        (order) =>
-          order.userId &&
-          !order.userId.suspended &&
-          order.items.every((item) => item.seller && !item.seller.suspended),
-      )
-      .map((order) => {
-        const itemStatuses = (order.items || []).map(
-          (item) => item.itemStatus || order.orderStatus || "pending",
-        );
-
-        const allCancelled =
-          itemStatuses.length > 0 &&
-          itemStatuses.every((status) => status === "cancelled");
-        const allDelivered =
-          itemStatuses.length > 0 &&
-          itemStatuses.every((status) => status === "delivered");
-        const anyCancelled = itemStatuses.some(
-          (status) => status === "cancelled",
-        );
-        const anyDelivered = itemStatuses.some(
-          (status) => status === "delivered",
-        );
-
-        let computedStatus = order.orderStatus || "pending";
-        if (allCancelled) computedStatus = "cancelled";
-        else if (allDelivered) computedStatus = "delivered";
-        else if (anyCancelled || anyDelivered) computedStatus = "partial";
-
-        return {
-          ...order.toObject(),
-          orderId: getDisplayOrderId(order),
-          computedStatus,
-        };
-      });
-
-    res.json({ orders, bookings });
+    res.json(data);
   } catch (err) {
     console.error("Orders API error", err);
     res.status(500).json({ error: "Failed to load orders/bookings" });
   }
 }
 
-async function getApiPayments(req, res) {
-  try {
-    const serviceOrdersRaw = await ServiceBooking.find({ status: "Ready" })
-      .populate("customerId", "name suspended")
-      .populate("providerId", "name suspended")
-      .sort({ date: -1 });
+async function collectOrdersData() {
+  const bookingsRaw = await ServiceBooking.find()
+    .populate("customerId")
+    .populate("providerId")
+    .sort({ createdAt: -1 });
 
-    const serviceOrders = serviceOrdersRaw.filter(
-      (serviceOrder) =>
-        serviceOrder.customerId &&
-        !serviceOrder.customerId.suspended &&
-        serviceOrder.providerId &&
-        !serviceOrder.providerId.suspended,
-    );
+  const bookings = bookingsRaw.filter(
+    (booking) =>
+      booking.customerId &&
+      !booking.customerId.suspended &&
+      booking.providerId &&
+      !booking.providerId.suspended,
+  );
 
-    const ordersRaw = await Order.find()
-      .populate("userId", "name suspended")
-      .populate("items.seller", "name suspended")
-      .sort({ placedAt: -1 });
+  const ordersRaw = await Order.find()
+    .populate("userId")
+    .populate("items.seller")
+    .sort({ placedAt: -1 });
 
-    const orders = ordersRaw.filter(
+  const orders = ordersRaw
+    .filter(
       (order) =>
         order.userId &&
         !order.userId.suspended &&
         order.items.every((item) => item.seller && !item.seller.suspended),
-    );
+    )
+    .map((order) => {
+      const itemStatuses = (order.items || []).map(
+        (item) => item.itemStatus || order.orderStatus || "pending",
+      );
 
-    res.json({ orders, serviceOrders });
+      const allCancelled =
+        itemStatuses.length > 0 &&
+        itemStatuses.every((status) => status === "cancelled");
+      const allDelivered =
+        itemStatuses.length > 0 &&
+        itemStatuses.every((status) => status === "delivered");
+      const anyCancelled = itemStatuses.some((status) => status === "cancelled");
+      const anyDelivered = itemStatuses.some((status) => status === "delivered");
+
+      let computedStatus = order.orderStatus || "pending";
+      if (allCancelled) computedStatus = "cancelled";
+      else if (allDelivered) computedStatus = "delivered";
+      else if (anyCancelled || anyDelivered) computedStatus = "partial";
+
+      return {
+        ...order.toObject(),
+        orderId: getDisplayOrderId(order),
+        computedStatus,
+      };
+    });
+
+  return { orders, bookings };
+}
+
+async function getApiPayments(req, res) {
+  try {
+    const { data } = await withCache(
+      MANAGER_PAYMENTS_CACHE_KEY,
+      MANAGER_DATA_TTL,
+      collectPaymentsData,
+    );
+    res.json(data);
   } catch (err) {
     console.error("Payments API error", err);
     res.status(500).json({ error: "Failed to load payments data" });
   }
 }
 
+async function collectPaymentsData() {
+  const serviceOrdersRaw = await ServiceBooking.find({ status: "Ready" })
+    .populate("customerId", "name suspended")
+    .populate("providerId", "name suspended")
+    .sort({ date: -1 });
+
+  const serviceOrders = serviceOrdersRaw.filter(
+    (serviceOrder) =>
+      serviceOrder.customerId &&
+      !serviceOrder.customerId.suspended &&
+      serviceOrder.providerId &&
+      !serviceOrder.providerId.suspended,
+  );
+
+  const ordersRaw = await Order.find()
+    .populate("userId", "name suspended")
+    .populate("items.seller", "name suspended")
+    .sort({ placedAt: -1 });
+
+  const orders = ordersRaw.filter(
+    (order) =>
+      order.userId &&
+      !order.userId.suspended &&
+      order.items.every((item) => item.seller && !item.seller.suspended),
+  );
+
+  return { orders, serviceOrders };
+}
+
 async function getApiSupport(req, res) {
   try {
-    const messages = await ContactMessage.find().sort({ createdAt: -1 });
-    res.json({ submissions: messages });
+    const { data } = await withCache(
+      MANAGER_SUPPORT_CACHE_KEY,
+      MANAGER_DATA_TTL,
+      collectSupportData,
+    );
+    res.json(data);
   } catch (err) {
     console.error("Support API error", err);
     res.status(500).json({ error: "Failed to load support tickets" });
   }
+}
+
+async function collectSupportData() {
+  const messages = await ContactMessage.find().sort({ createdAt: -1 });
+  return { submissions: messages };
 }
 
 async function getApiDashboard(req, res) {
@@ -889,6 +935,11 @@ async function getApiDashboardReport(req, res) {
 
 module.exports = {
   collectDashboardStats,
+  collectUsersData,
+  collectServicesData,
+  collectOrdersData,
+  collectPaymentsData,
+  collectSupportData,
   getApiUsers,
   getApiServices,
   getApiOrders,

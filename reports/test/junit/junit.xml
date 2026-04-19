@@ -1,35 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="13" failures="0" errors="0" time="1.319">
-  <testsuite name="errorMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-16T13:07:36" time="0.692" tests="5">
-    <testcase classname="errorMiddleware notFound forwards 404 error" name="errorMiddleware notFound forwards 404 error" time="0.007" file="tests\unit\errorMiddleware.test.js">
+<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.638">
+  <testsuite name="productSearchService" errors="0" failures="0" skipped="0" timestamp="2026-04-19T18:31:19" time="0.526" tests="3">
+    <testcase classname="productSearchService buildSolrQuery returns wildcard when query is empty" name="productSearchService buildSolrQuery returns wildcard when query is empty" time="0.003" file="tests\unit\productSearchService.test.js">
     </testcase>
-    <testcase classname="errorMiddleware errorHandler returns JSON for API path" name="errorMiddleware errorHandler returns JSON for API path" time="0.015" file="tests\unit\errorMiddleware.test.js">
+    <testcase classname="productSearchService buildSolrQuery creates exact plus fuzzy clauses" name="productSearchService buildSolrQuery creates exact plus fuzzy clauses" time="0.002" file="tests\unit\productSearchService.test.js">
     </testcase>
-    <testcase classname="errorMiddleware errorHandler omits stack in production" name="errorMiddleware errorHandler omits stack in production" time="0.002" file="tests\unit\errorMiddleware.test.js">
-    </testcase>
-    <testcase classname="errorMiddleware errorHandler returns HTML for non-API request" name="errorMiddleware errorHandler returns HTML for non-API request" time="0.001" file="tests\unit\errorMiddleware.test.js">
-    </testcase>
-    <testcase classname="errorMiddleware errorHandler forwards when headers are already sent" name="errorMiddleware errorHandler forwards when headers are already sent" time="0.001" file="tests\unit\errorMiddleware.test.js">
-    </testcase>
-  </testsuite>
-  <testsuite name="securityMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-16T13:07:36" time="0.725" tests="6">
-    <testcase classname="securityMiddleware rateLimit allows request under limit and blocks over limit" name="securityMiddleware rateLimit allows request under limit and blocks over limit" time="0.012" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-    <testcase classname="securityMiddleware securityHeaders sets expected headers" name="securityMiddleware securityHeaders sets expected headers" time="0.001" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-    <testcase classname="securityMiddleware contentSecurityPolicy sets CSP header" name="securityMiddleware contentSecurityPolicy sets CSP header" time="0.001" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-    <testcase classname="securityMiddleware sanitizeInput escapes configured fields only" name="securityMiddleware sanitizeInput escapes configured fields only" time="0.001" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-    <testcase classname="securityMiddleware preventNoSQLInjection blocks suspicious payloads" name="securityMiddleware preventNoSQLInjection blocks suspicious payloads" time="0.001" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-    <testcase classname="securityMiddleware preventNoSQLInjection allows safe payloads" name="securityMiddleware preventNoSQLInjection allows safe payloads" time="0" file="tests\unit\securityMiddleware.test.js">
-    </testcase>
-  </testsuite>
-  <testsuite name="loggingMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-16T13:07:36" time="0.755" tests="2">
-    <testcase classname="loggingMiddleware apiAnalytics counts requests by method and path" name="loggingMiddleware apiAnalytics counts requests by method and path" time="0.007" file="tests\unit\loggingMiddleware.test.js">
-    </testcase>
-    <testcase classname="loggingMiddleware responseTime wraps res.end and still calls original end" name="loggingMiddleware responseTime wraps res.end and still calls original end" time="0.005" file="tests\unit\loggingMiddleware.test.js">
+    <testcase classname="productSearchService searchProducts sends typo-tolerant q to Solr" name="productSearchService searchProducts sends typo-tolerant q to Solr" time="0.006" file="tests\unit\productSearchService.test.js">
     </testcase>
   </testsuite>
 </testsuites>
