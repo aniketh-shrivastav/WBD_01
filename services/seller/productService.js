@@ -6,6 +6,10 @@ const {
   isValidObjectId,
   uploadProductImages,
 } = require("./helpers");
+const {
+  indexProduct,
+  deleteProductFromIndex,
+} = require("../search/solrIndexer");
 
 async function addProduct(sellerId, body, files) {
   const {
@@ -43,6 +47,7 @@ async function addProduct(sellerId, body, files) {
   });
 
   await newProduct.save();
+  await indexProduct(newProduct._id);
 
   return newProduct;
 }
@@ -91,6 +96,7 @@ async function deleteProduct(productId, sellerId) {
   }
 
   await Product.deleteOne({ _id: productId });
+  await deleteProductFromIndex(productId);
   await Cart.updateMany(
     { "items.productId": productId },
     { $pull: { items: { productId } } },
@@ -148,6 +154,7 @@ async function editProduct(productId, sellerId, body, files) {
   product.status = "pending";
 
   await product.save();
+  await indexProduct(product._id);
   return product;
 }
 

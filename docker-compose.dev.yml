@@ -37,6 +37,13 @@ services:
     depends_on:
       - backend
 
+  solr:
+    image: solr:9
+    ports:
+      - "8983:8983"
+    command: >
+      sh -c "solr-precreate products && solr-foreground"
+
 volumes:
   backend_node_modules:
   client_node_modules:

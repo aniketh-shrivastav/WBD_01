@@ -16,3 +16,10 @@ services:
       MONGO_SOCKET_TIMEOUT_MS: 45000
       MONGO_CONNECT_TIMEOUT_MS: 10000
       MONGO_MAX_IDLE_TIME_MS: 60000
+
+  solr:
+    image: solr:9
+    ports:
+      - "8983:8983"
+    command: >
+      sh -c "solr-precreate products && solr-foreground"

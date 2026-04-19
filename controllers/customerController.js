@@ -1,22 +1,11 @@
 const path = require("path");
 const customerService = require("../services/customerService");
 
+const reactIndexPath = path.join(__dirname, "..", "client", "build", "index.html");
+
 // GET /customer/index
 exports.getIndex = async (req, res) => {
-  try {
-    const { products } = await customerService.getIndexData();
-    res.render("customer/index", {
-      products,
-      user: req.session.user,
-    });
-  } catch (err) {
-    console.error("Error fetching products:", err);
-    res.render("customer/index", {
-      products: [],
-      user: req.session.user,
-      error: "Failed to load products",
-    });
-  }
+  return res.sendFile(reactIndexPath);
 };
 
 // API endpoint for customer index
@@ -35,23 +24,7 @@ exports.getIndexApi = async (req, res) => {
 
 // GET /customer/booking
 exports.getBooking = async (req, res) => {
-  try {
-    const customerId = req.session.user.id;
-    const data = await customerService.getBookingData(customerId, false);
-
-    res.render("customer/booking", {
-      uniqueServices: data.uniqueServices,
-      uniqueDistricts: data.uniqueDistricts,
-      serviceProviders: data.serviceProviders,
-      customerProfile: data.customerProfile,
-      selectedServiceType: data.selectedServiceType,
-      selectedDistrict: data.selectedDistrict,
-      serviceCostMap: JSON.stringify(data.serviceCostMap),
-    });
-  } catch (error) {
-    console.error("Error rendering booking page:", error);
-    res.status(500).send("Error loading booking page");
-  }
+  return res.sendFile(reactIndexPath);
 };
 
 // JSON API for booking static page
@@ -95,22 +68,7 @@ exports.getProviderReviews = async (req, res) => {
 
 // GET /customer/cart
 exports.getCart = async (req, res) => {
-  try {
-    const { items } = await customerService.getCartPageData(
-      req.session.user.id,
-    );
-    res.render("customer/cart", {
-      user: req.session.user,
-      items,
-    });
-  } catch (err) {
-    console.error("Cart fetch error:", err.message);
-    res.render("customer/cart", {
-      user: req.session.user,
-      items: [],
-      error: "Failed to load cart",
-    });
-  }
+  return res.sendFile(reactIndexPath);
 };
 
 // JSON API for cart static page
@@ -152,9 +110,7 @@ exports.addToCart = async (req, res) => {
 
 // GET /customer/history
 exports.getHistory = async (req, res) => {
-  return res.sendFile(
-    path.join(__dirname, "..", "client", "build", "index.html"),
-  );
+  return res.sendFile(reactIndexPath);
 };
 
 // JSON API for history static page
@@ -286,14 +242,7 @@ exports.cancelService = async (req, res) => {
 
 // GET /customer/profile
 exports.getProfile = async (req, res) => {
-  try {
-    const userId = req.session.user.id;
-    const { user, profile } = await customerService.getProfilePageData(userId);
-    res.render("customer/profile", { user, profile });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error loading profile");
-  }
+  return res.sendFile(reactIndexPath);
 };
 
 // JSON API for profile static page
@@ -375,6 +324,13 @@ exports.deleteProfile = async (req, res) => {
 // GET /customer/product/:id
 exports.getProductDetails = async (req, res) => {
   try {
+    const wantsJson =
+      req.headers.accept && req.headers.accept.includes("application/json");
+
+    if (!wantsJson) {
+      return res.sendFile(reactIndexPath);
+    }
+
     const data = await customerService.getProductDetails(
       req.params.id,
       req.session.user?.id,
@@ -392,19 +348,8 @@ exports.getProductDetails = async (req, res) => {
       return res.status(404).send("Product not found");
     }
 
-    if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      return res.json({
-        success: true,
-        product: data.product,
-        user: req.session.user,
-        ratingSummary: data.ratingSummary,
-        reviews: data.reviews,
-        canReview: data.canReview,
-        userReview: data.userReview,
-      });
-    }
-
-    res.render("customer/productDetails", {
+    return res.json({
+      success: true,
       product: data.product,
       user: req.session.user,
       ratingSummary: data.ratingSummary,
@@ -514,23 +459,46 @@ exports.getProfileHtml = (req, res) => {
 };
 
 exports.getPayment = (req, res) => {
-  res.render("customer/payment");
+  return res.sendFile(reactIndexPath);
 };
 
 exports.getPurchase = (req, res) => {
-  res.render("customer/purchase");
+  return res.sendFile(reactIndexPath);
 };
 
 exports.getReviews = (req, res) => {
-  res.render("customer/reviews");
+  return res.sendFile(reactIndexPath);
 };
 
 exports.getSearch = (req, res) => {
-  res.render("customer/search");
+  return res.sendFile(reactIndexPath);
 };
 
 exports.getService = (req, res) => {
-  res.render("customer/service");
+  return res.sendFile(reactIndexPath);
+};
+
+exports.searchProductsApi = async (req, res) => {
+  try {
+    const result = await customerService.searchProducts({
+      q: req.query.q,
+      category: req.query.category,
+      limit: req.query.limit,
+      offset: req.query.offset,
+    });
+
+    return res.json({
+      success: true,
+      engine: result.engine,
+      total: result.total,
+      products: result.products,
+    });
+  } catch (err) {
+    console.error("Product search API error:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to search products" });
+  }
 };
 
 // Aliases for route compatibility

@@ -32,6 +32,8 @@ export default function CustomerIndex() {
   );
 
   const [products, setProducts] = useState([]);
+  const [searchProducts, setSearchProducts] = useState([]);
+  const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [term, setTerm] = useState("");
@@ -75,6 +77,10 @@ export default function CustomerIndex() {
   }, [products]);
 
   const filtered = useMemo(() => {
+    if (term.trim() || category) {
+      return searchProducts;
+    }
+
     const q = term.toLowerCase().trim();
     const cat = category.toLowerCase();
     return (products || []).filter((p) => {
@@ -84,7 +90,48 @@ export default function CustomerIndex() {
       const matchesCat = !cat || c === cat;
       return matchesText && matchesCat;
     });
-  }, [products, term, category]);
+  }, [products, searchProducts, term, category]);
+
+  useEffect(() => {
+    if (!term.trim() && !category) {
+      setSearchProducts([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        setSearching(true);
+        const params = new URLSearchParams();
+        if (term.trim()) params.set("q", term.trim());
+        if (category) params.set("category", category);
+        params.set("limit", "100");
+
+        const res = await fetch(`/customer/api/search/products?${params.toString()}`, {
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to search products");
+        }
+
+        const data = await res.json();
+        setSearchProducts(Array.isArray(data.products) ? data.products : []);
+      } catch (searchError) {
+        if (searchError.name !== "AbortError") {
+          setSearchProducts([]);
+        }
+      } finally {
+        setSearching(false);
+      }
+    }, 250);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [term, category]);
 
   async function addToCart(id, button) {
     const original = button.textContent;
@@ -188,6 +235,12 @@ export default function CustomerIndex() {
           <div className="customer-loading">
             <div className="customer-spinner"></div>
             <div className="customer-loading-text">Loading products...</div>
+          </div>
+        )}
+
+        {!loading && searching && (
+          <div className="customer-loading" style={{ paddingTop: 8, paddingBottom: 8 }}>
+            <div className="customer-loading-text">Searching...</div>
           </div>
         )}
 

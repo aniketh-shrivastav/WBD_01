@@ -14,6 +14,7 @@ const upload = uploadImageToDisk;
 // Index routes
 router.get("/index", customerOnly, customerController.getIndex);
 router.get("/api/index", customerOnly, customerController.getApiIndex);
+router.get("/api/search/products", customerOnly, customerController.searchProductsApi);
 router.get("/index.html", customerOnly, customerController.getIndexHtml);
 
 // Booking routes

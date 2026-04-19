@@ -14,6 +14,9 @@
     "docker:run": "docker run --rm -p 3000:3000 --env-file .env ffsd-project:latest",
     "docker:compose": "docker compose up --build",
     "docker:compose:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "search:solr:up": "docker compose up -d solr",
+    "search:solr:down": "docker compose stop solr",
+    "search:solr:reindex": "node scripts/reindexProductsToSolr.js",
     "perf:db": "node scripts/dbPerfReport.js",
     "perf:db:compare": "node scripts/dbPerfCompare.js",
     "perf:cache": "node scripts/cachePerfReport.js"
