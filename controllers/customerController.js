@@ -152,20 +152,9 @@ exports.addToCart = async (req, res) => {
 
 // GET /customer/history
 exports.getHistory = async (req, res) => {
-  const customerId = req.session.user.id;
-
-  try {
-    const data = await customerService.getHistoryData(customerId, false);
-
-    res.render("customer/history", {
-      bookings: data.bookings,
-      upcomingOrders: data.upcomingOrders,
-      pastOrders: data.pastOrders,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
+  return res.sendFile(
+    path.join(__dirname, "..", "client", "build", "index.html"),
+  );
 };
 
 // JSON API for history static page

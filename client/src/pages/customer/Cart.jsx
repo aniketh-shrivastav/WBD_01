@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
@@ -14,6 +15,7 @@ function useLink(href) {
 }
 
 export default function CustomerCart() {
+  const navigate = useNavigate();
   useLink("/styles/styles.css");
 
   const [items, setItems] = useState([]);
@@ -267,14 +269,14 @@ export default function CustomerCart() {
           errorMessage.includes("district")
         ) {
           if (window.confirm("Would you like to update your profile now?")) {
-            window.location.href = "/customer/profile";
+            navigate("/customer/profile");
           }
         }
         return;
       }
 
       alert(data.message || "Order placed successfully!");
-      window.location.href = "/customer/history";
+      navigate("/customer/history");
     } catch (e) {
       alert(
         e.message ||
