@@ -378,6 +378,22 @@ export default function OrderDetails() {
                           {formatExpectedDate(item.deliveryDate)}
                         </strong>
                       </div>
+
+                      {String(item.itemStatus || order.orderStatus || "").toLowerCase() ===
+                        "delivered" &&
+                        item.productId && (
+                          <div style={{ marginTop: "12px" }}>
+                            <button
+                              type="button"
+                              className="customer-btn customer-btn-primary customer-btn-sm"
+                              onClick={() =>
+                                navigate(`/customer/product/${item.productId}`)
+                              }
+                            >
+                              Write / Update Review
+                            </button>
+                          </div>
+                        )}
                     </div>
                   </div>
 

@@ -23,6 +23,14 @@ export default function ServiceDetails() {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [ratingValue, setRatingValue] = useState("");
+  const [ratingReview, setRatingReview] = useState("");
+  const [ratingErrors, setRatingErrors] = useState({});
+  const [submitState, setSubmitState] = useState({
+    loading: false,
+    message: "",
+    success: false,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +71,68 @@ export default function ServiceDetails() {
     };
     return statusMap[status?.toLowerCase()] || "customer-status-pending";
   };
+
+  async function submitRating(e) {
+    e.preventDefault();
+    if (!booking?._id) return;
+
+    const errs = {};
+    const numericRating = Number(ratingValue);
+    if (
+      !Number.isFinite(numericRating) ||
+      numericRating < 1 ||
+      numericRating > 5
+    ) {
+      errs.rating = "Please enter a rating between 1 and 5.";
+    }
+    if (ratingReview.trim() && ratingReview.trim().length < 5) {
+      errs.review = "Review must be at least 5 characters if provided.";
+    }
+    setRatingErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    try {
+      setSubmitState({ loading: true, message: "", success: false });
+      const res = await fetch(`/customer/rate-service/${booking._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          rating: numericRating,
+          review: ratingReview,
+        }),
+      });
+
+      const payload = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      if (!res.ok || payload?.success === false) {
+        throw new Error(payload?.message || "Failed to submit rating");
+      }
+
+      setBooking((prev) => ({
+        ...prev,
+        rating: numericRating,
+        review: ratingReview,
+      }));
+      setSubmitState({
+        loading: false,
+        message: "Rating submitted successfully.",
+        success: true,
+      });
+    } catch (submitError) {
+      setSubmitState({
+        loading: false,
+        message: submitError.message || "Failed to submit rating",
+        success: false,
+      });
+    }
+  }
 
   return (
     <div className="customer-page">
@@ -485,6 +555,96 @@ export default function ServiceDetails() {
                 </div>
               </div>
             )}
+
+            <div className="customer-card" style={{ marginBottom: "24px" }}>
+              <div className="customer-card-header">
+                <h3 style={{ margin: 0, fontSize: "1rem" }}>⭐ Service Review</h3>
+              </div>
+              <div className="customer-card-body">
+                {booking.rating ? (
+                  <div>
+                    <p style={{ marginBottom: "6px" }}>
+                      <strong>Your Rating:</strong> {booking.rating}/5
+                    </p>
+                    {booking.review ? (
+                      <p style={{ margin: 0 }}>
+                        <strong>Your Comment:</strong> {booking.review}
+                      </p>
+                    ) : (
+                      <p style={{ margin: 0, color: "var(--customer-text-secondary)" }}>
+                        You submitted a rating without a comment.
+                      </p>
+                    )}
+                  </div>
+                ) : String(booking.status || "").toLowerCase() === "ready" ? (
+                  <form onSubmit={submitRating}>
+                    <div className="customer-form-group" style={{ marginBottom: "12px" }}>
+                      <label className="customer-label" htmlFor="serviceRating">
+                        Rating (1 to 5)
+                      </label>
+                      <input
+                        id="serviceRating"
+                        type="number"
+                        min={1}
+                        max={5}
+                        required
+                        value={ratingValue}
+                        onChange={(e) => {
+                          setRatingValue(e.target.value);
+                          setRatingErrors((prev) => ({ ...prev, rating: undefined }));
+                        }}
+                        className={`customer-input ${ratingErrors.rating ? "customer-input-error" : ""}`}
+                        style={{ maxWidth: "120px" }}
+                      />
+                      {ratingErrors.rating && (
+                        <div className="customer-error-text">{ratingErrors.rating}</div>
+                      )}
+                    </div>
+                    <div className="customer-form-group" style={{ marginBottom: "12px" }}>
+                      <label className="customer-label" htmlFor="serviceReview">
+                        Comment (optional)
+                      </label>
+                      <textarea
+                        id="serviceReview"
+                        rows={4}
+                        value={ratingReview}
+                        onChange={(e) => {
+                          setRatingReview(e.target.value);
+                          setRatingErrors((prev) => ({ ...prev, review: undefined }));
+                        }}
+                        className={`customer-input ${ratingErrors.review ? "customer-input-error" : ""}`}
+                        placeholder="Share your experience..."
+                      />
+                      {ratingErrors.review && (
+                        <div className="customer-error-text">{ratingErrors.review}</div>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="customer-btn customer-btn-success"
+                      disabled={submitState.loading}
+                    >
+                      {submitState.loading ? "Submitting..." : "Submit Rating"}
+                    </button>
+                    {submitState.message && (
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          color: submitState.success ? "#047857" : "#b91c1c",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {submitState.message}
+                      </p>
+                    )}
+                  </form>
+                ) : (
+                  <p style={{ margin: 0, color: "var(--customer-text-secondary)" }}>
+                    You can submit a review once the service status becomes Ready.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </main>
