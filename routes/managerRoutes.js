@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 const managerController = require("../controllers/managerController");
 
 // Import centralized middleware
 const { isAuthenticated, isManager } = require("../middleware");
+
+function serveManagerSpa(req, res) {
+  res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
+}
 
 // Static HTML page routes
 router.get(
@@ -86,22 +91,22 @@ router.get(
   "/dashboard",
   isAuthenticated,
   isManager,
-  managerController.getDashboard,
+  serveManagerSpa,
 );
-router.get("/orders", isAuthenticated, isManager, managerController.getOrders);
+router.get("/orders", isAuthenticated, isManager, serveManagerSpa);
 router.get(
   "/payments",
   isAuthenticated,
   isManager,
-  managerController.getPayments,
+  serveManagerSpa,
 );
 router.get(
   "/services",
   isAuthenticated,
   isManager,
-  managerController.getServices,
+  serveManagerSpa,
 );
-router.get("/users", isAuthenticated, isManager, managerController.getUsers);
+router.get("/users", isAuthenticated, isManager, serveManagerSpa);
 
 // Profile routes
 router.get("/profile-data/:id", managerController.getProfileData);

@@ -1,5 +1,6 @@
 const ContactMessage = require("../models/ContactMessage");
 const User = require("../models/User");
+const path = require("path");
 
 // Contact Us Submission
 exports.submitContact = async (req, res) => {
@@ -38,8 +39,7 @@ exports.submitContact = async (req, res) => {
 // Manager view for submitted messages
 exports.getManagerSupport = async (req, res) => {
   try {
-    const messages = await ContactMessage.find().sort({ createdAt: -1 }); // recent first
-    res.render("manager/support", { submissions: messages });
+    res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
   } catch (err) {
     console.error("Error loading support data:", err);
     res.status(500).send("Error loading support data");
