@@ -12,6 +12,9 @@ body.manager-theme {
   --card-hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #e5e7eb;
+  --text-secondary: #94a3b8;
+  --card-background: #0f172a;
 }
 
 html[data-theme="light"] body.manager-theme {
@@ -20,6 +23,9 @@ html[data-theme="light"] body.manager-theme {
   --glass-border: rgba(0, 0, 0, 0.08);
   --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   --card-hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  --text-primary: #111827;
+  --text-secondary: #475569;
+  --card-background: #ffffff;
 }
 
 /* ===== NAVBAR ENHANCEMENT FOR MANAGER ===== */
@@ -131,6 +137,7 @@ body.manager-theme .main-content {
   background: linear-gradient(180deg, var(--background-color) 0%, #0a0f1a 100%);
   min-height: calc(100vh - 80px);
   padding: 2.5rem;
+  color: var(--text-primary);
 }
 
 html[data-theme="light"] body.manager-theme .main-content {
@@ -218,6 +225,20 @@ body.manager-theme .stat-card h3 {
   letter-spacing: 1px;
   color: var(--text-secondary);
   margin-bottom: 0.75rem;
+}
+
+body.manager-theme .main-content > h1,
+body.manager-theme .chart-wrapper h2,
+body.manager-theme .product-tabs h2,
+body.manager-theme section h2,
+body.manager-theme .recent-activity h2 {
+  color: var(--text-primary);
+}
+
+body.manager-theme .generic-table td,
+body.manager-theme .user-table td,
+body.manager-theme .order-table td {
+  color: var(--text-primary);
 }
 
 /* Chart Enhancement */
