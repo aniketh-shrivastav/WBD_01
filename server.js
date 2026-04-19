@@ -28,13 +28,16 @@ const {
 
 const app = express();
 const httpServer = http.createServer(app);
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
+
 const io = new Server(httpServer, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://wbd01-frontend-production-9fbc.up.railway.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
   },
 });
@@ -52,11 +55,7 @@ app.use(jwtSessionCompat);
 // cors: Cross-Origin Resource Sharing
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://wbd-01-frontend.up.railway.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
