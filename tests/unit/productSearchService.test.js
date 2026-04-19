@@ -2,7 +2,10 @@ jest.mock("../../models/Product", () => ({
   find: jest.fn(),
 }));
 
-const { searchProducts, __testables } = require("../../services/search/productSearchService");
+const {
+  searchProducts,
+  __testables,
+} = require("../../services/search/productSearchService");
 
 describe("productSearchService", () => {
   const originalEnv = { ...process.env };
@@ -15,8 +18,7 @@ describe("productSearchService", () => {
 
   test("buildSolrQuery returns wildcard when query is empty", () => {
     expect(__testables.buildSolrQuery("")).toBe("*:*");
-    expect(__testables.buildSolrQuery("   ")).toBe("*:*"
-    );
+    expect(__testables.buildSolrQuery("   ")).toBe("*:*");
   });
 
   test("buildSolrQuery creates exact plus fuzzy clauses", () => {

@@ -17,7 +17,9 @@ jest.mock("../../controllers/notificationController", () => ({
 const ServiceBooking = require("../../models/serviceBooking");
 const User = require("../../models/User");
 const bookingController = require("../../controllers/bookingController");
-const { createNotification } = require("../../controllers/notificationController");
+const {
+  createNotification,
+} = require("../../controllers/notificationController");
 const { createMockReq, createMockRes } = require("../helpers/httpMocks");
 
 function buildProvider(overrides = {}) {
@@ -252,7 +254,10 @@ describe("bookingController.createBooking", () => {
       body: {
         providerId: "provider-1",
         selectedServices: ["Wash"],
-        vehiclePhotos: ["https://img.example/1.jpg", "https://img.example/2.jpg"],
+        vehiclePhotos: [
+          "https://img.example/1.jpg",
+          "https://img.example/2.jpg",
+        ],
       },
     });
     const res = createMockRes();

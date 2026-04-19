@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">19.48% </span>
+                <span class="strong">19.36% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>60/308</span>
+                <span class='fraction'>61/315</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.11% </span>
+                <span class="strong">10.78% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>22/198</span>
+                <span class='fraction'>22/204</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">19.6% </span>
+                <span class="strong">19.48% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>60/306</span>
+                <span class='fraction'>61/313</span>
             </div>
         
             
@@ -810,7 +810,17 @@
 <a name='L745'></a><a href='#L745'>745</a>
 <a name='L746'></a><a href='#L746'>746</a>
 <a name='L747'></a><a href='#L747'>747</a>
-<a name='L748'></a><a href='#L748'>748</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L748'></a><a href='#L748'>748</a>
+<a name='L749'></a><a href='#L749'>749</a>
+<a name='L750'></a><a href='#L750'>750</a>
+<a name='L751'></a><a href='#L751'>751</a>
+<a name='L752'></a><a href='#L752'>752</a>
+<a name='L753'></a><a href='#L753'>753</a>
+<a name='L754'></a><a href='#L754'>754</a>
+<a name='L755'></a><a href='#L755'>755</a>
+<a name='L756'></a><a href='#L756'>756</a>
+<a name='L757'></a><a href='#L757'>757</a>
+<a name='L758'></a><a href='#L758'>758</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1067,6 +1077,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1104,6 +1115,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1813,6 +1833,7 @@ exports.getLogin = <span class="fstat-no" title="function not covered" >(r</span
 &nbsp;
 exports.postLogin = async (req, res) =&gt; {
   const { email, password } = req.body;
+  const requireSignupOtp = process.env.SIGNUP_REQUIRE_OTP === "true";
   const normalizedEmail = String(email || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>
     .trim()
     .toLowerCase();
@@ -1836,7 +1857,7 @@ exports.postLogin = async (req, res) =&gt; {
       }
       return res.status(401).json({ message: "Invalid credentials" });
     }
-<span class="cstat-no" title="statement not covered" >    if (user.emailVerified === false) {</span>
+<span class="cstat-no" title="statement not covered" >    if (requireSignupOtp &amp;&amp; user.emailVerified === false) {</span>
 <span class="cstat-no" title="statement not covered" >      if (authDebug) {</span>
 <span class="cstat-no" title="statement not covered" >        console.log("[auth] login blocked: email not verified", {</span>
           normalizedEmail,
@@ -1851,6 +1872,15 @@ exports.postLogin = async (req, res) =&gt; {
         message: "Please verify your email to continue.",
         redirect: verifyUrl,
       });
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!requireSignupOtp &amp;&amp; user.emailVerified === false) {</span>
+      // OTP is disabled: promote legacy unverified accounts on successful login.
+<span class="cstat-no" title="statement not covered" >      user.emailVerified = true;</span>
+<span class="cstat-no" title="statement not covered" >      user.signupOtp = undefined;</span>
+<span class="cstat-no" title="statement not covered" >      user.signupOtpExpires = undefined;</span>
+<span class="cstat-no" title="statement not covered" >      user.signupOtpAttempts = 0;</span>
+<span class="cstat-no" title="statement not covered" >      await user.save();</span>
     }
 &nbsp;
     // Check if the user is suspended
@@ -2311,7 +2341,7 @@ exports.googleSignIn = <span class="fstat-no" title="function not covered" >as</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T19:14:30.981Z
+                at 2026-04-19T19:20:08.602Z
             </div>
         <script src="prettify.js"></script>
         <script>

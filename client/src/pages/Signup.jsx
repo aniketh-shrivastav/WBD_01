@@ -196,17 +196,7 @@ export default function Signup() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        if (data.requiresOtp) {
-          const fallbackOtpUrl = `/verify-otp?email=${encodeURIComponent(payload.email || "")}`;
-          const otpRedirect = data.redirect
-            ? data.redirect.replace(/^https?:\/\/[^/]+/, "")
-            : fallbackOtpUrl;
-          navigate(otpRedirect);
-        } else if (data.redirect) {
-          navigate(data.redirect.replace(/^https?:\/\/[^/]+/, ""));
-        } else {
-          navigate("/login");
-        }
+        navigate("/login");
       } else {
         const msg = data.message || "Signup failed. Please try again.";
         // Attach field-specific error if we can guess

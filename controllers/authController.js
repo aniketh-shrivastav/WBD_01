@@ -254,6 +254,7 @@ exports.getLogin = (req, res) => {
 
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
+  const requireSignupOtp = process.env.SIGNUP_REQUIRE_OTP === "true";
   const normalizedEmail = String(email || "")
     .trim()
     .toLowerCase();
@@ -277,7 +278,7 @@ exports.postLogin = async (req, res) => {
       }
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    if (user.emailVerified === false) {
+    if (requireSignupOtp && user.emailVerified === false) {
       if (authDebug) {
         console.log("[auth] login blocked: email not verified", {
           normalizedEmail,
@@ -292,6 +293,15 @@ exports.postLogin = async (req, res) => {
         message: "Please verify your email to continue.",
         redirect: verifyUrl,
       });
+    }
+
+    if (!requireSignupOtp && user.emailVerified === false) {
+      // OTP is disabled: promote legacy unverified accounts on successful login.
+      user.emailVerified = true;
+      user.signupOtp = undefined;
+      user.signupOtpExpires = undefined;
+      user.signupOtpAttempts = 0;
+      await user.save();
     }
 
     // Check if the user is suspended

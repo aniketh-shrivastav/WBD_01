@@ -118,7 +118,10 @@ async function solrSearch({ q, category, limit, offset }) {
 
   params.append("fq", "status:approved");
   if (category) {
-    params.append("fq", `category:\"${String(category).replace(/\"/g, '\\\"')}\"`);
+    params.append(
+      "fq",
+      `category:\"${String(category).replace(/\"/g, '\\\"')}\"`,
+    );
   }
 
   const url = `${baseUrl.replace(/\/$/, "")}/solr/${collection}/select?${params.toString()}`;
@@ -179,7 +182,10 @@ async function searchProducts(rawOptions = {}) {
     try {
       return await solrSearch({ q, category, limit, offset });
     } catch (err) {
-      console.warn("Solr search unavailable, falling back to Mongo:", err.message);
+      console.warn(
+        "Solr search unavailable, falling back to Mongo:",
+        err.message,
+      );
     }
   }
 

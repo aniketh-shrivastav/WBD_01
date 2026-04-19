@@ -556,7 +556,8 @@ async function collectServicesData() {
       ...provider.toObject(),
       ratingAvg:
         typeof stats?.ratingAvg === "number" ? Number(stats.ratingAvg) : null,
-      ratingCount: typeof stats?.ratingCount === "number" ? stats.ratingCount : 0,
+      ratingCount:
+        typeof stats?.ratingCount === "number" ? stats.ratingCount : 0,
       latestRating:
         typeof stats?.latestRating === "number" ? stats.latestRating : null,
       latestReview:
@@ -635,8 +636,12 @@ async function collectOrdersData() {
       const allDelivered =
         itemStatuses.length > 0 &&
         itemStatuses.every((status) => status === "delivered");
-      const anyCancelled = itemStatuses.some((status) => status === "cancelled");
-      const anyDelivered = itemStatuses.some((status) => status === "delivered");
+      const anyCancelled = itemStatuses.some(
+        (status) => status === "cancelled",
+      );
+      const anyDelivered = itemStatuses.some(
+        (status) => status === "delivered",
+      );
 
       let computedStatus = order.orderStatus || "pending";
       if (allCancelled) computedStatus = "cancelled";
