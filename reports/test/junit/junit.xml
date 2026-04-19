@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.227">
-  <testsuite name="authController" errors="0" failures="0" skipped="0" timestamp="2026-04-19T19:20:08" time="0.169" tests="3">
+<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.257">
+  <testsuite name="authController" errors="0" failures="0" skipped="0" timestamp="2026-04-19T19:40:29" time="0.194" tests="3">
     <testcase classname="authController postSignup returns 400 for invalid json signup payload" name="authController postSignup returns 400 for invalid json signup payload" time="0.003" file="tests\unit\authController.test.js">
     </testcase>
     <testcase classname="authController postLogin returns 401 when user is missing" name="authController postLogin returns 401 when user is missing" time="0.032" file="tests\unit\authController.test.js">
