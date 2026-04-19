@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const path = require("path");
 const User = require("../models/User");
 const firebaseAdmin = require("../config/firebaseAdmin");
 const {
@@ -81,7 +82,9 @@ async function sendEmail(to, subject, text, html) {
 }
 
 exports.getSignup = (req, res) => {
-  res.render("signup", { error: null });
+  return res.sendFile(
+    path.join(__dirname, "..", "client", "build", "index.html"),
+  );
 };
 
 exports.postSignup = async (req, res) => {
@@ -210,7 +213,9 @@ exports.postSignup = async (req, res) => {
 };
 
 exports.getLogin = (req, res) => {
-  res.render("login");
+  return res.sendFile(
+    path.join(__dirname, "..", "client", "build", "index.html"),
+  );
 };
 
 exports.postLogin = async (req, res) => {
@@ -568,10 +573,15 @@ exports.postResendOtp = async (req, res) => {
 };
 
 // Static page routes
-const path = require("path");
 
 function sendReactApp(res) {
-  const reactIndexPath = path.join(__dirname, "..", "client", "build", "index.html");
+  const reactIndexPath = path.join(
+    __dirname,
+    "..",
+    "client",
+    "build",
+    "index.html",
+  );
   return res.sendFile(reactIndexPath);
 }
 
