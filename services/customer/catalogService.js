@@ -89,14 +89,14 @@ async function getProductDetails(productId, userId) {
               $elemMatch: {
                 productId: product._id,
                 $or: [
-                  { itemStatus: "delivered" },
+                  { itemStatus: { $ne: "cancelled" } },
                   { itemStatus: { $exists: false } },
                 ],
               },
             },
           },
           {
-            orderStatus: "delivered",
+            orderStatus: { $ne: "cancelled" },
             "items.productId": product._id,
           },
         ],
@@ -136,14 +136,14 @@ async function getProductDetails(productId, userId) {
               $elemMatch: {
                 productId: product._id,
                 $or: [
-                  { itemStatus: "delivered" },
+                  { itemStatus: { $ne: "cancelled" } },
                   { itemStatus: { $exists: false } },
                 ],
               },
             },
           },
           {
-            orderStatus: "delivered",
+            orderStatus: { $ne: "cancelled" },
             "items.productId": product._id,
           },
         ],
@@ -182,13 +182,13 @@ async function submitProductReview(productId, userId, rating, review) {
           $elemMatch: {
             productId,
             $or: [
-              { itemStatus: "delivered" },
+              { itemStatus: { $ne: "cancelled" } },
               { itemStatus: { $exists: false } },
             ],
           },
         },
       },
-      { orderStatus: "delivered", "items.productId": productId },
+      { orderStatus: { $ne: "cancelled" }, "items.productId": productId },
     ],
   });
 

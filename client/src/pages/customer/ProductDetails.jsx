@@ -467,6 +467,22 @@ export default function ProductDetails() {
                     <p className="pd-review-text">{userReview.review}</p>
                   </div>
                 )}
+
+                {!canReview && !userReview && (
+                  <div className="pd-your-review">
+                    <h4 className="pd-your-review-title">Write a Review</h4>
+                    <p className="pd-review-text" style={{ marginBottom: 10 }}>
+                      You can submit a review after purchasing this product.
+                    </p>
+                    <button
+                      type="button"
+                      className="pd-submit-btn"
+                      onClick={() => navigate("/customer/history")}
+                    >
+                      Go to Order History
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
