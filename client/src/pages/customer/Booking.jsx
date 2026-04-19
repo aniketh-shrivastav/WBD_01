@@ -3,6 +3,7 @@ import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
 import "../../Css/booking.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function CustomerBooking() {
     async function load() {
       try {
         setLoading(true);
-        const res = await fetch("/customer/api/booking", {
+        const res = await fetch(getBackendUrl("/customer/api/booking"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -141,7 +142,7 @@ export default function CustomerBooking() {
         setProviderReviewsLoading(true);
         setProviderReviewsError("");
         const res = await fetch(
-          `/customer/api/provider/${providerId}/reviews`,
+          getBackendUrl(`/customer/api/provider/${providerId}/reviews`),
           {
             headers: { Accept: "application/json" },
             credentials: "include",
@@ -491,7 +492,7 @@ export default function CustomerBooking() {
 
   async function confirmBooking() {
     try {
-      const res = await fetch("/bookings/create-booking", {
+      const res = await fetch(getBackendUrl("/bookings/create-booking"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SellerNav from "../../components/SellerNav";
 import SellerFooter from "../../components/SellerFooter";
 import "../../Css/seller.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function SellerReviews() {
   const [reviews, setReviews] = useState([]);
@@ -15,7 +16,7 @@ export default function SellerReviews() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch("/seller/api/reviews", {
+        const res = await fetch(getBackendUrl("/seller/api/reviews"), {
           headers: { Accept: "application/json" },
           credentials: "include",
         });

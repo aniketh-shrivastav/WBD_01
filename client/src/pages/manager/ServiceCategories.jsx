@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function ServiceCategories({ mode = "manager" }) {
   const isAdmin = mode === "admin";
@@ -27,7 +28,7 @@ export default function ServiceCategories({ mode = "manager" }) {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(catApiBase, {
+      const res = await fetch(getBackendUrl(catApiBase), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });
@@ -54,7 +55,7 @@ export default function ServiceCategories({ mode = "manager" }) {
     if (!newName.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/service-categories", {
+      const res = await fetch(getBackendUrl("/api/service-categories"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +77,7 @@ export default function ServiceCategories({ mode = "manager" }) {
 
   async function toggleActive(cat) {
     try {
-      const res = await fetch(`/api/service-categories/${cat._id}`, {
+      const res = await fetch(getBackendUrl(`/api/service-categories/${cat._id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +100,7 @@ export default function ServiceCategories({ mode = "manager" }) {
     if (!editName.trim() || !editId) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/service-categories/${editId}`, {
+      const res = await fetch(getBackendUrl(`/api/service-categories/${editId}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +124,7 @@ export default function ServiceCategories({ mode = "manager" }) {
   async function deleteCategory(id) {
     if (!window.confirm("Delete this category permanently?")) return;
     try {
-      const res = await fetch(`/api/service-categories/${id}`, {
+      const res = await fetch(getBackendUrl(`/api/service-categories/${id}`), {
         method: "DELETE",
         headers: { Accept: "application/json" },
         credentials: "include",

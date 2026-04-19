@@ -4,6 +4,7 @@ import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
 import "../../Css/productDetails.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function ProductDetails() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch(`/customer/product/${id}`, {
+        const res = await fetch(getBackendUrl(`/customer/product/${id}`), {
           headers: { Accept: "application/json" },
           credentials: "include",
         });
@@ -152,7 +153,7 @@ export default function ProductDetails() {
     setReviewErrors(errs);
     if (Object.keys(errs).length > 0) return;
     try {
-      const res = await fetch(`/customer/product/${id}/review`, {
+      const res = await fetch(getBackendUrl(`/customer/product/${id}/review`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +171,7 @@ export default function ProductDetails() {
       }
 
       // Refresh product details to show updated review list
-      const refresh = await fetch(`/customer/product/${id}`, {
+      const refresh = await fetch(getBackendUrl(`/customer/product/${id}`), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });

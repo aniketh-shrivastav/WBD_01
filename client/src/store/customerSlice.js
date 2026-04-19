@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getBackendUrl } from "../utils/api";
 
 export const CUSTOMER_STATE_STORAGE_KEY = "customerState";
 
@@ -25,7 +26,7 @@ export const fetchCustomerHistory = createAsyncThunk(
   "customer/fetchHistory",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/customer/api/history", {
+      const res = await fetch(getBackendUrl("/customer/api/history"), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });

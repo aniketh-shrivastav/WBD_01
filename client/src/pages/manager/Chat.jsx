@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import ManagerNav from "../../components/ManagerNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 async function fetchSession() {
   try {
-    const res = await fetch("/api/session", {
+    const res = await fetch(getBackendUrl("/api/session"), {
       headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -140,7 +141,7 @@ export default function ManagerChat() {
   async function loadCustomers() {
     setLoadingCustomers(true);
     try {
-      const res = await fetch("/chat/customers");
+      const res = await fetch(getBackendUrl("/chat/customers"));
       const j = await res.json();
       if (!j.success) throw new Error(j.message || "Failed customers");
       setCustomers(j.customers || []);
@@ -163,7 +164,7 @@ export default function ManagerChat() {
       try {
         setSearching(true);
         const res = await fetch(
-          `/chat/customers/search?q=${encodeURIComponent(term)}`,
+          getBackendUrl(`/chat/customers/search?q=${encodeURIComponent(term)}`),
           { signal: controller.signal },
         );
         const j = await res.json();
@@ -189,7 +190,7 @@ export default function ManagerChat() {
     setLoadingThread(true);
     try {
       socketRef.current?.emit("chat:join", { customerId });
-      const res = await fetch(`/chat/customer/${customerId}/messages`);
+      const res = await fetch(getBackendUrl(`/chat/customer/${customerId}/messages`));
       const j = await res.json();
       if (!j.success) throw new Error(j.message || "Failed thread");
       setMessages(j.messages || []);
@@ -208,7 +209,7 @@ export default function ManagerChat() {
     if (!text || !activeCustomer) return;
     setInput("");
     try {
-      const res = await fetch(`/chat/customer/${activeCustomer}/messages`, {
+      const res = await fetch(getBackendUrl(`/chat/customer/${activeCustomer}/messages`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 function TicketCard({ t, onRespond, readOnly }) {
   const verified = t.verifiedUser ? (
@@ -55,7 +56,7 @@ export default function Support({ mode = "manager" }) {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch(`${apiPrefix}/api/support`, {
+        const res = await fetch(getBackendUrl(`${apiPrefix}/api/support`), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401 || res.status === 403) {
@@ -93,7 +94,7 @@ export default function Support({ mode = "manager" }) {
     if (!window.confirm("Mark this ticket as responded?")) return;
     const btnState = { ok: false };
     try {
-      const res = await fetch(`/support/respond/${id}`, { method: "DELETE" });
+      const res = await fetch(getBackendUrl(`/support/respond/${id}`), { method: "DELETE" });
       if (!res.ok) throw new Error("Failed");
       setTickets((prev) => prev.filter((t) => t._id !== id));
     } catch (e) {

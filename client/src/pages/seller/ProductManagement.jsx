@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import SellerNav from "../../components/SellerNav";
 import SellerFooter from "../../components/SellerFooter";
 import "../../Css/seller.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function ProductManagement() {
   // Product categories fetched from backend
@@ -83,7 +84,7 @@ export default function ProductManagement() {
   async function loadProducts() {
     setLoading(true);
     try {
-      const res = await fetch("/seller/api/products", {
+      const res = await fetch(getBackendUrl("/seller/api/products"), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });
@@ -108,7 +109,7 @@ export default function ProductManagement() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch("/api/product-categories/active", {
+        const res = await fetch(getBackendUrl("/api/product-categories/active"), {
           credentials: "include",
           headers: { Accept: "application/json" },
         });
@@ -158,7 +159,7 @@ export default function ProductManagement() {
         }
       });
 
-      const res = await fetch("/seller/add-product", {
+      const res = await fetch(getBackendUrl("/seller/add-product"), {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -198,7 +199,7 @@ export default function ProductManagement() {
   async function handleDelete(id) {
     if (!window.confirm("Delete this product?")) return;
     try {
-      const res = await fetch(`/seller/delete-product/${id}`, {
+      const res = await fetch(getBackendUrl(`/seller/delete-product/${id}`), {
         method: "POST",
         credentials: "include",
         headers: { Accept: "application/json" },
@@ -232,7 +233,7 @@ export default function ProductManagement() {
     }
     setStockLoading(true);
     try {
-      const res = await fetch(`/seller/update-stock/${stockProductId}`, {
+      const res = await fetch(getBackendUrl(`/seller/update-stock/${stockProductId}`), {
         method: "POST",
         credentials: "include",
         headers: {
@@ -305,7 +306,7 @@ export default function ProductManagement() {
       if (editImages.length > 0) {
         editImages.forEach((file) => formData.append("images", file));
       }
-      const res = await fetch(`/seller/edit-product/${editProduct._id}`, {
+      const res = await fetch(getBackendUrl(`/seller/edit-product/${editProduct._id}`), {
         method: "PUT",
         body: formData,
         credentials: "include",

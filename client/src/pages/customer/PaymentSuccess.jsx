@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -22,7 +23,7 @@ export default function PaymentSuccess() {
 
       try {
         // Verify the payment session
-        const res = await fetch(`/api/payments/verify-session/${sessionId}`, {
+        const res = await fetch(getBackendUrl(`/api/payments/verify-session/${sessionId}`), {
           headers: { Accept: "application/json" },
         });
 
@@ -36,7 +37,7 @@ export default function PaymentSuccess() {
           setPaymentDetails(data);
 
           // Create the order after successful payment verification
-          const orderRes = await fetch("/customer/create-order", {
+          const orderRes = await fetch(getBackendUrl("/customer/create-order"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

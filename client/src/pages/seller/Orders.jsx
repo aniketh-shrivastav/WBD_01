@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SellerNav from "../../components/SellerNav";
 import SellerFooter from "../../components/SellerFooter";
 import "../../Css/seller.css";
+import { getBackendUrl } from "../../utils/api";
 
 function StatusBadge({ status }) {
   const statusColors = {
@@ -53,7 +54,7 @@ function DetailsModal({
     try {
       const orderIdentifier = order._id || order.orderId;
       const res = await fetch(
-        `/seller/orders/${orderIdentifier}/delivery-date`,
+        getBackendUrl(`/seller/orders/${orderIdentifier}/delivery-date`),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -490,7 +491,7 @@ export default function SellerOrders() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/seller/api/orders", {
+      const res = await fetch(getBackendUrl("/seller/api/orders"), {
         headers: { Accept: "application/json" },
       });
       if (res.status === 401) {
@@ -565,7 +566,7 @@ export default function SellerOrders() {
     try {
       const deliveryDate = deliveryDates[uniqueId] || null;
 
-      const res = await fetch(`/seller/orders/${orderIdentifier}/status`, {
+      const res = await fetch(getBackendUrl(`/seller/orders/${orderIdentifier}/status`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

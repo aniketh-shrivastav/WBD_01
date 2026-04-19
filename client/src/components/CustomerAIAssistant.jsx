@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "../Css/customerAssistant.css";
+import { getBackendUrl } from "../utils/api";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
@@ -15,12 +16,6 @@ export default function CustomerAIAssistant() {
 
   const canSend = useMemo(() => input.trim().length > 0 && !loading, [input, loading]);
 
-  function backendBase() {
-    const { protocol, hostname, port } = window.location;
-    if (port === "5173") return `${protocol}//${hostname}:3000`;
-    return "";
-  }
-
   async function sendMessage(e) {
     e?.preventDefault?.();
     if (!canSend) return;
@@ -32,7 +27,7 @@ export default function CustomerAIAssistant() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${backendBase()}/customer/api/assistant/chat`, {
+      const res = await fetch(getBackendUrl("/customer/api/assistant/chat"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

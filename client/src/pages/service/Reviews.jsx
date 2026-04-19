@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ServiceNav from "../../components/ServiceNav";
 import ServiceFooter from "../../components/ServiceFooter";
 import "../../Css/service.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function Reviews() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch("/service/api/reviews", {
+        const res = await fetch(getBackendUrl("/service/api/reviews"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {

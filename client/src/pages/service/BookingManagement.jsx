@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ServiceNav from "../../components/ServiceNav";
 import ServiceFooter from "../../components/ServiceFooter";
 import "../../Css/service.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function BookingManagement() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch("/service/api/bookings", {
+        const res = await fetch(getBackendUrl("/service/api/bookings"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -89,7 +90,7 @@ export default function BookingManagement() {
       const body = { orderId };
       if (status) body.status = status;
       if (typeof totalCost !== "undefined") body.totalCost = totalCost;
-      const res = await fetch("/service/updateBooking", {
+      const res = await fetch(getBackendUrl("/service/updateBooking"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +108,7 @@ export default function BookingManagement() {
   async function bulkUpdate(newStatus) {
     if (!selected.size) return alert("Please select at least one order.");
     const orderIds = Array.from(selected);
-    const res = await fetch("/service/updateMultipleBookingStatus", {
+    const res = await fetch(getBackendUrl("/service/updateMultipleBookingStatus"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderIds, newStatus }),
@@ -589,7 +590,7 @@ function ProductCostEditor({ bookingId, currentCost, onSaved }) {
         e.preventDefault();
         setSaving(true);
         try {
-          const res = await fetch("/service/api/update-product-cost", {
+          const res = await fetch(getBackendUrl("/service/api/update-product-cost"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -642,7 +643,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/product-categories/active", {
+        const res = await fetch(getBackendUrl("/api/product-categories/active"), {
           credentials: "include",
           headers: { Accept: "application/json" },
         });
@@ -658,7 +659,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
       const params = new URLSearchParams();
       if (searchQ.trim()) params.set("q", searchQ.trim());
       if (searchCat) params.set("category", searchCat);
-      const res = await fetch(`/api/parts/search?${params}`, {
+      const res = await fetch(getBackendUrl(`/api/parts/search?${params}`), {
         credentials: "include",
         headers: { Accept: "application/json" },
       });
@@ -676,7 +677,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
     try {
       setLinking(productId);
       const qty = quantities[productId] || 1;
-      const res = await fetch("/api/parts/link", {
+      const res = await fetch(getBackendUrl("/api/parts/link"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -704,7 +705,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
   async function unlinkProduct(productId) {
     if (!window.confirm("Remove this part from the booking?")) return;
     try {
-      const res = await fetch("/api/parts/unlink", {
+      const res = await fetch(getBackendUrl("/api/parts/unlink"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -724,7 +725,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
   async function changeAllocationStatus(productId, status) {
     try {
       setUpdatingStatus(productId);
-      const res = await fetch("/api/parts/allocation-status", {
+      const res = await fetch(getBackendUrl("/api/parts/allocation-status"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -737,7 +738,7 @@ function PartsResolver({ bookingId, linkedProducts = [], onUpdate }) {
       if (!j.success) return alert(j.message || "Failed to update status");
       if (onUpdate) {
         // Refresh from server response
-        const refetch = await fetch(`/api/parts/booking/${bookingId}`, {
+        const refetch = await fetch(getBackendUrl(`/api/parts/booking/${bookingId}`), {
           credentials: "include",
           headers: { Accept: "application/json" },
         });

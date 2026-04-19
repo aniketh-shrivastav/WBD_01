@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { getBackendUrl } from "./utils/api";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -64,7 +65,7 @@ function useSession() {
     (async () => {
       try {
         const token = localStorage.getItem("auth_token") || "";
-        const res = await fetch("/api/session", {
+        const res = await fetch(getBackendUrl("/api/session"), {
           headers: {
             Accept: "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),

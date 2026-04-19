@@ -3,6 +3,7 @@ import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/profile.css";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function CustomerProfile() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/customer/api/profile", {
+        const res = await fetch(getBackendUrl("/customer/api/profile"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -422,7 +423,7 @@ export default function CustomerProfile() {
         vehiclePhotoFiles.forEach((f) => formData.append("vehiclePhotos", f));
       }
 
-      const res = await fetch("/customer/profile", {
+      const res = await fetch(getBackendUrl("/customer/profile"), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -452,7 +453,7 @@ export default function CustomerProfile() {
       setInsuranceCopyFile(null);
       setVehiclePhotoFiles([]);
       // Reload to get fresh data (updated photos, docs URLs)
-      const reload = await fetch("/customer/api/profile", {
+      const reload = await fetch(getBackendUrl("/customer/api/profile"), {
         headers: { Accept: "application/json" },
       });
       if (reload.ok) {
@@ -480,7 +481,7 @@ export default function CustomerProfile() {
     setStatus("Deleting...");
     setStatusColor("#333");
     try {
-      const res = await fetch("/customer/delete-profile", {
+      const res = await fetch(getBackendUrl("/customer/delete-profile"), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -1084,7 +1085,7 @@ export default function CustomerProfile() {
                               if (!window.confirm("Remove this vehicle photo?"))
                                 return;
                               try {
-                                await fetch("/customer/delete-vehicle-photo", {
+                                await fetch(getBackendUrl("/customer/delete-vehicle-photo"), {
                                   method: "DELETE",
                                   headers: {
                                     "Content-Type": "application/json",

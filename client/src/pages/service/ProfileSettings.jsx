@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ServiceNav from "../../components/ServiceNav";
 import ServiceFooter from "../../components/ServiceFooter";
 import "../../Css/service.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function ServiceProfileSettings() {
     (async () => {
       try {
         // Load available categories from manager
-        const catRes = await fetch("/api/service-categories/active", {
+        const catRes = await fetch(getBackendUrl("/api/service-categories/active"), {
           headers: { Accept: "application/json" },
           credentials: "include",
         });
@@ -123,7 +124,7 @@ export default function ServiceProfileSettings() {
           if (catData.success) setAvailableCategories(catData.categories || []);
         }
 
-        const res = await fetch(`/service/api/profile`, {
+        const res = await fetch(getBackendUrl(`/service/api/profile`), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -255,7 +256,7 @@ export default function ServiceProfileSettings() {
     setStatus("Saving...");
     setStatusColor("#333");
     try {
-      const res = await fetch(`/profile/update`, {
+      const res = await fetch(getBackendUrl(`/profile/update`), {
         method: "POST",
         headers: { Accept: "application/json" },
         body: (() => {
@@ -295,7 +296,7 @@ export default function ServiceProfileSettings() {
     setErrors({});
     (async () => {
       try {
-        const res = await fetch(`/service/api/profile`, {
+        const res = await fetch(getBackendUrl(`/service/api/profile`), {
           headers: { Accept: "application/json" },
         });
         if (!res.ok) return;
@@ -339,7 +340,7 @@ export default function ServiceProfileSettings() {
       const fd = new FormData();
       fd.append("docType", docUploadType);
       fd.append("document", docFile);
-      const res = await fetch("/profile/upload-document", {
+      const res = await fetch(getBackendUrl("/profile/upload-document"), {
         method: "POST",
         body: fd,
       });
@@ -362,7 +363,7 @@ export default function ServiceProfileSettings() {
     if (!window.confirm(`Delete ${docType}?`)) return;
     try {
       const res = await fetch(
-        `/profile/delete-document/${encodeURIComponent(docType)}`,
+        getBackendUrl(`/profile/delete-document/${encodeURIComponent(docType)}`),
         { method: "DELETE", headers: { Accept: "application/json" } },
       );
       const out = await res.json().catch(() => ({}));
@@ -383,7 +384,7 @@ export default function ServiceProfileSettings() {
     )
       return;
     try {
-      const res = await fetch(`/service/profile/delete/${userId}`, {
+      const res = await fetch(getBackendUrl(`/service/profile/delete/${userId}`), {
         method: "DELETE",
         headers: { Accept: "application/json" },
       });

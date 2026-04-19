@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../../Css/publicPages.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function AllIndex() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function AllIndex() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/session", {
+        const res = await fetch(getBackendUrl("/api/session"), {
           headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error("Failed session");

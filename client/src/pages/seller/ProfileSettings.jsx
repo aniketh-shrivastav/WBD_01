@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import SellerNav from "../../components/SellerNav";
 import SellerFooter from "../../components/SellerFooter";
 import "../../Css/seller.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function SellerProfileSettings() {
   const MAX_LEN = 15;
@@ -85,7 +86,7 @@ export default function SellerProfileSettings() {
     (async () => {
       try {
         setStatus("Loading profile...");
-        const res = await fetch("/seller/api/profileSettings", {
+        const res = await fetch(getBackendUrl("/seller/api/profileSettings"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -140,7 +141,7 @@ export default function SellerProfileSettings() {
     }
     setStatus("Saving...");
     try {
-      const res = await fetch("/seller/api/profileSettings", {
+      const res = await fetch(getBackendUrl("/seller/api/profileSettings"), {
         method: "POST",
         headers: { Accept: "application/json" },
         body: (() => {
@@ -177,7 +178,7 @@ export default function SellerProfileSettings() {
       const fd = new FormData();
       fd.append("docType", docUploadType);
       fd.append("document", docFile);
-      const res = await fetch("/seller/upload-document", {
+      const res = await fetch(getBackendUrl("/seller/upload-document"), {
         method: "POST",
         body: fd,
       });
@@ -199,7 +200,7 @@ export default function SellerProfileSettings() {
     if (!window.confirm(`Delete ${docType}?`)) return;
     try {
       const res = await fetch(
-        `/seller/delete-document/${encodeURIComponent(docType)}`,
+        getBackendUrl(`/seller/delete-document/${encodeURIComponent(docType)}`),
         { method: "DELETE", headers: { Accept: "application/json" } },
       );
       const out = await res.json().catch(() => ({}));

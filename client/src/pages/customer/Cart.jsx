@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -89,10 +90,10 @@ export default function CustomerCart() {
         setLoading(true);
         // Load cart and check Stripe config
         const [cartRes, configRes] = await Promise.all([
-          fetch("/customer/api/cart", {
+          fetch(getBackendUrl("/customer/api/cart"), {
             headers: { Accept: "application/json" },
           }),
-          fetch("/api/payments/config", {
+          fetch(getBackendUrl("/api/payments/config"), {
             headers: { Accept: "application/json" },
           }),
         ]);
@@ -123,7 +124,7 @@ export default function CustomerCart() {
   async function updateQuantity(productId, action) {
     if (!userId) return;
     try {
-      const res = await fetch(`/api/cart/update/${userId}`, {
+      const res = await fetch(getBackendUrl(`/api/cart/update/${userId}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +135,7 @@ export default function CustomerCart() {
       const j = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(j.message || "Update failed");
       // reload items
-      const cartRes = await fetch("/customer/api/cart", {
+      const cartRes = await fetch(getBackendUrl("/customer/api/cart"), {
         headers: { Accept: "application/json" },
       });
       const cart = await cartRes.json();
@@ -152,7 +153,7 @@ export default function CustomerCart() {
   async function handleStripeCheckout() {
     try {
       setProcessingPayment(true);
-      const res = await fetch("/api/payments/create-checkout-session", {
+      const res = await fetch(getBackendUrl("/api/payments/create-checkout-session"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -246,7 +247,7 @@ export default function CustomerCart() {
         };
       }
 
-      const res = await fetch("/customer/create-order", {
+      const res = await fetch(getBackendUrl("/customer/create-order"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

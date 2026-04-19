@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getBackendUrl } from "../utils/api";
 
 export const SELLER_STATE_STORAGE_KEY = "sellerState";
 const STALE_KEYS = ["dashboard", "lastFetched"];
@@ -25,7 +26,7 @@ export const fetchSellerDashboard = createAsyncThunk(
   "seller/fetchDashboard",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/seller/api/dashboard", {
+      const res = await fetch(getBackendUrl("/seller/api/dashboard"), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });

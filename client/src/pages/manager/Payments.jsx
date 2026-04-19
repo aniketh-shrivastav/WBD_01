@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 function formatDate(d) {
   try {
@@ -33,7 +34,7 @@ export default function Payments({ mode = "manager" }) {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch(`${apiPrefix}/api/payments`, {
+        const res = await fetch(getBackendUrl(`${apiPrefix}/api/payments`), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401 || res.status === 403) {

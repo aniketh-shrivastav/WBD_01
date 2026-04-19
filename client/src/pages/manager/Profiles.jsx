@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 const ROLE_TABS = [
   { key: "all", label: "All Profiles" },
@@ -311,7 +312,7 @@ export default function Profiles({ mode = "manager" }) {
     let cancelled = false;
     async function load() {
       try {
-        const resp = await fetch(`${apiPrefix}/api/services`, {
+        const resp = await fetch(getBackendUrl(`${apiPrefix}/api/services`), {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {

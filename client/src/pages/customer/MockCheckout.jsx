@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function MockCheckout() {
   const [searchParams] = useSearchParams();
@@ -28,7 +29,7 @@ export default function MockCheckout() {
 
     async function loadSession() {
       try {
-        const res = await fetch(`/api/payments/mock-session/${sessionId}`, {
+        const res = await fetch(getBackendUrl(`/api/payments/mock-session/${sessionId}`), {
           headers: { Accept: "application/json" },
         });
         const data = await res.json();
@@ -106,7 +107,7 @@ export default function MockCheckout() {
     setError("");
 
     try {
-      const res = await fetch(`/api/payments/mock-payment/${sessionId}`, {
+      const res = await fetch(getBackendUrl(`/api/payments/mock-payment/${sessionId}`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

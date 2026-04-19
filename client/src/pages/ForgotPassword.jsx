@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../Css/auth.css";
 import { useNavigate } from "react-router-dom";
+import { getBackendUrl } from "../utils/api";
 
 export default function ForgotPassword() {
   //State Variables
@@ -23,7 +24,7 @@ export default function ForgotPassword() {
 
     try {
       // Send POST request to backend
-      const res = await fetch("/forgot-password", {
+      const res = await fetch(getBackendUrl("/forgot-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../Css/auth.css";
 import { useNavigate } from "react-router-dom";
 import { signInWithGoogle } from "../firebase";
+import { getBackendUrl } from "../utils/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Login() {
       }
 
       // Send the ID token to backend
-      const res = await fetch("/auth/google", {
+      const res = await fetch(getBackendUrl("/auth/google"), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -50,7 +51,7 @@ export default function Login() {
     setError("");
     const normalizedEmail = email.trim().toLowerCase();
     try {
-      const res = await fetch("/login", {
+      const res = await fetch(getBackendUrl("/login"), {
         method: "POST",
         headers: {
           Accept: "application/json",

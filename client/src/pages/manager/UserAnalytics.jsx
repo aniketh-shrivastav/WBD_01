@@ -4,6 +4,7 @@ import Chart from "chart.js/auto";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 /* ── helpers ── */
 function fmtMoney(v) {
@@ -1045,7 +1046,7 @@ export default function UserAnalytics({ mode = "manager" }) {
       try {
         setLoading(true);
         setError("");
-        const resp = await fetch(`${apiPrefix}/api/user-analytics/${id}`, {
+        const resp = await fetch(getBackendUrl(`${apiPrefix}/api/user-analytics/${id}`), {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {

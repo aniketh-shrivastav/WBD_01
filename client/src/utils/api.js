@@ -8,6 +8,19 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 /**
+ * Returns the full backend URL for a given path.
+ * Uses REACT_APP_BACKEND_URL in production; falls back to localhost:3000 for dev.
+ *
+ * @param {string} path - API path (e.g. "/login")
+ * @returns {string} - Absolute URL
+ */
+export const getBackendUrl = (path) => {
+  const backendUrl =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:3000";
+  return `${backendUrl}${path}`;
+};
+
+/**
  * Authenticated fetch wrapper
  * Automatically includes credentials and handles common request patterns
  *

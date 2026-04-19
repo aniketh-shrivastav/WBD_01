@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getBackendUrl } from "../utils/api";
 
 export const SERVICE_STATE_STORAGE_KEY = "serviceState";
 const DEFAULT_EARNINGS_LABELS = ["Week 1", "Week 2", "Week 3", "Week 4"];
@@ -42,7 +43,7 @@ export const fetchServiceDashboard = createAsyncThunk(
   "service/fetchDashboard",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/service/api/dashboard", {
+      const res = await fetch(getBackendUrl("/service/api/dashboard"), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });
@@ -61,12 +62,12 @@ export const fetchServiceDashboard = createAsyncThunk(
       const dashboard = await res.json();
 
       const earningsRaw = await safeJsonFetch(
-        "/service/api/earnings-data?timeRange=1",
+        getBackendUrl("/service/api/earnings-data?timeRange=1"),
         {},
         { labels: DEFAULT_EARNINGS_LABELS, data: DEFAULT_EARNINGS_DATA }
       );
       const activityRaw = await safeJsonFetch(
-        "/service/api/recent-activity?limit=5",
+        getBackendUrl("/service/api/recent-activity?limit=5"),
         {},
         { activities: [] }
       );

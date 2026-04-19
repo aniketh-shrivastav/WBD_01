@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getBackendUrl } from "../utils/api";
 
 export const MANAGER_STATE_STORAGE_KEY = "managerState";
 
@@ -44,7 +45,7 @@ export const fetchManagerDashboard = createAsyncThunk(
   "manager/fetchDashboard",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/manager/api/dashboard", {
+      const res = await fetch(getBackendUrl("/manager/api/dashboard"), {
         headers: { Accept: "application/json" },
       });
       if (res.status === 401 || res.status === 403) {

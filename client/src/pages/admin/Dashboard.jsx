@@ -4,6 +4,7 @@ import Chart from "chart.js/auto";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
 import { fetchAdminDashboard, clearAdminError } from "../../store/adminSlice";
+import { getBackendUrl } from "../../utils/api";
 
 const STALE_AFTER_MS = 1000 * 60 * 5; // 5 minutes
 
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
     async function loadMgrData() {
       try {
         setMgrLoading(true);
-        const res = await fetch("/admin/api/manager-dashboard", {
+        const res = await fetch(getBackendUrl("/admin/api/manager-dashboard"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401 || res.status === 403) return;

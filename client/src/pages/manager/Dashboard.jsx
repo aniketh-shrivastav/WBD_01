@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ManagerNav from "../../components/ManagerNav";
 import "../../Css/manager.css";
 import Chart from "chart.js/auto";
+import { getBackendUrl } from "../../utils/api";
 import {
   fetchManagerDashboard,
   setActiveProductTab,
@@ -673,7 +674,7 @@ export default function ManagerDashboard() {
       error: null,
     });
     try {
-      const res = await fetch(`/manager/products/${productId}/${action}`, {
+      const res = await fetch(getBackendUrl(`/manager/products/${productId}/${action}`), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -710,7 +711,7 @@ export default function ManagerDashboard() {
   const handleSaveProduct = async (productId, formData) => {
     setEditLoading(true);
     try {
-      const res = await fetch(`/manager/products/${productId}/edit`, {
+      const res = await fetch(getBackendUrl(`/manager/products/${productId}/edit`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -748,7 +749,7 @@ export default function ManagerDashboard() {
   const handleDownloadReport = async () => {
     setReportState({ loading: true, error: "" });
     try {
-      const res = await fetch("/manager/api/dashboard/report", {
+      const res = await fetch(getBackendUrl("/manager/api/dashboard/report"), {
         headers: { Accept: "application/pdf" },
       });
       if (!res.ok) {

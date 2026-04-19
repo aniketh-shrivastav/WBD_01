@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 const ROLES = ["customer", "seller", "service-provider", "manager", "admin"]; // order matters
 
@@ -102,7 +103,7 @@ export default function ManagerUsers({ mode = "manager" }) {
     let cancelled = false;
     async function load() {
       try {
-        const resp = await fetch(`${apiPrefix}/api/users`, {
+        const resp = await fetch(getBackendUrl(`${apiPrefix}/api/users`), {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -147,7 +148,7 @@ export default function ManagerUsers({ mode = "manager" }) {
         : "Are you sure you want to restore this user?";
     if (!window.confirm(confirmMsg)) return;
     try {
-      const resp = await fetch(`/manager/users/${action}/${userId}`, {
+      const resp = await fetch(getBackendUrl(`/manager/users/${action}/${userId}`), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -179,7 +180,7 @@ export default function ManagerUsers({ mode = "manager" }) {
     }
     setFormMsg("Creating manager...");
     try {
-      const resp = await fetch("/manager/users/create-manager", {
+      const resp = await fetch(getBackendUrl("/manager/users/create-manager"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

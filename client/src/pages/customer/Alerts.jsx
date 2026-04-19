@@ -3,13 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
-
-/* ─── helpers ─── */
-function backendBase() {
-  const { protocol, hostname, port } = window.location;
-  if (port === "5173") return `${protocol}//${hostname}:3000`;
-  return "";
-}
+import { getBackendUrl } from "../../utils/api";
 
 function timeAgo(dateStr) {
   const seconds = Math.floor((Date.now() - new Date(dateStr)) / 1000);
@@ -110,7 +104,7 @@ export default function Alerts() {
     try {
       setLoading(true);
       const res = await fetch(
-        `${backendBase()}/customer/api/notifications?page=${pg}&limit=20`,
+        getBackendUrl(`/customer/api/notifications?page=${pg}&limit=20`),
         { headers: { Accept: "application/json" }, credentials: "include" },
       );
       if (res.status === 401) {
@@ -144,7 +138,7 @@ export default function Alerts() {
   useEffect(() => {
     let socket;
     try {
-      const base = backendBase();
+      const base = process.env.REACT_APP_BACKEND_URL || "";
       // eslint-disable-next-line no-undef
       const io =
         window.io ||
@@ -170,7 +164,7 @@ export default function Alerts() {
 
   /* ─── actions ─── */
   async function apiAction(url, method = "POST") {
-    const res = await fetch(`${backendBase()}${url}`, {
+    const res = await fetch(getBackendUrl(url), {
       method,
       headers: {
         Accept: "application/json",

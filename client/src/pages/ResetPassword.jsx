@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../Css/auth.css";
 import { useParams, useNavigate } from "react-router-dom";
+import { getBackendUrl } from "../utils/api";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -16,7 +17,7 @@ export default function ResetPassword() {
     let active = true;
     async function validate() {
       try {
-        const res = await fetch(`/reset-password/${token}`);
+        const res = await fetch(getBackendUrl(`/reset-password/${token}`));
         const j = await res.json().catch(() => ({}));
         if (!active) return;
         setValid(j.valid === true);
@@ -44,7 +45,7 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`/reset-password/${token}`, {
+      const res = await fetch(getBackendUrl(`/reset-password/${token}`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

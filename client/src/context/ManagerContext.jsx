@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { getBackendUrl } from "../utils/api";
 
 const initialUsersState = {
   data: [],
@@ -26,7 +27,7 @@ export function ManagerProvider({ children }) {
   const refreshUsers = useCallback(async ({ signal } = {}) => {
     setUsersState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
-      const res = await fetch("/manager/api/users", {
+      const res = await fetch(getBackendUrl("/manager/api/users"), {
         headers: { Accept: "application/json" },
         credentials: "include",
         signal,
@@ -73,7 +74,7 @@ export function ManagerProvider({ children }) {
       return { success: false, message: "Invalid action" };
     }
     try {
-      const res = await fetch(`/manager/users/${action}/${userId}`, {
+      const res = await fetch(getBackendUrl(`/manager/users/${action}/${userId}`), {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -106,7 +107,7 @@ export function ManagerProvider({ children }) {
   const createManager = useCallback(
     async ({ name, email, phone, password }) => {
       try {
-        const res = await fetch("/manager/users/create-manager", {
+        const res = await fetch(getBackendUrl("/manager/users/create-manager"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

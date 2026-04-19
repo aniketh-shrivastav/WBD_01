@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "../Css/auth.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { getBackendUrl } from "../utils/api";
 
 export default function VerifyOtp() {
   const [params] = useSearchParams();
@@ -27,7 +28,7 @@ export default function VerifyOtp() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/verify-otp", {
+      const res = await fetch(getBackendUrl("/verify-otp"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export default function VerifyOtp() {
     if (!email) return;
     setLoading(true);
     try {
-      const res = await fetch("/resend-otp", {
+      const res = await fetch(getBackendUrl("/resend-otp"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

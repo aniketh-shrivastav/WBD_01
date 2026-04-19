@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 function formatDateTime(d) {
   if (!d) return "";
@@ -71,7 +72,7 @@ export default function ManagerProfileOverview({ mode = "manager" }) {
       try {
         setLoading(true);
         setError("");
-        const resp = await fetch(`${apiPrefix}/api/profile-overview/${id}`, {
+        const resp = await fetch(getBackendUrl(`${apiPrefix}/api/profile-overview/${id}`), {
           headers: { Accept: "application/json" },
         });
         if (resp.status === 401 || resp.status === 403) {
@@ -151,7 +152,7 @@ export default function ManagerProfileOverview({ mode = "manager" }) {
       try {
         // Use subject.userId for verification (works for both service providers and sellers)
         const verifyId = data?.subject?.userId || id;
-        const resp = await fetch(`/manager/verify-provider/${verifyId}`, {
+        const resp = await fetch(getBackendUrl(`/manager/verify-provider/${verifyId}`), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -171,7 +172,7 @@ export default function ManagerProfileOverview({ mode = "manager" }) {
         );
         // Refresh data
         const refreshResp = await fetch(
-          `${apiPrefix}/api/profile-overview/${id}`,
+          getBackendUrl(`${apiPrefix}/api/profile-overview/${id}`),
           {
             headers: { Accept: "application/json" },
           },

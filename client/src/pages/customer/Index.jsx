@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function CustomerIndex() {
     async function load() {
       try {
         setLoading(true);
-        const res = await fetch("/customer/api/index", {
+        const res = await fetch(getBackendUrl("/customer/api/index"), {
           headers: { Accept: "application/json" },
         });
         if (res.status === 401) {
@@ -91,7 +92,7 @@ export default function CustomerIndex() {
     button.disabled = true;
     button.textContent = "Adding...";
     try {
-      const res = await fetch("/customer/cart/add", {
+      const res = await fetch(getBackendUrl("/customer/cart/add"), {
         method: "POST",
         headers: {
           Accept: "application/json",

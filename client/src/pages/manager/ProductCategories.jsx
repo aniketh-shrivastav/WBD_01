@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 export default function ProductCategories({ mode = "manager" }) {
   const isAdmin = mode === "admin";
@@ -41,7 +42,7 @@ export default function ProductCategories({ mode = "manager" }) {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(API, {
+      const res = await fetch(getBackendUrl(API), {
         headers: { Accept: "application/json" },
         credentials: "include",
       });
@@ -73,7 +74,7 @@ export default function ProductCategories({ mode = "manager" }) {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-      const res = await fetch(API, {
+      const res = await fetch(getBackendUrl(API), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +103,7 @@ export default function ProductCategories({ mode = "manager" }) {
   /* ─── Toggle active ─── */
   async function toggleActive(cat) {
     try {
-      const res = await fetch(`${API}/${cat._id}`, {
+      const res = await fetch(getBackendUrl(`${API}/${cat._id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +125,7 @@ export default function ProductCategories({ mode = "manager" }) {
   /* ─── Toggle compliance ─── */
   async function toggleCompliance(cat) {
     try {
-      const res = await fetch(`${API}/${cat._id}`, {
+      const res = await fetch(getBackendUrl(`${API}/${cat._id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +153,7 @@ export default function ProductCategories({ mode = "manager" }) {
     if (!editName.trim() || !editId) return;
     setSaving(true);
     try {
-      const res = await fetch(`${API}/${editId}`, {
+      const res = await fetch(getBackendUrl(`${API}/${editId}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +186,7 @@ export default function ProductCategories({ mode = "manager" }) {
     )
       return;
     try {
-      const res = await fetch(`${API}/${id}`, {
+      const res = await fetch(getBackendUrl(`${API}/${id}`), {
         method: "DELETE",
         headers: { Accept: "application/json" },
         credentials: "include",
@@ -202,7 +203,7 @@ export default function ProductCategories({ mode = "manager" }) {
   async function addSubcategory(catId) {
     if (!addSubName.trim()) return;
     try {
-      const res = await fetch(`${API}/${catId}/subcategory`, {
+      const res = await fetch(getBackendUrl(`${API}/${catId}/subcategory`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +228,7 @@ export default function ProductCategories({ mode = "manager" }) {
   async function removeSubcategory(catId, subIndex) {
     if (!window.confirm("Remove this subcategory?")) return;
     try {
-      const res = await fetch(`${API}/${catId}/subcategory/${subIndex}`, {
+      const res = await fetch(getBackendUrl(`${API}/${catId}/subcategory/${subIndex}`), {
         method: "DELETE",
         headers: { Accept: "application/json" },
         credentials: "include",

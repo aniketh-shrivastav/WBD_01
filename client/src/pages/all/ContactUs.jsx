@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "../../Css/publicPages.css";
+import { getBackendUrl } from "../../utils/api";
 
 const nameRegex = /^[A-Za-z\s.-]+$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,7 +23,7 @@ export default function ContactUs() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/session", {
+        const res = await fetch(getBackendUrl("/api/session"), {
           headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error("session");

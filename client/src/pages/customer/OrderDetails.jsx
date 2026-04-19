@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import CustomerNav from "../../components/CustomerNav";
 import CustomerFooter from "../../components/CustomerFooter";
 import "../../Css/customer.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function OrderDetails() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch(`/customer/api/order/${id}`, {
+        const res = await fetch(getBackendUrl(`/customer/api/order/${id}`), {
           headers: { Accept: "application/json" },
           credentials: "include",
         });

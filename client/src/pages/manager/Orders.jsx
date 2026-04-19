@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManagerNav from "../../components/ManagerNav";
 import AdminNav from "../../components/AdminNav";
 import "../../Css/manager.css";
+import { getBackendUrl } from "../../utils/api";
 
 const COMMISSION_RATE = 0.2; // 20% manager commission
 
@@ -277,7 +278,7 @@ export default function Orders({ mode = "manager" }) {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch(`${apiPrefix}/api/orders`, {
+      const res = await fetch(getBackendUrl(`${apiPrefix}/api/orders`), {
         headers: { Accept: "application/json" },
       });
       if (res.status === 401 || res.status === 403) {
@@ -312,7 +313,7 @@ export default function Orders({ mode = "manager" }) {
         : `/manager/${
             action === "cancel" ? "cancel-booking" : "restore-booking"
           }/${id}`;
-    const res = await fetch(endpoint, {
+    const res = await fetch(getBackendUrl(endpoint), {
       method: "POST",
       headers: { Accept: "application/json" },
     });

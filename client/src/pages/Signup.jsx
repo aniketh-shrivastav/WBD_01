@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "../Css/auth.css";
 import { useNavigate } from "react-router-dom";
+import { getBackendUrl } from "../utils/api";
 
 const nameRegex = /^[A-Za-z\s.-]+$/;
 const phoneRegex = /^\d{10}$/;
@@ -186,7 +187,7 @@ export default function Signup() {
     }
 
     try {
-      const res = await fetch("/signup", {
+      const res = await fetch(getBackendUrl("/signup"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,6 +5,7 @@ import { fetchServiceDashboard } from "../../store/serviceSlice";
 import ServiceNav from "../../components/ServiceNav";
 import ServiceFooter from "../../components/ServiceFooter";
 import "../../Css/service.css";
+import { getBackendUrl } from "../../utils/api";
 
 function useLink(href) {
   useEffect(() => {
