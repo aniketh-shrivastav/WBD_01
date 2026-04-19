@@ -28,6 +28,7 @@ function isSwaggerDocsRequest(req) {
 async function sendEmail(to, subject, text, html) {
   let emailSent = false;
   let previewUrl = null;
+  let errorMessage = null;
 
   try {
     if (
@@ -35,10 +36,13 @@ async function sendEmail(to, subject, text, html) {
       process.env.SMTP_USER &&
       process.env.SMTP_PASS
     ) {
+      const smtpPort = process.env.SMTP_PORT
+        ? Number(process.env.SMTP_PORT)
+        : 587;
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
-        secure: false,
+        port: smtpPort,
+        secure: smtpPort === 465,
         auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
       });
       await transporter.sendMail({
@@ -52,6 +56,7 @@ async function sendEmail(to, subject, text, html) {
     }
   } catch (e) {
     console.error("Email send failed", e.message);
+    errorMessage = e.message;
   }
 
   // Development fallback using Ethereal test account
@@ -75,10 +80,11 @@ async function sendEmail(to, subject, text, html) {
       emailSent = true;
     } catch (e) {
       console.log("Ethereal email send failed.");
+      errorMessage = e.message;
     }
   }
 
-  return { emailSent, previewUrl };
+  return { emailSent, previewUrl, errorMessage };
 }
 
 exports.getSignup = (req, res) => {
@@ -90,6 +96,7 @@ exports.getSignup = (req, res) => {
 exports.postSignup = async (req, res) => {
   const { name, email, password, role, businessName, workshopName, phone } =
     req.body;
+  const requireSignupOtp = process.env.SIGNUP_REQUIRE_OTP === "true";
   const finalName = name || businessName || workshopName;
   const normalizedEmail = String(email || "")
     .trim()
@@ -162,47 +169,74 @@ exports.postSignup = async (req, res) => {
       phone,
       password: hashedPassword,
       role,
-      emailVerified: false,
+      emailVerified: !requireSignupOtp,
     });
 
-    // Generate 6-digit OTP and store hashed
-    const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedOtp = crypto.createHash("sha256").update(rawOtp).digest("hex");
-    newUser.signupOtp = hashedOtp;
-    newUser.signupOtpExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
-    newUser.signupOtpAttempts = 0;
+    if (requireSignupOtp) {
+      // Generate 6-digit OTP and store hashed
+      const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashedOtp = crypto
+        .createHash("sha256")
+        .update(rawOtp)
+        .digest("hex");
+      newUser.signupOtp = hashedOtp;
+      newUser.signupOtpExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
+      newUser.signupOtpAttempts = 0;
 
-    await newUser.save();
-    console.log("MongoDB user inserted (pending verification):", newUser._id);
+      await newUser.save();
+      console.log("MongoDB user inserted (pending verification):", newUser._id);
 
-    // Send OTP email
-    const { emailSent, previewUrl } = await sendEmail(
-      normalizedEmail,
-      "Verify your AutoCustomizer account",
-      `Your verification code is ${rawOtp}. It expires in 10 minutes.`,
-      `<p>Welcome to AutoCustomizer!</p><p>Your verification code is <b>${rawOtp}</b>. It expires in 10 minutes.</p>`,
-    );
+      // Send OTP email
+      const { emailSent, previewUrl, errorMessage } = await sendEmail(
+        normalizedEmail,
+        "Verify your AutoCustomizer account",
+        `Your verification code is ${rawOtp}. It expires in 10 minutes.`,
+        `<p>Welcome to AutoCustomizer!</p><p>Your verification code is <b>${rawOtp}</b>. It expires in 10 minutes.</p>`,
+      );
 
-    if (!emailSent) {
-      console.log("Signup OTP for", normalizedEmail, "=", rawOtp);
+      if (!emailSent && process.env.NODE_ENV === "production") {
+        return res.status(502).json({
+          success: false,
+          message:
+            "We could not send your verification code email. Please try again shortly.",
+          reason: errorMessage || "smtp_unavailable",
+        });
+      }
+
+      if (!emailSent) {
+        console.log("Signup OTP for", normalizedEmail, "=", rawOtp);
+      }
+
+      const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
+      const redirect = `${frontendBase.replace(
+        /\/$/,
+        "",
+      )}/verify-otp?email=${encodeURIComponent(normalizedEmail)}`;
+
+      if (isJson) {
+        return res.json({
+          success: true,
+          requiresOtp: true,
+          message: "We've sent a 6-digit verification code to your email.",
+          redirect,
+          previewUrl,
+        });
+      }
+      return res.redirect(redirect);
     }
 
-    const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
-    const redirect = `${frontendBase.replace(
-      /\/$/,
-      "",
-    )}/verify-otp?email=${encodeURIComponent(normalizedEmail)}`;
+    await newUser.save();
+    console.log("MongoDB user inserted (verified):", newUser._id);
 
     if (isJson) {
       return res.json({
         success: true,
-        requiresOtp: true,
-        message: "We've sent a 6-digit verification code to your email.",
-        redirect,
-        previewUrl,
+        requiresOtp: false,
+        message: "Account created successfully. You can now log in.",
+        redirect: "/login",
       });
     }
-    return res.redirect(redirect);
+    return res.redirect("/login");
   } catch (error) {
     console.error("MongoDB error:", error.message);
     if (isJson) {
@@ -554,12 +588,21 @@ exports.postResendOtp = async (req, res) => {
     user.signupOtpAttempts = 0;
     await user.save();
 
-    const { emailSent, previewUrl } = await sendEmail(
+    const { emailSent, previewUrl, errorMessage } = await sendEmail(
       email,
       "Your verification code",
       `Your verification code is ${rawOtp}. It expires in 10 minutes.`,
       `<p>Your verification code is <b>${rawOtp}</b>. It expires in 10 minutes.</p>`,
     );
+
+    if (!emailSent && process.env.NODE_ENV === "production") {
+      return res.status(502).json({
+        success: false,
+        message:
+          "We could not resend your verification code email. Please try again shortly.",
+        reason: errorMessage || "smtp_unavailable",
+      });
+    }
 
     if (!emailSent) {
       console.log("Resent OTP for", email, "=", rawOtp);

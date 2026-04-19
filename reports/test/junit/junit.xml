@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.638">
-  <testsuite name="productSearchService" errors="0" failures="0" skipped="0" timestamp="2026-04-19T18:31:19" time="0.526" tests="3">
-    <testcase classname="productSearchService buildSolrQuery returns wildcard when query is empty" name="productSearchService buildSolrQuery returns wildcard when query is empty" time="0.003" file="tests\unit\productSearchService.test.js">
+<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.541">
+  <testsuite name="authController" errors="0" failures="0" skipped="0" timestamp="2026-04-19T19:14:30" time="0.479" tests="3">
+    <testcase classname="authController postSignup returns 400 for invalid json signup payload" name="authController postSignup returns 400 for invalid json signup payload" time="0.004" file="tests\unit\authController.test.js">
     </testcase>
-    <testcase classname="productSearchService buildSolrQuery creates exact plus fuzzy clauses" name="productSearchService buildSolrQuery creates exact plus fuzzy clauses" time="0.002" file="tests\unit\productSearchService.test.js">
+    <testcase classname="authController postLogin returns 401 when user is missing" name="authController postLogin returns 401 when user is missing" time="0.016" file="tests\unit\authController.test.js">
     </testcase>
-    <testcase classname="productSearchService searchProducts sends typo-tolerant q to Solr" name="productSearchService searchProducts sends typo-tolerant q to Solr" time="0.006" file="tests\unit\productSearchService.test.js">
+    <testcase classname="authController postForgotPassword returns 400 when email is absent" name="authController postForgotPassword returns 400 when email is absent" time="0.001" file="tests\unit\authController.test.js">
     </testcase>
   </testsuite>
 </testsuites>

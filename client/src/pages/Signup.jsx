@@ -196,8 +196,13 @@ export default function Signup() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        if (data.redirect) {
-          // Let the SPA navigate to OTP verification when required
+        if (data.requiresOtp) {
+          const fallbackOtpUrl = `/verify-otp?email=${encodeURIComponent(payload.email || "")}`;
+          const otpRedirect = data.redirect
+            ? data.redirect.replace(/^https?:\/\/[^/]+/, "")
+            : fallbackOtpUrl;
+          navigate(otpRedirect);
+        } else if (data.redirect) {
           navigate(data.redirect.replace(/^https?:\/\/[^/]+/, ""));
         } else {
           navigate("/login");

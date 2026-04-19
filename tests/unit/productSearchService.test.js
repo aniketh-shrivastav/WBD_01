@@ -24,7 +24,12 @@ describe("productSearchService", () => {
 
     expect(built).toContain("(toyta filter)");
     expect(built).toContain("(toyta~1 filter~2)");
+    expect(built).toContain("(toyta* filter*)");
     expect(built).toContain("OR");
+  });
+
+  test("buildSolrQuery includes prefix clause for short typed input", () => {
+    expect(__testables.buildSolrQuery("e")).toBe("(e) OR (e*)");
   });
 
   test("searchProducts sends typo-tolerant q to Solr", async () => {
@@ -51,7 +56,7 @@ describe("productSearchService", () => {
     const parsed = new URL(calledUrl);
     const qParam = parsed.searchParams.get("q");
 
-    expect(qParam).toBe("(toyta) OR (toyta~1)");
+    expect(qParam).toBe("(toyta) OR (toyta~1) OR (toyta*)");
     expect(parsed.searchParams.get("mm")).toBe("1<75%");
   });
 });

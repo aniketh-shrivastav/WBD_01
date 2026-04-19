@@ -41,12 +41,21 @@ function buildSolrQuery(rawQuery) {
       return `${term}~2`;
     })
     .join(" ");
+  const prefixClause = terms.map((term) => `${term}*`).join(" ");
 
-  if (fuzzyClause === exactClause) {
+  if (fuzzyClause === exactClause && prefixClause === exactClause) {
     return exactClause;
   }
 
-  return `(${exactClause}) OR (${fuzzyClause})`;
+  const clauses = [exactClause];
+  if (fuzzyClause !== exactClause) {
+    clauses.push(fuzzyClause);
+  }
+  if (prefixClause !== exactClause && prefixClause !== fuzzyClause) {
+    clauses.push(prefixClause);
+  }
+
+  return clauses.map((clause) => `(${clause})`).join(" OR ");
 }
 
 function buildMongoFilter({ q, category }) {
