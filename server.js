@@ -33,7 +33,7 @@ const io = new Server(httpServer, {
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://wbd-01-frontend.up.railway.app",
+      "https://wbd01-frontend-production-9fbc.up.railway.app",
     ],
     credentials: true,
   },
