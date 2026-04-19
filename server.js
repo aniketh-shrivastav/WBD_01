@@ -30,7 +30,11 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://wbd-01-frontend.up.railway.app",
+    ],
     credentials: true,
   },
 });
@@ -48,7 +52,11 @@ app.use(jwtSessionCompat);
 // cors: Cross-Origin Resource Sharing
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://wbd-01-frontend.up.railway.app",
+    ],
     credentials: true,
   }),
 );
