@@ -107,10 +107,13 @@ export default function CustomerIndex() {
         if (category) params.set("category", category);
         params.set("limit", "100");
 
-        const res = await fetch(`/customer/api/search/products?${params.toString()}`, {
-          headers: { Accept: "application/json" },
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          `/customer/api/search/products?${params.toString()}`,
+          {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          },
+        );
 
         if (!res.ok) {
           throw new Error("Failed to search products");
@@ -239,7 +242,10 @@ export default function CustomerIndex() {
         )}
 
         {!loading && searching && (
-          <div className="customer-loading" style={{ paddingTop: 8, paddingBottom: 8 }}>
+          <div
+            className="customer-loading"
+            style={{ paddingTop: 8, paddingBottom: 8 }}
+          >
             <div className="customer-loading-text">Searching...</div>
           </div>
         )}

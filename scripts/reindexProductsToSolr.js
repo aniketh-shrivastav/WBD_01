@@ -1,7 +1,9 @@
 require("dotenv").config();
 
 const connectDB = require("../db");
-const { reindexAllApprovedProducts } = require("../services/search/solrIndexer");
+const {
+  reindexAllApprovedProducts,
+} = require("../services/search/solrIndexer");
 
 async function main() {
   try {

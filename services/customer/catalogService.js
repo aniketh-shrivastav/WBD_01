@@ -3,7 +3,9 @@ const ProductReview = require("../../models/ProductReview");
 const Order = require("../../models/Orders");
 const { createError } = require("./helpers");
 const { withCache } = require("../../utils/cacheClient");
-const { searchProducts: searchProductsFromEngine } = require("../search/productSearchService");
+const {
+  searchProducts: searchProductsFromEngine,
+} = require("../search/productSearchService");
 
 const PRODUCT_INDEX_CACHE_TTL = Number(process.env.CACHE_TTL_PRODUCTS || 60);
 

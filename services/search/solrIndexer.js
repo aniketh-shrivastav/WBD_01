@@ -34,7 +34,8 @@ async function resolveSellerVerificationStatus(productDoc) {
 }
 
 async function toSolrDoc(productDoc) {
-  const sellerVerificationStatus = await resolveSellerVerificationStatus(productDoc);
+  const sellerVerificationStatus =
+    await resolveSellerVerificationStatus(productDoc);
   return {
     id: String(productDoc._id),
     name: productDoc.name || "",
@@ -50,7 +51,9 @@ async function toSolrDoc(productDoc) {
     images: normalizeImages(productDoc.images),
     imagePublicId: productDoc.imagePublicId || "",
     status: productDoc.status || "pending",
-    createdAt: productDoc.createdAt ? new Date(productDoc.createdAt).toISOString() : new Date().toISOString(),
+    createdAt: productDoc.createdAt
+      ? new Date(productDoc.createdAt).toISOString()
+      : new Date().toISOString(),
     sellerId: String(productDoc.seller || ""),
     sellerVerificationStatus,
   };

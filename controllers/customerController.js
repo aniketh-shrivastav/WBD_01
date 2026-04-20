@@ -1,7 +1,13 @@
 const path = require("path");
 const customerService = require("../services/customerService");
 
-const reactIndexPath = path.join(__dirname, "..", "client", "build", "index.html");
+const reactIndexPath = path.join(
+  __dirname,
+  "..",
+  "client",
+  "build",
+  "index.html",
+);
 
 // GET /customer/index
 exports.getIndex = async (req, res) => {

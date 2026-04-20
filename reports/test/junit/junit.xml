@@ -1,11 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="3" failures="0" errors="0" time="0.327">
-  <testsuite name="authController" errors="0" failures="0" skipped="0" timestamp="2026-04-19T20:17:02" time="0.25" tests="3">
+<testsuites name="jest tests" tests="44" failures="0" errors="0" time="15.54">
+  <testsuite name="productSearchService" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.304" tests="4">
+    <testcase classname="productSearchService buildSolrQuery returns wildcard when query is empty" name="productSearchService buildSolrQuery returns wildcard when query is empty" time="0.005" file="tests\unit\productSearchService.test.js">
+    </testcase>
+    <testcase classname="productSearchService buildSolrQuery creates exact plus fuzzy clauses" name="productSearchService buildSolrQuery creates exact plus fuzzy clauses" time="0.001" file="tests\unit\productSearchService.test.js">
+    </testcase>
+    <testcase classname="productSearchService buildSolrQuery includes prefix clause for short typed input" name="productSearchService buildSolrQuery includes prefix clause for short typed input" time="0" file="tests\unit\productSearchService.test.js">
+    </testcase>
+    <testcase classname="productSearchService searchProducts sends typo-tolerant q to Solr" name="productSearchService searchProducts sends typo-tolerant q to Solr" time="0.001" file="tests\unit\productSearchService.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="orderController.createOrderFromCart" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.303" tests="2">
+    <testcase classname="orderController.createOrderFromCart returns 400 when cart is empty" name="orderController.createOrderFromCart returns 400 when cart is empty" time="0.007" file="tests\unit\orderController.test.js">
+    </testcase>
+    <testcase classname="orderController.createOrderFromCart returns 404 when any product is missing" name="orderController.createOrderFromCart returns 404 when any product is missing" time="0.003" file="tests\unit\orderController.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="loggingMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.281" tests="2">
+    <testcase classname="loggingMiddleware apiAnalytics counts requests by method and path" name="loggingMiddleware apiAnalytics counts requests by method and path" time="0.009" file="tests\unit\loggingMiddleware.test.js">
+    </testcase>
+    <testcase classname="loggingMiddleware responseTime wraps res.end and still calls original end" name="loggingMiddleware responseTime wraps res.end and still calls original end" time="0.003" file="tests\unit\loggingMiddleware.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="securityMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.305" tests="6">
+    <testcase classname="securityMiddleware rateLimit allows request under limit and blocks over limit" name="securityMiddleware rateLimit allows request under limit and blocks over limit" time="0.009" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+    <testcase classname="securityMiddleware securityHeaders sets expected headers" name="securityMiddleware securityHeaders sets expected headers" time="0.002" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+    <testcase classname="securityMiddleware contentSecurityPolicy sets CSP header" name="securityMiddleware contentSecurityPolicy sets CSP header" time="0" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+    <testcase classname="securityMiddleware sanitizeInput escapes configured fields only" name="securityMiddleware sanitizeInput escapes configured fields only" time="0" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+    <testcase classname="securityMiddleware preventNoSQLInjection blocks suspicious payloads" name="securityMiddleware preventNoSQLInjection blocks suspicious payloads" time="0.001" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+    <testcase classname="securityMiddleware preventNoSQLInjection allows safe payloads" name="securityMiddleware preventNoSQLInjection allows safe payloads" time="0" file="tests\unit\securityMiddleware.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="errorMiddleware" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.299" tests="5">
+    <testcase classname="errorMiddleware notFound forwards 404 error" name="errorMiddleware notFound forwards 404 error" time="0.007" file="tests\unit\errorMiddleware.test.js">
+    </testcase>
+    <testcase classname="errorMiddleware errorHandler returns JSON for API path" name="errorMiddleware errorHandler returns JSON for API path" time="0.015" file="tests\unit\errorMiddleware.test.js">
+    </testcase>
+    <testcase classname="errorMiddleware errorHandler omits stack in production" name="errorMiddleware errorHandler omits stack in production" time="0.001" file="tests\unit\errorMiddleware.test.js">
+    </testcase>
+    <testcase classname="errorMiddleware errorHandler returns HTML for non-API request" name="errorMiddleware errorHandler returns HTML for non-API request" time="0.001" file="tests\unit\errorMiddleware.test.js">
+    </testcase>
+    <testcase classname="errorMiddleware errorHandler forwards when headers are already sent" name="errorMiddleware errorHandler forwards when headers are already sent" time="0.001" file="tests\unit\errorMiddleware.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="cartController.updateCart" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.323" tests="3">
+    <testcase classname="cartController.updateCart returns 404 when cart is missing" name="cartController.updateCart returns 404 when cart is missing" time="0.024" file="tests\unit\cartController.test.js">
+    </testcase>
+    <testcase classname="cartController.updateCart returns 400 for invalid cart action" name="cartController.updateCart returns 400 for invalid cart action" time="0.003" file="tests\unit\cartController.test.js">
+    </testcase>
+    <testcase classname="cartController.updateCart blocks quantity increase when stock is insufficient" name="cartController.updateCart blocks quantity increase when stock is insufficient" time="0.001" file="tests\unit\cartController.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="bookingController.createBooking" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.361" tests="10">
+    <testcase classname="bookingController.createBooking returns 400 for invalid provider" name="bookingController.createBooking returns 400 for invalid provider" time="0.009" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking creates booking and computes total with pickup/dropoff" name="bookingController.createBooking creates booking and computes total with pickup/dropoff" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking returns 400 when car painting selected but provider has no configured colors" name="bookingController.createBooking returns 400 when car painting selected but provider has no configured colors" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking returns 400 when car painting selected but paint color is missing" name="bookingController.createBooking returns 400 when car painting selected but paint color is missing" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking returns 400 when selected paint color is not offered" name="bookingController.createBooking returns 400 when selected paint color is not offered" time="0.001" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking normalizes valid paint color and allows booking when car painting is selected" name="bookingController.createBooking normalizes valid paint color and allows booking when car painting is selected" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking still returns success if notification creation fails" name="bookingController.createBooking still returns success if notification creation fails" time="0.027" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking returns 500 when provider lookup throws" name="bookingController.createBooking returns 500 when provider lookup throws" time="0.001" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking maps numeric vehicle fields and wraps single vehicle photo string into array" name="bookingController.createBooking maps numeric vehicle fields and wraps single vehicle photo string into array" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+    <testcase classname="bookingController.createBooking keeps vehicle photos as array when array is provided" name="bookingController.createBooking keeps vehicle photos as array when array is provided" time="0.002" file="tests\unit\bookingController.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="authController" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="0.361" tests="3">
     <testcase classname="authController postSignup returns 400 for invalid json signup payload" name="authController postSignup returns 400 for invalid json signup payload" time="0.009" file="tests\unit\authController.test.js">
     </testcase>
-    <testcase classname="authController postLogin returns 401 when user is missing" name="authController postLogin returns 401 when user is missing" time="0.036" file="tests\unit\authController.test.js">
+    <testcase classname="authController postLogin returns 401 when user is missing" name="authController postLogin returns 401 when user is missing" time="0.033" file="tests\unit\authController.test.js">
     </testcase>
-    <testcase classname="authController postForgotPassword returns 400 when email is absent" name="authController postForgotPassword returns 400 when email is absent" time="0" file="tests\unit\authController.test.js">
+    <testcase classname="authController postForgotPassword returns 400 when email is absent" name="authController postForgotPassword returns 400 when email is absent" time="0.001" file="tests\unit\authController.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="route wiring" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="1.389" tests="4">
+    <testcase classname="route wiring authRoutes exposes auth and password-reset endpoints" name="route wiring authRoutes exposes auth and password-reset endpoints" time="0.656" file="tests\unit\routesWiring.test.js">
+    </testcase>
+    <testcase classname="route wiring cartRoutes has update/remove/place-order endpoints" name="route wiring cartRoutes has update/remove/place-order endpoints" time="0.012" file="tests\unit\routesWiring.test.js">
+    </testcase>
+    <testcase classname="route wiring bookingRoutes protects create-booking route" name="route wiring bookingRoutes protects create-booking route" time="0.052" file="tests\unit\routesWiring.test.js">
+    </testcase>
+    <testcase classname="route wiring managerRoutes includes protected dashboard and API endpoints" name="route wiring managerRoutes includes protected dashboard and API endpoints" time="0.379" file="tests\unit\routesWiring.test.js">
+    </testcase>
+  </testsuite>
+  <testsuite name="role service aggregators" errors="0" failures="0" skipped="0" timestamp="2026-04-20T11:34:41" time="1.644" tests="5">
+    <testcase classname="role service aggregators adminService merges admin api and dashboard services" name="role service aggregators adminService merges admin api and dashboard services" time="0.014" file="tests\unit\roleServiceAggregators.test.js">
+    </testcase>
+    <testcase classname="role service aggregators managerService exposes dashboard, users and analytics features" name="role service aggregators managerService exposes dashboard, users and analytics features" time="0.882" file="tests\unit\roleServiceAggregators.test.js">
+    </testcase>
+    <testcase classname="role service aggregators sellerService exposes dashboard and product management features" name="role service aggregators sellerService exposes dashboard and product management features" time="0.244" file="tests\unit\roleServiceAggregators.test.js">
+    </testcase>
+    <testcase classname="role service aggregators customerService exposes catalog, cart and booking features" name="role service aggregators customerService exposes catalog, cart and booking features" time="0.147" file="tests\unit\roleServiceAggregators.test.js">
+    </testcase>
+    <testcase classname="role service aggregators serviceProviderService exposes dashboard and bookings" name="role service aggregators serviceProviderService exposes dashboard and bookings" time="0.079" file="tests\unit\roleServiceAggregators.test.js">
     </testcase>
   </testsuite>
 </testsuites>

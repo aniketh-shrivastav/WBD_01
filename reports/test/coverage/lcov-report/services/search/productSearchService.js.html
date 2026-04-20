@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for controllers/bookingController.js</title>
+    <title>Code coverage report for services/search/productSearchService.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">controllers</a> bookingController.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">services/search</a> productSearchService.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">61.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>49/49</span>
+                <span class='fraction'>55/90</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.4% </span>
+                <span class="strong">46.37% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>61/69</span>
+                <span class='fraction'>32/69</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">62.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>10/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">62.96% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/49</span>
+                <span class='fraction'>51/81</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -261,185 +261,117 @@
 <a name='L196'></a><a href='#L196'>196</a>
 <a name='L197'></a><a href='#L197'>197</a>
 <a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -451,211 +383,288 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const ServiceBooking = require("../models/serviceBooking");
-const User = require("../models/User");
-const { createNotification } = require("./notificationController");
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const Product = require("../../models/Product");
 &nbsp;
-exports.createBooking = async (req, res) =&gt; {
-  try {
-    const {
-      providerId,
-      selectedServices,
-      date,
-      phone,
-      name,
-      carYear,
-      address,
-      description,
-      district,
-      paintColor,
-      // Pickup / Drop-off
-      needsPickup,
-      needsDropoff,
-      // Service category
-      serviceCategory,
-      // Extended vehicle details
-      registrationNumber,
-      vehicleMake,
-      vehicleModel,
-      vehicleVariant,
-      fuelType,
-      transmission,
-      yearOfManufacture,
-      vin,
-      currentMileage,
-      insuranceProvider,
-      insuranceValidTill,
-      rcBook,
-      insuranceCopy,
-      vehiclePhotos,
-    } = req.body;
+const SOLR_SPECIAL_CHAR_PATTERN = /([+\-!(){}\[\]^"~*?:\\/]|&amp;&amp;|\|\|)/g;
 &nbsp;
-    const customerId = req.user.id;
+function normalizeLimit(rawLimit) {
+  const parsed = Number(rawLimit);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!Number.isFinite(parsed)) <span class="cstat-no" title="statement not covered" >return 30;</span>
+  return Math.max(1, Math.min(100, Math.trunc(parsed)));
+}
 &nbsp;
-    // Fetch provider to access service cost
-    const provider = await User.findById(providerId);
-    if (!provider || !provider.servicesOffered) {
-      return res.status(400).json({ error: "Invalid service provider" });
-    }
+function normalizeOffset(rawOffset) {
+  const parsed = Number(rawOffset);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!Number.isFinite(parsed)) <span class="cstat-no" title="statement not covered" >return 0;</span>
+  return Math.max(0, Math.trunc(parsed));
+}
 &nbsp;
-    const isCarPaintingSelected = Array.isArray(selectedServices)
-      ? selectedServices.some((s) =&gt; {
-          const name = String(s || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>.toLowerCase();
-          return (
-            name.includes("car") &amp;&amp;
-            (name.includes("paint") || <span class="branch-2 cbranch-no" title="branch not covered" >name.includes("painting"))</span>
-          );
-        })
-      : <span class="branch-1 cbranch-no" title="branch not covered" >false;</span>
+function escapeSolrTerm(value) {
+  return String(value).replace(SOLR_SPECIAL_CHAR_PATTERN, "\\$1");
+}
 &nbsp;
-    // Validate paintColor when needed
-    let normalizedPaintColor = undefined;
-    if (isCarPaintingSelected) {
-      const providerColors = Array.isArray(provider.paintColors)
-        ? provider.paintColors
-            .map((c) =&gt;
-              String(c || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>
-                .trim()
-                .toLowerCase(),
-            )
-            .filter((c) =&gt; /^#[0-9a-f]{6}$/.test(c))
-        : <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
-&nbsp;
-      const requested = String(paintColor || "")
-        .trim()
-        .toLowerCase();
-&nbsp;
-      if (providerColors.length === 0) {
-        return res.status(400).json({
-          error:
-            "This provider hasn't configured paint colors for Car Painting. Please choose a different provider.",
-        });
-      }
-&nbsp;
-      if (!requested) {
-        return res.status(400).json({
-          error: "Please select a paint color for Car Paint/Painting.",
-        });
-      }
-      if (!providerColors.includes(requested)) {
-        return res.status(400).json({
-          error: "Selected paint color is not offered by this provider.",
-        });
-      }
-      normalizedPaintColor = requested;
-    }
-&nbsp;
-    // Calculate totalCost from selected services
-    let totalCost = 0;
-    selectedServices.forEach((serviceName) =&gt; {
-      const matchedService = provider.servicesOffered.find(
-        (s) =&gt; s.name === serviceName,
-      );
-      <span class="missing-if-branch" title="else path not taken" >E</span>if (matchedService) {
-        totalCost += matchedService.cost;
-      }
-    });
-&nbsp;
-    // Pickup / Drop-off costs
-    let pickupCost = 0;
-    let dropoffCost = 0;
-    if (needsPickup) {
-      pickupCost = Number(provider.pickupRate) || <span class="branch-1 cbranch-no" title="branch not covered" >0;</span>
-      totalCost += pickupCost;
-    }
-    if (needsDropoff) {
-      dropoffCost = Number(provider.dropoffRate) || <span class="branch-1 cbranch-no" title="branch not covered" >0;</span>
-      totalCost += dropoffCost;
-    }
-&nbsp;
-    const booking = new ServiceBooking({
-      customerId,
-      providerId,
-      selectedServices,
-      date,
-      phone,
-      name,
-      carYear,
-      address,
-      description,
-      district,
-      paintColor: normalizedPaintColor,
-      totalCost,
-      needsPickup: !!needsPickup,
-      needsDropoff: !!needsDropoff,
-      pickupCost,
-      dropoffCost,
-      serviceCategory: serviceCategory || "",
-      // Extended vehicle details
-      registrationNumber: registrationNumber || "",
-      vehicleMake: vehicleMake || "",
-      vehicleModel: vehicleModel || "",
-      vehicleVariant: vehicleVariant || "",
-      fuelType: fuelType || "",
-      transmission: transmission || "",
-      yearOfManufacture: yearOfManufacture ? Number(yearOfManufacture) : null,
-      vin: vin || "",
-      currentMileage: currentMileage ? Number(currentMileage) : null,
-      insuranceProvider: insuranceProvider || "",
-      insuranceValidTill: insuranceValidTill || null,
-      rcBook: rcBook || "",
-      insuranceCopy: insuranceCopy || "",
-      vehiclePhotos: Array.isArray(vehiclePhotos)
-        ? vehiclePhotos
-        : vehiclePhotos
-          ? [vehiclePhotos]
-          : [],
-      statusHistory: [
-        {
-          from: null,
-          to: "Open",
-          changedAt: new Date(),
-          changedBy: { id: customerId, role: "customer" },
-        },
-      ],
-      costHistory: [
-        {
-          from: null,
-          to: totalCost,
-          changedAt: new Date(),
-          changedBy: { id: customerId, role: "customer" },
-        },
-      ],
-    });
-&nbsp;
-    await booking.save();
-&nbsp;
-    // Send notification for new service booking
-    try {
-      const io = req.app.get("io");
-      await createNotification(
-        {
-          customerId,
-          type: "new_service",
-          title: "Service Booked",
-          message: `Your service booking for ${selectedServices.join(", ")} with ${provider.workshopName || provider.name} has been created. Total: ₹${totalCost}.`,
-          referenceId: booking._id,
-          referenceModel: "ServiceBooking",
-        },
-        io,
-      );
-    } catch (e) {
-      console.error("Failed to create service booking notification:", e);
-    }
-&nbsp;
-    res.status(200).json({ message: "Booking created successfully", booking });
-  } catch (error) {
-    console.error("Booking creation failed:", error);
-    res.status(500).json({ error: "Failed to create booking" });
+function buildSolrQuery(rawQuery) {
+  const trimmed = String(rawQuery || "").trim();
+  if (!trimmed) {
+    return "*:*";
   }
+&nbsp;
+  const terms = trimmed
+    .split(/\s+/)
+    .map((term) =&gt; escapeSolrTerm(term))
+    .filter(Boolean);
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!terms.length) {
+<span class="cstat-no" title="statement not covered" >    return "*:*";</span>
+  }
+&nbsp;
+  const exactClause = terms.join(" ");
+  const fuzzyClause = terms
+    .map((term) =&gt; {
+      if (term.length &lt;= 2) return term;
+      if (term.length &lt;= 5) return `${term}~1`;
+      return `${term}~2`;
+    })
+    .join(" ");
+  const prefixClause = terms.map((term) =&gt; `${term}*`).join(" ");
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (fuzzyClause === exactClause &amp;&amp; prefixClause === exactClause) {
+<span class="cstat-no" title="statement not covered" >    return exactClause;</span>
+  }
+&nbsp;
+  const clauses = [exactClause];
+  if (fuzzyClause !== exactClause) {
+    clauses.push(fuzzyClause);
+  }
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (prefixClause !== exactClause &amp;&amp; prefixClause !== fuzzyClause) {
+    clauses.push(prefixClause);
+  }
+&nbsp;
+  return clauses.map((clause) =&gt; `(${clause})`).join(" OR ");
+}
+&nbsp;
+function <span class="fstat-no" title="function not covered" >buildMongoFilter(</span>{ q, category }) {
+  const filter = <span class="cstat-no" title="statement not covered" >{ status: "approved" };</span>
+<span class="cstat-no" title="statement not covered" >  if (category) {</span>
+<span class="cstat-no" title="statement not covered" >    filter.category = category;</span>
+  }
+<span class="cstat-no" title="statement not covered" >  if (q) {</span>
+<span class="cstat-no" title="statement not covered" >    filter.$text = { $search: q };</span>
+  }
+<span class="cstat-no" title="statement not covered" >  return filter;</span>
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >mongoSearch(</span>{ q, category, limit, offset }) {
+  const filter = <span class="cstat-no" title="statement not covered" >buildMongoFilter({ q, category });</span>
+&nbsp;
+  const query = <span class="cstat-no" title="statement not covered" >Product.find(filter)</span>
+    .populate("seller", "verificationStatus")
+    .skip(offset)
+    .limit(limit)
+    .lean();
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  if (q) {</span>
+<span class="cstat-no" title="statement not covered" >    query.select({ score: { $meta: "textScore" } });</span>
+<span class="cstat-no" title="statement not covered" >    query.sort({ score: { $meta: "textScore" }, createdAt: -1 });</span>
+  } else {
+<span class="cstat-no" title="statement not covered" >    query.sort({ createdAt: -1 });</span>
+  }
+&nbsp;
+  const products = <span class="cstat-no" title="statement not covered" >await query;</span>
+<span class="cstat-no" title="statement not covered" >  products.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; {</span>
+    const aVerified = <span class="cstat-no" title="statement not covered" >a.seller?.verificationStatus === "verified" ? 0 : 1;</span>
+    const bVerified = <span class="cstat-no" title="statement not covered" >b.seller?.verificationStatus === "verified" ? 0 : 1;</span>
+<span class="cstat-no" title="statement not covered" >    if (aVerified !== bVerified) <span class="cstat-no" title="statement not covered" >return aVerified - bVerified;</span></span>
+<span class="cstat-no" title="statement not covered" >    return 0;</span>
+  });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return {</span>
+    engine: "mongo",
+    products,
+    total: products.length,
+  };
+}
+&nbsp;
+async function solrSearch({ q, category, limit, offset }) {
+  const baseUrl = process.env.SOLR_BASE_URL || <span class="branch-1 cbranch-no" title="branch not covered" >"http://localhost:8983";</span>
+  const collection = process.env.SOLR_COLLECTION || <span class="branch-1 cbranch-no" title="branch not covered" >"products";</span>
+  const solrQuery = buildSolrQuery(q);
+&nbsp;
+  const params = new URLSearchParams({
+    wt: "json",
+    defType: "edismax",
+    q: solrQuery,
+    qf: "name^6 brand^4 sku^5 category^3 subcategory^2 compatibility^2 description^1",
+    mm: "1&lt;75%",
+    rows: String(limit),
+    start: String(offset),
+    sort: q ? "score desc, createdAt desc" : <span class="branch-1 cbranch-no" title="branch not covered" >"createdAt desc",</span>
+  });
+&nbsp;
+  params.append("fq", "status:approved");
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (category) {
+<span class="cstat-no" title="statement not covered" >    params.append(</span>
+      "fq",
+      `category:\"${String(category).replace(/\"/g, '\\\"')}\"`,
+    );
+  }
+&nbsp;
+  const url = `${baseUrl.replace(/\/$/, "")}/solr/${collection}/select?${params.toString()}`;
+&nbsp;
+  const res = await fetch(url, { method: "GET" });
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!res.ok) {
+<span class="cstat-no" title="statement not covered" >    throw new Error(`Solr query failed with status ${res.status}`);</span>
+  }
+&nbsp;
+  const data = await res.json();
+  const docs = data?.response?.docs || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
+&nbsp;
+  const products = docs.map(<span class="fstat-no" title="function not covered" >(d</span>oc) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+    _id: doc.id,
+    name: doc.name,
+    price: doc.price,
+    description: doc.description,
+    category: doc.category,
+    subcategory: doc.subcategory,
+    brand: doc.brand,
+    quantity: doc.quantity,
+    sku: doc.sku,
+    compatibility: doc.compatibility,
+    image: doc.image,
+    images: (doc.images || []).map(<span class="fstat-no" title="function not covered" >(u</span>rlItem) =&gt; (<span class="cstat-no" title="statement not covered" >{ url: urlItem })</span>),
+    imagePublicId: doc.imagePublicId,
+    status: doc.status,
+    createdAt: doc.createdAt,
+    seller: {
+      verificationStatus: doc.sellerVerificationStatus || "unverified",
+    },
+    score: doc.score,
+  }));
+&nbsp;
+  products.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; {
+    const aVerified = <span class="cstat-no" title="statement not covered" >a.seller?.verificationStatus === "verified" ? 0 : 1;</span>
+    const bVerified = <span class="cstat-no" title="statement not covered" >b.seller?.verificationStatus === "verified" ? 0 : 1;</span>
+<span class="cstat-no" title="statement not covered" >    if (aVerified !== bVerified) <span class="cstat-no" title="statement not covered" >return aVerified - bVerified;</span></span>
+<span class="cstat-no" title="statement not covered" >    return 0;</span>
+  });
+&nbsp;
+  return {
+    engine: "solr",
+    products,
+    total: Number(data?.response?.numFound || products.length),
+  };
+}
+&nbsp;
+async function searchProducts(rawOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+  const q = String(rawOptions.q || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>.trim();
+  const category = String(rawOptions.category || "").trim();
+  const limit = normalizeLimit(rawOptions.limit);
+  const offset = normalizeOffset(rawOptions.offset);
+&nbsp;
+  const preferredEngine = (process.env.SEARCH_ENGINE || <span class="branch-1 cbranch-no" title="branch not covered" >"mongo")</span>.toLowerCase();
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (preferredEngine === "solr") {
+    try {
+      return await solrSearch({ q, category, limit, offset });
+    } catch (err) {
+<span class="cstat-no" title="statement not covered" >      console.warn(</span>
+        "Solr search unavailable, falling back to Mongo:",
+        err.message,
+      );
+    }
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return mongoSearch({ q, category, limit, offset });</span>
+}
+&nbsp;
+module.exports = {
+  searchProducts,
+  __testables: {
+    buildSolrQuery,
+    escapeSolrTerm,
+  },
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -666,14 +675,14 @@ exports.createBooking = async (req, res) =&gt; {
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2026-04-20T11:34:43.608Z
             </div>
-        <script src="../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../sorter.js"></script>
-        <script src="../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
