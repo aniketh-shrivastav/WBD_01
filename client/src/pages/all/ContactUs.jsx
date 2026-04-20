@@ -165,7 +165,7 @@ export default function ContactUs() {
               <div className="pp-contact-method">
                 <div className="pp-contact-method-icon">📧</div>
                 <div className="pp-contact-method-text">
-                  <h4>Email Us</h4>
+                  <h4>Email </h4>
                   <p>autocustomizer25@gmail.com</p>
                 </div>
               </div>
