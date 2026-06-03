@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../../Css/publicPages.css";
+import cloudinaryAssets from "../../config/cloudinaryAssets";
 
 export default function AllIndex() {
   const navigate = useNavigate();
@@ -137,7 +138,7 @@ export default function AllIndex() {
             </div>
           </div>
           <div className="pp-hero-image">
-            <img src="/images2/car-customization.png" alt="Car Customization" />
+            <img src={cloudinaryAssets.landingHero} alt="Car Customization" />
           </div>
         </div>
       </section>
