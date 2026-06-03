@@ -1,167 +1,285 @@
 # AutoCustomizer
 
-AutoCustomizer is a full-stack operations platform for managing car-related bookings, service workflows, order processing, payments, and communication across multiple user roles. It is designed for real-world operational use where dispatchers, service providers, customers, sellers, and administrators all need a shared system of record with clear access boundaries and traceable status changes.
+AutoCustomizer is a full-stack automotive operations platform for car customization services and related product sales. It combines customer booking flows, seller order management, service-provider workflows, payments, chat, notifications, and admin oversight in one system.
 
-## Recruiter Summary
+The project is built as a production-style multi-role platform rather than a simple catalog app. It focuses on lifecycle tracking, role-based access, operational visibility, and audit-friendly business flows.
 
-This project demonstrates end-to-end ownership of a production-style platform, including:
+## Highlights
 
-- Booking and order lifecycle design with status history, approvals, and role-based transitions
-- Live integrations for customer, provider, seller, and admin workflows
-- Financial workflows for payments, settlement tracking, and audit-friendly records
-- Multi-tenant authentication and authorization with role-aware access control
-- Performance-focused backend work, including indexing, caching, logging, and operational reporting
-- API design for web dashboards, mobile-facing flows, and internal admin tools
+- Multi-role platform for customers, sellers, service providers, managers, and admins
+- Service booking lifecycle with tracked status updates and pricing workflows
+- Product ordering with item-level and order-level fulfillment states
+- Role-aware dashboards and protected routes
+- Real-time communication and notifications with Socket.IO
+- API documentation with Swagger
+- Admin and manager operational tooling
+- Search/performance utilities for Solr, caching, and database analysis
 
 ## User Roles
 
-The platform is built around distinct roles, each with a specific operational responsibility:
-
 ### Customer
 
-- Creates service bookings and product orders
-- Shares vehicle and contact details needed for fulfillment
-- Tracks request status, payment state, and notifications
-- Communicates with providers through chat and workflow updates
-
-### Service Provider
-
-- Reviews incoming bookings and updates service status
-- Confirms pricing, parts, pickup/drop-off needs, and completion details
-- Manages linked products and service progress
-- Works from the operational queue for assigned customer requests
+- Browse parts and services
+- Create service bookings
+- Place product orders
+- Track orders, bookings, alerts, and payments
+- Chat with providers and view workflow updates
 
 ### Seller
 
-- Manages product listings and order fulfillment-related actions
-- Updates item-level order progress such as confirmation, shipping, and delivery
-- Handles order history, delivery OTP flow, and payment-related order states
-- Supports marketplace-side operations tied to service fulfillment
+- Manage products and inventory
+- Process product orders
+- Update shipping and delivery states
+- View seller dashboards, reviews, and order history
+
+### Service Provider
+
+- Review and manage service bookings
+- Update booking progress and pricing
+- Manage provider profile and reviews
+- Work from service-side operational dashboards
 
 ### Manager
 
-- Maintains service categories and operational oversight
-- Monitors active bookings, provider activity, and business flow
-- Reviews pricing changes, approvals, and status transitions
-- Supports governance across customers, providers, and sellers
+- Oversee products, orders, payments, and support flows
+- Manage operational categories and platform activity
+- Review dashboards and user-facing business metrics
 
 ### Admin
 
-- Manages platform-wide users, permissions, and oversight workflows
-- Accesses dashboards, reports, and operational summaries
-- Reviews system-level activity across bookings, orders, and payments
-- Handles governance, support, and administrative controls
+- Manage platform-wide users and data visibility
+- Access admin dashboard and governance tooling
+- Monitor platform activity across roles
 
-## What The Platform Does
+## Core Features
 
-The system supports the operational flow of a fleet or service business from request to completion:
+### Booking and Service Workflows
 
-1. A customer creates a booking or order.
-2. The request is assigned, confirmed, and moved through a tracked lifecycle.
-3. Providers, sellers, and managers update the request as work progresses.
-4. Payments and financial status are recorded and reconciled.
-5. Notifications, chat, and audit trails keep stakeholders aligned.
+- Service booking creation and lifecycle management
+- Provider-side booking queue and status transitions
+- Pricing updates and approval-related workflow support
+- Vehicle details, pickup/drop-off, and related service metadata
 
-The backend is structured to handle real operational edge cases such as partial fulfillment, status rollback, custom address handling, payment states, and historical tracking of changes.
+### Orders and Commerce
 
-## Key Product Capabilities
+- Product catalog and product details pages
+- Cart and checkout flows
+- Seller order management
+- Order status tracking and customer order history
 
-### Booking and Lifecycle Management
+### Authentication and Access Control
 
-- Service booking flows with customer, provider, and manager roles
-- Order tracking with item-level and order-level status history
-- Price approval workflows and change history for service bookings
-- Support for operational fields such as pickup, drop-off, vehicle metadata, and linked parts
+- Role-based signup/login flows
+- JWT/session compatibility middleware
+- Protected routes for each platform role
 
-### Financial and Settlement Workflows
+### Communication
 
-- Payment capture and payment status management
-- Order and booking records structured for reconciliation and reporting
-- Audit-friendly timestamps and history logs for status and cost changes
-- Export and reporting utilities for operational review
+- Customer-provider messaging
+- Real-time alerts and notifications using Socket.IO rooms
 
-### Access Control and Multi-Role Operations
+### Platform Operations
 
-- Authentication and authorization across admin, manager, customer, seller, and service-provider experiences
-- Session and JWT compatibility for smoother migration and client integration
-- Role-aware route protection and scoped data access patterns
+- Admin and manager dashboards
+- Product and service category management
+- Swagger/OpenAPI docs
+- Reporting and performance scripts
 
-### Communication and Operations
+## Tech Stack
 
-- Real-time support using Socket.IO rooms for customer and provider notifications
-- Admin and dashboard routes for operational visibility
-- Swagger API documentation for discoverability and integration support
-
-### Performance and Reliability
-
-- Database indexes on core order and booking queries
-- Request logging, security headers, rate limiting, and NoSQL injection protection
-- Operational scripts for database performance and cache analysis
-
-## Architecture Snapshot
-
-- Backend: Node.js, Express, MongoDB, Socket.IO
-- Frontend: React application served from the backend in production
-- API styles: REST endpoints plus GraphQL for admin workflows
-- Documentation: Swagger/OpenAPI
-- Infrastructure support: Docker and Docker Compose for local development
-
-## Core Modules
-
-- Authentication: user signup, login, session compatibility, role checks
-- Orders: product order lifecycle, delivery status, payment status, and history
-- Bookings: service booking lifecycle, pricing, linked products, and status transitions
-- Payments: payment workflows and settlement-facing records
-- Messaging: chat and notification delivery
-- Admin tooling: dashboard, reports, and management endpoints
-
-## Technology Stack
+### Backend
 
 - Node.js
 - Express
-- MongoDB / Mongoose
-- React
+- MongoDB with Mongoose
 - Socket.IO
 - GraphQL
 - Swagger / OpenAPI
-- Redis
-- Stripe
-- Firebase Admin
+
+### Frontend
+
+- React
+- React Router
+- Redux Toolkit
+- Chart.js
+
+### Integrations and Infrastructure
+
 - Cloudinary
-- Docker
+- Firebase Admin
+- Stripe
+- Redis
+- Docker / Docker Compose
+- Solr
 
-## Why This Project Matters
+## Project Structure
 
-This is not just a CRUD application. It models the operational complexity of a real service business:
+```text
+.
+|-- client/                 # React frontend
+|-- config/                 # App, Swagger, Cloudinary, Firebase config
+|-- controllers/            # Express controllers
+|-- graphql/                # GraphQL schema/resolvers
+|-- middleware/             # Auth, security, logging, upload, error middleware
+|-- models/                 # Mongoose models
+|-- public/                 # Static assets
+|-- routes/                 # Express route modules
+|-- scripts/                # Reindexing, performance, asset upload scripts
+|-- services/               # Business logic by domain/role
+|-- tests/                  # Unit tests
+|-- views/                  # Legacy EJS views still supported by backend
+|-- server.js               # Main server entry point
+```
 
-- Multiple user roles with different permissions and responsibilities
-- Mutable lifecycle states that need traceability
-- Financial workflows that require consistency and auditability
-- Live operational communication between users
-- Backend structure that can support scale, integrations, and reporting
+## Getting Started
 
-## Local Development
+### Prerequisites
 
-Install dependencies and start the app:
+- Node.js 18+
+- npm
+- MongoDB
+- Redis optional
+- Docker optional
+
+### 1. Install dependencies
 
 ```bash
 npm install
-npm run build:client
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root and add the values your local setup needs.
+
+Typical variables used by this project include:
+
+```env
+PORT=3000
+MONGODB_URI=your_mongodb_connection
+JWT_SECRET=your_jwt_secret
+FRONTEND_URL=http://localhost:5173
+STRIPE_SECRET_KEY=your_stripe_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+REDIS_URL=your_redis_url
+```
+
+Use your existing local `.env` as the source of truth if this repo already has one configured.
+
+### 3. Start the backend
+
+```bash
 npm start
 ```
 
-Useful scripts:
+### 4. Run the React client in development
 
-- `npm test` - run backend tests
-- `npm run docker:compose:dev` - start the local Docker development stack
-- `npm run search:solr:up` - start search infrastructure
-- `npm run perf:db` - generate database performance reporting
+In a second terminal:
 
-## Suggested Recruiter Pitch
+```bash
+npm --prefix client start
+```
 
-I worked on AutoCustomizer, a multi-role fleet and service operations platform that manages the full lifecycle from booking confirmation to completion, including payments, settlement tracking, notifications, and admin oversight. The system was built with role-based access control, audit-friendly state transitions, real-time communication, and performance-conscious data modeling to support production usage.
+### 5. Build the client for production
 
-## Notes
+```bash
+npm run build:client
+```
 
-- The project includes both legacy and modern route patterns, so the backend supports gradual migration and integration work.
-- If you want this README adapted for a specific role, such as backend engineer, full-stack engineer, or platform engineer, the same content can be rewritten to emphasize that angle.
+The backend serves the built React app from `client/build` in production mode.
+
+## Available Scripts
+
+### Root scripts
+
+```bash
+npm start
+npm test
+npm run test:watch
+npm run test:coverage
+npm run build
+npm run build:client
+npm run docker:build
+npm run docker:run
+npm run docker:compose
+npm run docker:compose:dev
+npm run search:solr:up
+npm run search:solr:down
+npm run search:solr:reindex
+npm run perf:db
+npm run perf:db:compare
+npm run perf:cache
+```
+
+### Client scripts
+
+```bash
+npm --prefix client start
+npm --prefix client build
+npm --prefix client test
+```
+
+## API Docs
+
+Swagger UI is available at:
+
+```text
+/api-docs
+```
+
+Raw OpenAPI JSON is available at:
+
+```text
+/api-docs.json
+```
+
+## Testing
+
+Run backend tests:
+
+```bash
+npm test
+```
+
+Run frontend tests:
+
+```bash
+npm --prefix client test
+```
+
+Generate backend coverage:
+
+```bash
+npm run test:coverage
+```
+
+## Architecture Notes
+
+- Express handles API routes, auth/session compatibility, static asset serving, and production React hosting.
+- React powers the main user-facing and dashboard experiences.
+- Business logic is separated into controllers, services, and models.
+- The backend still supports some legacy EJS routes while the React app covers the main SPA flows.
+- Socket.IO is used for chat and alert delivery.
+
+## Why This Project Stands Out
+
+AutoCustomizer models a more realistic business system than a standard ecommerce demo:
+
+- Multiple user roles with different responsibilities
+- Service and commerce flows in the same platform
+- Operational state transitions instead of one-step CRUD actions
+- Payment, reporting, and audit-oriented data flows
+- A mix of product, service, communication, and admin tooling
+
+## Roadmap Ideas
+
+- Add `.env.example`
+- Improve onboarding/demo seed data
+- Expand integration and end-to-end tests
+- Normalize remaining legacy pages into the React app
+- Add deployment docs for Railway/Docker/cloud hosting
+
+## License
+
+This project currently has no published license. Add one before open-source distribution if needed.
